@@ -45,7 +45,8 @@ Basic JWT architecture           ✅
 EF Core relationship concepts    🟡 continue in project
 MD architecture                  ✅
 Project skeleton                 ✅ Session 1 complete
-Product system                   next
+Product model                    ✅ Session 3 complete
+Product endpoint                 next
 ```
 
 ## Read order
@@ -57,7 +58,7 @@ Product system                   next
 6. `TASKS.md`
 7. `docs/DECISIONS.md`
 
-## Run the backend (Session 2)
+## Run the backend (Session 3)
 
 Prerequisite: .NET SDK 10.0.200 (or a newer patch in the same feature band).
 
@@ -65,11 +66,11 @@ Prerequisite: .NET SDK 10.0.200 (or a newer patch in the same feature band).
 dotnet tool restore
 dotnet restore Pikwise.sln
 dotnet build Pikwise.sln --configuration Release --no-restore
-dotnet test Pikwise.sln --configuration Release --no-build
+dotnet test Pikwise.sln --configuration Release --no-build --filter 'Category!=SqlServer'
 dotnet run --project src/Pikwise.Api --no-launch-profile -- --environment Development --urls http://localhost:5080
 ```
 
 Open http://localhost:5080/health: expected HTTP 200, body `Healthy`.
 Before running, configure ConnectionStrings:DefaultConnection using the User Secrets command in [docs/DATABASE.md](docs/DATABASE.md). A running database is not required for /health.
 The unit test project is intentionally empty until business rules are implemented;
-five integration tests verify startup, routing, health, SQL Server provider registration, scoped lifetime and missing configuration. They do not open a database connection.
+five host/configuration tests run without SQL Server. The sixth test verifies the migration, relationships, Include/ThenInclude and constraints on a dedicated SQL Server database; see docs/DATABASE.md for the command.

@@ -387,3 +387,72 @@ dotnet ef database update --project src/Pikwise.Infrastructure --startup-project
 ```
 
 The application does not call EnsureCreated or Migrate on startup.
+
+## Session 3 — implemented schema and verification
+
+Domain entities are mapped by Infrastructure/Persistence/Configurations.
+The reviewed migration is `20261001173029_InitialCreate`; its generated SQL is
+[InitialCreate.sql](InitialCreate.sql). The four business tables are Brands,
+Categories, Products and LaptopSpecifications. EF also creates migration history.
+The migration was applied to local SQL Server `localhost`, database `PikwiseDb`.
+Windows authentication connection configuration was stored in User Secrets.
+
+Foreign key placement:
+- Product.BrandId: each product belongs to one brand, while a brand has many products.
+- Product.CategoryId: each product belongs to one category, while a category has many products.
+- LaptopSpecification.ProductId: specifications depend on products. Its unique index
+  limits each product to at most one specification. The FK prevents orphan specifications.
+
+Brand.Name and Category.Name have unique indexes. Brand/category deletion uses
+NO ACTION and is rejected while products reference them. Deleting a product
+cascades to its specification. Required relationships do not force every product
+to have a specification; the future product creation use case must enforce that rule.
+Navigation properties support object traversal and require explicit loading.
+
+Price uses decimal(18,2); ScreenSize uses inches, decimal(5,2); Weight uses kg,
+decimal(6,3). CreatedAt/UpdatedAt are datetimeoffset, with UpdatedAt nullable.
+String lengths and reasons are recorded in ADR-011. Name uniqueness uses the
+server/database collation. Application owns future value validation and timestamp
+assignment; the database mapping does not invent those business rules.
+
+### Relationship queries verified on SQL Server
+
+```csharp
+var product = await context.Products.AsNoTracking()
+    .Include(p => p.Brand)
+    .Include(p => p.Category)
+    .Include(p => p.LaptopSpecification)
+    .SingleAsync(p => p.Id == productId);
+
+var brand = await context.Brands.AsNoTracking()
+    .Include(b => b.Products)
+    .ThenInclude(p => p.LaptopSpecification)
+    .SingleAsync(b => b.Id == brandId);
+```
+
+Include loads one relationship level. ThenInclude continues from the previously
+included relationship, here Brand -> Products -> LaptopSpecification.
+These queries are exercised in SqlServerRelationshipTests; no product endpoint
+or repository is introduced before Session 4.
+
+### Test commands
+
+Run the five host/configuration tests without SQL Server:
+
+```powershell
+dotnet test Pikwise.sln --configuration Release --filter 'Category!=SqlServer'
+```
+
+Run all six tests against a dedicated local database:
+
+```powershell
+$env:PIKWISE_TEST_CONNECTION = 'Server=localhost;Database=PikwiseSession3Tests;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;'
+dotnet test Pikwise.sln --configuration Release
+```
+
+The SQL test requires the exact database name PikwiseSession3Tests, applies
+migrations and verifies async writes/queries, unique name and specification
+constraints, all three FKs and deletion behavior. Test data is rolled back; the
+empty migrated test database remains for subsequent runs. The migration and
+model snapshot have no pending differences. Six tests passed; Release build
+completed with zero errors and warnings. UserProfile/Favorite belong to Session 6.

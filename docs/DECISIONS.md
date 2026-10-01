@@ -122,3 +122,21 @@ User Secrets in Development or environment/deployment secrets. Fail early for a
 missing connection string without logging its value. Keep sensitive-data logging
 disabled. No design-time factory is needed: tooling uses the same host registration.
 Health remains liveness-only. Entities and initial migration belong to Session 3.
+
+## ADR-011 — Session 3 relational mapping
+**Status:** Accepted
+
+Brand, Category, Product and LaptopSpecification are EF-independent Domain entities.
+Use separate IEntityTypeConfiguration classes in Infrastructure. Keep the documented
+integer Id on LaptopSpecification and enforce a unique, required ProductId FK.
+BrandId and CategoryId are required Product FKs with NO ACTION on deletion; deleting
+a referenced lookup must not remove products. Product deletion cascades to its
+owned specification. A FK cannot require every product to have a specification;
+that completeness rule belongs to the future Application product creation use case.
+
+Use required Unicode names with limits of 100 characters for lookups and 200 for
+products, CPU and GPU; resolution is 50 and OS is 100. Use decimal(18,2) for price,
+decimal(5,2) for screen inches, decimal(6,3) for weight in kg. Timestamps use
+DateTimeOffset; UpdatedAt is nullable until the first update. The future use case
+owns timestamp assignment. Name uniqueness follows the configured SQL Server
+collation. No speculative filtering indexes, seed catalog or Favorite model is added.

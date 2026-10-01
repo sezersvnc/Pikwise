@@ -56,29 +56,29 @@ Do not build Recommendation Engine or AI yet.
 # Session 3 — First Real Data Model
 
 Create:
-- [ ] Brand
-- [ ] Category
-- [ ] Product
-- [ ] LaptopSpecification
+- [x] Brand
+- [x] Category
+- [x] Product
+- [x] LaptopSpecification
 
 Relationships:
-- [ ] Brand 1 -> many Products
-- [ ] Category 1 -> many Products
-- [ ] Product 1 -> 1 LaptopSpecification
+- [x] Brand 1 -> many Products
+- [x] Category 1 -> many Products
+- [x] Product 1 -> 1 LaptopSpecification
 
 Practice:
-- [ ] Foreign keys
-- [ ] Navigation properties
-- [ ] Fluent API
-- [ ] Unique constraints
-- [ ] Initial migration
-- [ ] Inspect generated schema
-- [ ] `Include`
-- [ ] `ThenInclude` when needed
+- [x] Foreign keys
+- [x] Navigation properties
+- [x] Fluent API
+- [x] Unique constraints
+- [x] Initial migration
+- [x] Inspect generated schema
+- [x] `Include`
+- [x] `ThenInclude` when needed
 
 Exit check:
-- [ ] Explain why each FK is on that entity
-- [ ] Explain One-to-One vs One-to-Many without notes
+- [x] Explain why each FK is on that entity
+- [x] Explain One-to-One vs One-to-Many without notes
 
 ---
 

@@ -19,8 +19,8 @@ public class PersistenceConfigurationTests
         Assert.Same(context, firstScope.ServiceProvider.GetRequiredService<ApplicationDbContext>());
         Assert.NotSame(context, secondScope.ServiceProvider.GetRequiredService<ApplicationDbContext>());
         Assert.Equal("Microsoft.EntityFrameworkCore.SqlServer", context.Database.ProviderName);
-        Assert.Empty(context.Model.GetEntityTypes());
-        Assert.Empty(context.Database.GetMigrations());
+        Assert.Equal(4, context.Model.GetEntityTypes().Count());
+        Assert.Single(context.Database.GetMigrations());
     }
 
     [Theory]

@@ -153,5 +153,12 @@ The unit test project is prepared for future business rules and contains no test
 Infrastructure owns ApplicationDbContext and AddInfrastructure(configuration).
 API calls the registration method from Program.cs; no database queries live in API.
 The context is scoped. Connection configuration is required at startup and comes
-from User Secrets or environment variables. No entity model or migration exists yet.
+from User Secrets or environment variables. Session 3 adds the four core entities and InitialCreate migration.
 See DATABASE.md for setup and tooling commands.
+
+## Session 3 implementation
+
+Domain holds Brand, Category, Product and LaptopSpecification without EF dependencies.
+Infrastructure holds Fluent API mappings and migrations. SQL relationship queries
+are verified in integration tests. API and Application gain no product use cases yet.
+See DATABASE.md and ADR-011 for schema choices and relationship explanations.
