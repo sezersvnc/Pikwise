@@ -1,5 +1,4 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Pikwise.IntegrationTests;
 
@@ -8,7 +7,7 @@ public class HealthEndpointTests
     [Fact]
     public async Task Health_returns_ok_when_application_starts()
     {
-        await using var factory = new WebApplicationFactory<Program>();
+        await using var factory = new PikwiseApiFactory();
         using var client = factory.CreateClient();
 
         using var response = await client.GetAsync("/health");

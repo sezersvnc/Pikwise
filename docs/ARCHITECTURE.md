@@ -140,10 +140,18 @@ The solution targets `net10.0` using the installed .NET SDK 10.0.200
 
 Project references follow the dependency direction above. The Api reference to
 Infrastructure is reserved for composition/DI. Domain has no project or package
-references. Application and Infrastructure have no implementation yet.
+references. Application has no implementation yet. Infrastructure now contains the Session 2 persistence setup.
 
 `GET /health` uses ASP.NET Core health checks registered through DI in the API
 composition root. This is a liveness endpoint with no business logic, so it needs
 no Application service or repository. No database readiness check is registered.
 Integration tests exercise the actual HTTP pipeline using WebApplicationFactory.
 The unit test project is prepared for future business rules and contains no tests yet.
+
+## Session 2 implementation
+
+Infrastructure owns ApplicationDbContext and AddInfrastructure(configuration).
+API calls the registration method from Program.cs; no database queries live in API.
+The context is scoped. Connection configuration is required at startup and comes
+from User Secrets or environment variables. No entity model or migration exists yet.
+See DATABASE.md for setup and tooling commands.

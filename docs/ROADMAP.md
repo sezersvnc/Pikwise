@@ -328,7 +328,7 @@ Browser extension/mobile remain late-stage.
 | 7 | Value-for-Money + tests | Explainable scoring + unit tests |
 | 8 | LLM integration | Natural language -> JSON -> engine -> explanation |
 
-Current position: Week 3 / Stage 5 completed. Work stops after Session 1; SQL Server + EF Core (Session 2) has not started.
+Current position: Week 3 / Stage 5 completed. Session 2 SQL Server + EF Core configuration and tooling are complete. Real database connectivity is not yet verified. Session 3 entities and initial migration have not started.
 
 ---
 

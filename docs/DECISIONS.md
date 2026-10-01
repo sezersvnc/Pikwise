@@ -110,3 +110,15 @@ Pin the SDK feature band with latestPatch roll-forward for reproducible builds.
 Use xUnit for the two test projects and WebApplicationFactory for API integration tests.
 Use built-in ASP.NET Core health checks at /health to verify startup, DI and HTTP
 routing without introducing business services or persistence ahead of their sessions.
+
+## ADR-010 — Session 2 persistence composition and configuration
+**Status:** Accepted
+
+Keep ApplicationDbContext and SQL Server registration in Infrastructure. API calls
+AddInfrastructure and serves as the EF tooling startup project. Use the installed
+EF tool version 10.0.11 for both packages and a repository-local tool manifest.
+Use scoped DbContext lifetime. Require external connection configuration through
+User Secrets in Development or environment/deployment secrets. Fail early for a
+missing connection string without logging its value. Keep sensitive-data logging
+disabled. No design-time factory is needed: tooling uses the same host registration.
+Health remains liveness-only. Entities and initial migration belong to Session 3.

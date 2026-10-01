@@ -332,3 +332,58 @@ This model intentionally covers:
 - Review generated migrations.
 - Keep important relationships/index decisions documented.
 - Recommendation scoring must use verified structured database fields.
+
+## Session 2 — persistence setup
+
+EF Core SQL Server and Design packages and the local dotnet-ef tool are pinned to
+10.0.11. Restore the repository tool with `dotnet tool restore`.
+ApplicationDbContext lives in Infrastructure/Persistence and currently has no
+entities. Infrastructure registers it with the default scoped lifetime through
+AddInfrastructure; the API invokes this method in its composition root.
+The API also references Design with PrivateAssets=all because it is the tooling
+startup project. Domain and Application remain independent of EF Core.
+
+### Local connection configuration
+
+Run from the repository root (adjust the server for your installation):
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost;Database=PikwiseDb;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;" --project src/Pikwise.Api
+```
+
+This example uses Windows authentication and trusts the local development server
+certificate. In deployment, provide a valid server certificate and do not enable
+TrustServerCertificate. Supply production configuration through the deployment
+secret store or the `ConnectionStrings__DefaultConnection` environment variable.
+User Secrets are loaded in Development and are stored outside the repository;
+they are a development convenience, not an encrypted production secret store.
+No real connection string is stored in tracked appsettings files.
+Missing or blank configuration stops startup with a configuration-key-only error.
+
+### Verify tooling without a database connection
+
+After configuring the connection and building:
+
+```powershell
+dotnet tool restore
+dotnet build Pikwise.sln --configuration Release
+dotnet ef dbcontext info --project src/Pikwise.Infrastructure --startup-project src/Pikwise.Api --configuration Release --no-build -- --environment Development
+dotnet ef migrations list --no-connect --project src/Pikwise.Infrastructure --startup-project src/Pikwise.Api --configuration Release --no-build -- --environment Development
+```
+
+Session 2 verification: context info resolves the SQL Server provider and migration
+listing reports no migrations. These commands do not prove server reachability.
+No database was created or changed, and no real SQL connection was verified.
+
+### Session 3 reference commands (not executed in Session 2)
+
+After the real entities and relationships are implemented:
+
+```powershell
+dotnet ef migrations add InitialCreate --project src/Pikwise.Infrastructure --startup-project src/Pikwise.Api --output-dir Persistence/Migrations -- --environment Development
+dotnet ef migrations script --project src/Pikwise.Infrastructure --startup-project src/Pikwise.Api -- --environment Development
+# Review the generated migration and SQL before applying:
+dotnet ef database update --project src/Pikwise.Infrastructure --startup-project src/Pikwise.Api -- --environment Development
+```
+
+The application does not call EnsureCreated or Migrate on startup.

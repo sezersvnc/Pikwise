@@ -57,18 +57,19 @@ Product system                   next
 6. `TASKS.md`
 7. `docs/DECISIONS.md`
 
-## Run the Session 1 skeleton
+## Run the backend (Session 2)
 
 Prerequisite: .NET SDK 10.0.200 (or a newer patch in the same feature band).
 
 ```powershell
+dotnet tool restore
 dotnet restore Pikwise.sln
 dotnet build Pikwise.sln --configuration Release --no-restore
 dotnet test Pikwise.sln --configuration Release --no-build
-dotnet run --project src/Pikwise.Api --no-launch-profile --urls http://localhost:5080
+dotnet run --project src/Pikwise.Api --no-launch-profile -- --environment Development --urls http://localhost:5080
 ```
 
 Open http://localhost:5080/health: expected HTTP 200, body `Healthy`.
-No database connection or credentials are required for Session 1.
+Before running, configure ConnectionStrings:DefaultConnection using the User Secrets command in [docs/DATABASE.md](docs/DATABASE.md). A running database is not required for /health.
 The unit test project is intentionally empty until business rules are implemented;
-the integration test verifies startup, DI, routing and the health response.
+five integration tests verify startup, routing, health, SQL Server provider registration, scoped lifetime and missing configuration. They do not open a database connection.

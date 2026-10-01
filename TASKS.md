@@ -43,13 +43,13 @@ Do not build Recommendation Engine or AI yet.
 
 # Session 2 — SQL Server + EF Core
 
-- [ ] Add EF Core packages
-- [ ] Add SQL Server provider
-- [ ] Create `ApplicationDbContext`
-- [ ] Configure connection safely
-- [ ] Register DbContext with DI
-- [ ] Verify migration commands
-- [ ] Never commit secrets
+- [x] Add EF Core packages
+- [x] Add SQL Server provider
+- [x] Create `ApplicationDbContext`
+- [x] Configure connection safely
+- [x] Register DbContext with DI
+- [x] Verify migration commands
+- [x] Never commit secrets
 
 ---
 
