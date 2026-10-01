@@ -1,0 +1,112 @@
+# DECISIONS.md — Pikwise ADRs
+
+## ADR-001 — Laptop-only MVP
+**Status:** Accepted
+
+Start with laptops only.
+
+Reason:
+- narrows data modeling,
+- makes scoring rules testable,
+- avoids premature multi-category complexity.
+
+---
+
+## ADR-002 — Modular monolith first
+**Status:** Accepted
+
+Use:
+- Pikwise.Api
+- Pikwise.Application
+- Pikwise.Domain
+- Pikwise.Infrastructure
+
+Do not start with microservices.
+
+---
+
+## ADR-003 — Business logic belongs in Application/Service
+**Status:** Accepted
+
+Controller:
+- HTTP
+
+Service:
+- business logic / orchestration
+
+Repository:
+- data access
+
+---
+
+## ADR-004 — Deterministic Recommendation Engine
+**Status:** Accepted
+
+Recommendation ranking/scoring is deterministic and testable.
+
+AI explains; engine decides.
+
+---
+
+## ADR-005 — Supabase Auth
+**Status:** Proposed
+
+Direction:
+- Supabase handles registration/login/session/token issuance.
+- ASP.NET Core validates bearer tokens.
+- Pikwise owns authorization/business rules.
+- local `UserProfile` may map to Supabase `sub`.
+
+Review this before auth implementation.
+
+---
+
+## ADR-006 — V0.1 relational model
+**Status:** Accepted
+
+Relationships:
+- Brand 1 -> many Product
+- Category 1 -> many Product
+- Product 1 -> 1 LaptopSpecification
+- UserProfile -> Favorite <- Product using explicit join entity
+
+Reason:
+This covers the EF Core relationship types needed by the roadmap without overcomplicating V0.1.
+
+---
+
+## ADR-007 — Learn while building
+**Status:** Accepted
+
+Do not wait to finish every .NET topic before building Pikwise.
+
+Use the roadmap as working vertical slices:
+- encounter a need,
+- learn the required concept,
+- implement,
+- review,
+- continue.
+
+The project is part of the learning process.
+
+---
+
+## ADR-008 — SQL Server
+**Status:** Accepted
+
+**Decision:** Use Microsoft SQL Server for Pikwise V0.1.
+
+**Reason:** SQL Server is already available in the development environment, integrates directly with EF Core, and avoids introducing a second database system without a real project need.
+
+**Provider:** `Microsoft.EntityFrameworkCore.SqlServer`
+
+---
+
+## ADR-009 — Session 1 runtime and health endpoint
+**Status:** Accepted for the project skeleton
+
+Use net10.0 and SDK 10.0.200, already installed in the development environment.
+Pin the SDK feature band with latestPatch roll-forward for reproducible builds.
+Use xUnit for the two test projects and WebApplicationFactory for API integration tests.
+Use built-in ASP.NET Core health checks at /health to verify startup, DI and HTTP
+routing without introducing business services or persistence ahead of their sessions.
