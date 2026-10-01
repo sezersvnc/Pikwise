@@ -3,7 +3,7 @@
 ## Current roadmap position
 
 ```text
-Stage 3 — EF Core relationships     🟡 continue inside project
+Stage 3 — EF Core relationships     ✅ Session 6 complete
 Stage 4 — MD architecture           ✅ done
 Stage 5 — Project skeleton          ✅ complete
 Stage 6 — Product system            ✅ CRUD complete
@@ -130,8 +130,8 @@ Review:
 # Session 6 — Complete Relationship Practice
 
 Create:
-- [ ] UserProfile
-- [ ] Favorite
+- [x] UserProfile
+- [x] Favorite
 
 Relationship:
 
@@ -140,11 +140,11 @@ UserProfile 1 -> many Favorite <- many-to-1 Product
 ```
 
 Practice:
-- [ ] explicit join entity
-- [ ] composite key
-- [ ] prevent duplicate favorite
-- [ ] Include
-- [ ] ThenInclude
+- [x] explicit join entity
+- [x] composite key
+- [x] prevent duplicate favorite
+- [x] Include
+- [x] ThenInclude
 
 Auth integration can follow once the core product/data model is stable.
 

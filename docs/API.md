@@ -92,7 +92,8 @@ Input:
 - route `id`
 
 Status: implemented in Session 5. Physically deletes the product and its
-specification, returns 204; an absent product returns 404. Lookup rows remain.
+specification and, since Session 6, related favorites. Returns 204; an absent
+product returns 404. Lookup rows and user profiles remain.
 
 ### POST / PUT request example
 
@@ -171,6 +172,10 @@ Output:
 ---
 
 ## Authentication
+
+Session 6 implements UserProfile/Favorite persistence only. There are no profile
+or favorite routes yet. ProductResponseDto excludes favorites, user emails and
+roles. UserProfile.Role is stored data; it does not enable authorization.
 
 Preferred authentication provider: Supabase Auth.
 

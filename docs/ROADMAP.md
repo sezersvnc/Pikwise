@@ -328,9 +328,10 @@ Browser extension/mobile remain late-stage.
 | 7 | Value-for-Money + tests | Explainable scoring + unit tests |
 | 8 | LLM integration | Natural language -> JSON -> engine -> explanation |
 
-Current position: Sessions 1-5 are complete. Product CRUD, validation and the
-central exception handler are verified on SQL Server. Session 6 relationships
-have not started; filtering/pagination and auth remain future roadmap work.
+Current position: Sessions 1-6 are complete. Product CRUD, validation, the
+central exception handler and UserProfile/Favorite relationships are verified on
+SQL Server. Work pauses here for the user's code review. Filtering/pagination
+and auth remain future roadmap work.
 
 ---
 

@@ -42,12 +42,13 @@ tests/
 Service/repository separation    ✅
 DTO/Mapper/DI/async concepts     ✅
 Basic JWT architecture           ✅
-EF Core relationship concepts    🟡 continue in project
+EF Core relationship concepts    ✅ Session 6 complete
 MD architecture                  ✅
 Project skeleton                 ✅ Session 1 complete
 Product model                    ✅ Session 3 complete
 GET product by id                ✅ Session 4 complete
 Complete product CRUD            ✅ Session 5 complete
+User profiles / favorites        ✅ Session 6 complete
 ```
 
 ## Read order
@@ -59,7 +60,7 @@ Complete product CRUD            ✅ Session 5 complete
 6. `TASKS.md`
 7. `docs/DECISIONS.md`
 
-## Run the backend (Session 5)
+## Run the backend (Session 6)
 
 Prerequisite: .NET SDK 10.0.200 (or a newer patch in the same feature band).
 
@@ -73,7 +74,12 @@ dotnet run --project src/Pikwise.Api --no-launch-profile -- --environment Develo
 
 Open http://localhost:5080/health: expected HTTP 200, body `Healthy`.
 Before running, configure ConnectionStrings:DefaultConnection using the User Secrets command in [docs/DATABASE.md](docs/DATABASE.md). A running database is not required for /health.
-Fourteen tests run without SQL Server. Three additional integration tests verify
+Fourteen tests run without SQL Server. Four additional integration tests verify
 the migration, relationships and full HTTP CRUD workflow on a dedicated SQL Server
 database; see docs/DATABASE.md for the command. Request examples and error contracts
 are in docs/API.md. CRUD currently serves local development without auth integration.
+
+Session 6 adds UserProfiles and Favorites with a composite favorite key, explicit
+foreign keys and tested Include/ThenInclude queries. The reviewed migration is
+applied to local PikwiseDb. Profile/favorite HTTP endpoints and authentication
+remain future work. Sessions 1-6 are ready for code review.

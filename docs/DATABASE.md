@@ -443,7 +443,7 @@ Run fourteen tests without SQL Server:
 dotnet test Pikwise.sln --configuration Release --filter 'Category!=SqlServer'
 ```
 
-Run all seventeen tests against a dedicated local database:
+Run all eighteen tests against a dedicated local database:
 
 ```powershell
 $env:PIKWISE_TEST_CONNECTION = 'Server=localhost;Database=PikwiseSession3Tests;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;'
@@ -455,11 +455,67 @@ migrations and verify async writes/queries, unique name and specification
 constraints, all three FKs, deletion behavior and the Session 4 HTTP endpoint.
 Test records are removed after use; the empty migrated database remains for
 subsequent runs. The migration and model snapshot have no pending differences.
-Across the solution, seventeen tests pass: six unit tests and eleven integration tests.
-Release build completes with zero errors and warnings. UserProfile/Favorite belong
-to Session 6.
+Across the solution, eighteen tests pass: six unit tests and twelve integration tests.
+Release build completes with zero errors and warnings.
 
 Session 5 adds HTTP CRUD without changing the schema. The dedicated SQL test
 database also verifies POST/PUT/DELETE, relation replacement, preserved creation
 timestamps, invalid fields/references and specification cascade deletion. Cleanup
 removes only the test's own records. No catalog data is inserted into PikwiseDb.
+
+## Session 6 — user profiles and favorites
+
+UserProfile and Favorite are Domain entities. Infrastructure owns their separate
+Fluent API configurations and migration. Product now exposes a Favorites
+navigation collection. UserProfile.Id remains a local integer identity; the
+external identity is stored separately in AuthProviderUserId.
+
+AuthProviderUserId is required Unicode text, limited to 128 characters, with a
+unique index and Latin1_General_100_BIN2 collation. External subjects are treated
+as case-sensitive identifiers even when the database's default collation is
+case-insensitive. Email is required Unicode text up to 254 characters; Role is
+required Unicode text up to 32 characters with a CLR default of User. Email has
+no unique constraint because the external subject identifies the profile.
+No passwords are stored. Role is not wired to authorization. Future profile and
+favorite use cases must validate input and assign UTC CreatedAt timestamps;
+the mapping supplies no SQL timestamp or role defaults.
+
+Favorite has a composite primary key (UserProfileId, ProductId). Both foreign
+keys live on Favorite because each favorite references exactly one profile and
+one product. The key prevents a user from favoriting the same product twice,
+including concurrent inserts. An explicit entity lets the relationship store
+CreatedAt. The primary key supports queries starting with UserProfileId; the
+separate ProductId index supports the reverse relationship.
+
+Both Favorite foreign keys use ON DELETE CASCADE. Deleting a profile removes its
+favorites while preserving products. Deleting a product removes its favorites
+and its existing specification while preserving profiles. Deleting a favorite
+does not delete either parent.
+
+### Queries verified on real SQL Server
+
+```csharp
+var user = await context.UserProfiles.AsNoTracking()
+    .Include(u => u.Favorites)
+    .ThenInclude(f => f.Product)
+    .ThenInclude(p => p.LaptopSpecification)
+    .SingleAsync(u => u.Id == userId);
+
+var product = await context.Products.AsNoTracking()
+    .Include(p => p.Favorites)
+    .ThenInclude(f => f.UserProfile)
+    .SingleAsync(p => p.Id == productId);
+```
+
+Include loads the first relationship; each ThenInclude continues from that
+relationship's target. FavoriteRelationshipTests verifies both directions,
+timestamps, duplicate pair/subject rejection, case-sensitive subjects, orphan FK
+rejection and database cascades without loading dependents. Test data is enclosed
+in a transaction and rolled back in the dedicated test database.
+
+Migration 20261001192501_AddUserProfilesAndFavorites adds only UserProfiles,
+Favorites and their constraints/indexes. Its reviewed delta SQL is
+[AddUserProfilesAndFavorites.sql](AddUserProfilesAndFavorites.sql). It was applied
+to localhost/PikwiseDb, preserving existing business tables and data. Both
+CASCADE constraints were checked in SQL Server; EF reports no pending model
+changes. Authentication and profile/favorite endpoints remain future work.

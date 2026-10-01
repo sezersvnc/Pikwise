@@ -14,4 +14,5 @@ public sealed class Product
     public Brand Brand { get; set; } = null!;
     public Category Category { get; set; } = null!;
     public LaptopSpecification? LaptopSpecification { get; set; }
+    public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
 }

@@ -220,3 +220,15 @@ This keeps product code together while making contracts, orchestration, mapping,
 validation and error types easier to find. DecimalScaleAttribute belongs to
 Validators. Repository implementations remain in Infrastructure. This organization
 changes file locations and namespaces without changing HTTP or database behavior.
+
+## Session 6 implementation
+
+Domain owns UserProfile, Favorite and their navigation properties without EF or
+HTTP dependencies. Infrastructure owns their Fluent API configurations, composite
+key, indexes, delete behavior and migration. SQL integration tests exercise the
+explicit join using Include/ThenInclude in both directions.
+
+This session completes persistence relationships. Application/API gain no profile
+or favorite use cases yet. Product responses continue to use explicit DTO mapping,
+so the new navigation graph does not expose profile emails or roles. Authentication
+and authorization require a later use case and pipeline integration.

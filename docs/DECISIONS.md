@@ -179,3 +179,27 @@ Infrastructure translates known persistence failures into an Application excepti
 No rowversion is introduced: simultaneous updates currently use last-write-wins.
 Authentication stays on its existing later-session schedule; writes are presently
 local-development endpoints. GET all returns an unpaginated list ordered by Id.
+
+---
+
+## ADR-014 — Session 6 profiles and explicit favorite join
+**Status:** Accepted
+
+Use a local integer UserProfile.Id and a separate unique AuthProviderUserId.
+Store the external subject as Unicode text up to 128 characters using
+Latin1_General_100_BIN2 collation to preserve case-sensitive identity. Email is
+limited to 254 characters and Role to 32; Role has a CLR default of User. Subject
+uniqueness identifies profiles; email is not unique. No password is stored.
+
+Favorite explicitly joins UserProfile and Product and stores CreatedAt. Its
+(UserProfileId, ProductId) composite primary key enforces duplicate prevention
+in SQL Server. Both FKs are required and cascade parent deletion to favorite
+rows. Product deletion also retains its existing specification cascade. Parent
+rows are preserved when the other parent or the join row is deleted. A separate
+ProductId index supports inverse queries; the primary key starts with UserProfileId.
+
+Domain remains EF-independent; Infrastructure owns mappings/migrations. DateTimeOffset
+timestamps follow the existing model; future Application use cases must assign UTC
+timestamps and validate profile/favorite input. No database defaults or auth routes
+are added. Include/ThenInclude, uniqueness, orphan rejection and delete behavior
+are verified against SQL Server. Stored Role does not yet authorize requests.

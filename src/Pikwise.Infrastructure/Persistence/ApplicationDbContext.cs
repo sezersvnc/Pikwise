@@ -10,6 +10,8 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<LaptopSpecification> LaptopSpecifications => Set<LaptopSpecification>();
+    public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+    public DbSet<Favorite> Favorites => Set<Favorite>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
