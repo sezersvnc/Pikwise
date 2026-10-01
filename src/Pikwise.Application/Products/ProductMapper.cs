@@ -4,6 +4,31 @@ namespace Pikwise.Application.Products;
 
 public static class ProductMapper
 {
+    public static void ApplyTo(this ProductWriteRequestDto request, Product product)
+    {
+        product.Name = request.Name.Trim();
+        product.Price = request.Price;
+        product.Stock = request.Stock;
+        product.IsActive = request.IsActive;
+        product.BrandId = request.BrandId;
+        product.CategoryId = request.CategoryId;
+        var input = request.Specification;
+        var specification = product.LaptopSpecification ??= new LaptopSpecification
+        {
+            Processor = input.Processor.Trim(), GPU = input.GPU.Trim(),
+            Resolution = input.Resolution.Trim(), OperatingSystem = input.OperatingSystem.Trim()
+        };
+        specification.Processor = input.Processor.Trim();
+        specification.GPU = input.GPU.Trim();
+        specification.RamGb = input.RamGb;
+        specification.StorageGb = input.StorageGb;
+        specification.ScreenSize = input.ScreenSize;
+        specification.Resolution = input.Resolution.Trim();
+        specification.RefreshRate = input.RefreshRate;
+        specification.Weight = input.Weight;
+        specification.OperatingSystem = input.OperatingSystem.Trim();
+    }
+
     public static ProductResponseDto ToResponseDto(this Product product) => new(
         product.Id,
         product.Name,

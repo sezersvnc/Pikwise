@@ -328,9 +328,9 @@ Browser extension/mobile remain late-stage.
 | 7 | Value-for-Money + tests | Explainable scoring + unit tests |
 | 8 | LLM integration | Natural language -> JSON -> engine -> explanation |
 
-Current position: Stage 5 and Sessions 1-3 are complete. Session 4 implements and
-verifies `GET /api/products/{id}` through Controller, Service, Repository, Mapper
-and DTO. The remaining CRUD operations belong to Session 5.
+Current position: Sessions 1-5 are complete. Product CRUD, validation and the
+central exception handler are verified on SQL Server. Session 6 relationships
+have not started; filtering/pagination and auth remain future roadmap work.
 
 ---
 

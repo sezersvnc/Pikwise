@@ -6,7 +6,7 @@
 Stage 3 — EF Core relationships     🟡 continue inside project
 Stage 4 — MD architecture           ✅ done
 Stage 5 — Project skeleton          ✅ complete
-Stage 6 — Product system            🟡 GET by id complete
+Stage 6 — Product system            ✅ CRUD complete
 ```
 
 ---
@@ -114,15 +114,15 @@ Review:
 
 # Session 5 — Complete Product CRUD
 
-- [ ] GET all
-- [ ] POST
-- [ ] PUT
-- [ ] DELETE
-- [ ] CreateProductRequestDto
-- [ ] UpdateProductRequestDto
-- [ ] ProductResponseDto
-- [ ] validation
-- [ ] centralized exception handling baseline
+- [x] GET all
+- [x] POST
+- [x] PUT
+- [x] DELETE
+- [x] CreateProductRequestDto
+- [x] UpdateProductRequestDto
+- [x] ProductResponseDto
+- [x] validation
+- [x] centralized exception handling baseline
 
 ---
 

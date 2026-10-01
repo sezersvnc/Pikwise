@@ -157,3 +157,25 @@ the response because the current relational model can enforce at most one
 specification, while product completeness belongs to the future create use case.
 Expose first-party ASP.NET Core OpenAPI JSON in Development and verify both the
 documented responses and real HTTP behavior with automated integration tests.
+
+---
+
+## ADR-013 — Session 5 CRUD and validation
+**Status:** Accepted
+
+POST/PUT require a complete LaptopSpecification. Use separate create/update types
+sharing editable fields; server-owned Id/CreatedAt/UpdatedAt are excluded. Service
+checks Brand and Category references and sets UTC timestamps. PUT replaces editable
+fields while preserving CreatedAt and updating the existing specification. DELETE
+is physical and follows the reviewed cascade relationship. Writes persist in one
+SaveChangesAsync call. No schema migration or lookup management endpoint is needed.
+
+Use DataAnnotations plus a decimal scale attribute to avoid SQL rounding. Decimal
+range constants parse with invariant culture, including on Turkish Windows.
+Service validates the same contracts for callers outside MVC. HTTP validation uses
+400, missing resources use 404, concurrent deletion/FK conflicts use 409 and
+unexpected exceptions use a generic 500 with traceId. API owns the error mapping;
+Infrastructure translates known persistence failures into an Application exception.
+No rowversion is introduced: simultaneous updates currently use last-write-wins.
+Authentication stays on its existing later-session schedule; writes are presently
+local-development endpoints. GET all returns an unpaginated list ordered by Id.

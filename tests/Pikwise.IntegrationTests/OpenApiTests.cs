@@ -18,5 +18,10 @@ public class OpenApiTests
 
         Assert.True(operation.GetProperty("responses").TryGetProperty("200", out _));
         Assert.True(operation.GetProperty("responses").TryGetProperty("404", out _));
+        var paths = document.RootElement.GetProperty("paths");
+        Assert.True(paths.GetProperty("/api/products").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/products").GetProperty("post").GetProperty("responses").TryGetProperty("201", out _));
+        Assert.True(paths.GetProperty("/api/products/{id}").TryGetProperty("put", out _));
+        Assert.True(paths.GetProperty("/api/products/{id}").GetProperty("delete").GetProperty("responses").TryGetProperty("204", out _));
     }
 }

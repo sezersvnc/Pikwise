@@ -185,3 +185,18 @@ Domain result into the use-case response contract. The API never returns an enti
 Registrations follow the dependency direction: Infrastructure registers the
 repository implementation, while the API composition root registers the service.
 The OpenAPI document is exposed only in Development.
+
+## Session 5 implementation
+
+Controllers route CRUD requests and select HTTP outcomes. Data annotations on
+Application request DTOs validate shape, lengths, ranges and SQL decimal precision.
+The service also runs the same validation for non-HTTP callers, verifies lookup
+existence and manages timestamps. ProductMapper applies the input to an entity.
+The repository owns tracking queries, lookup queries and SaveChangesAsync.
+One SaveChanges call persists the product and specification atomically.
+
+Read queries use AsNoTracking; update/delete use tracked entities. Updates modify
+the existing specification instead of inserting a duplicate. GET all has a stable
+Id order; filtering/pagination remain roadmap work. The API registers a central
+IExceptionHandler with ProblemDetails. Infrastructure translates FK/concurrent
+write failures into an Application exception without leaking EF dependencies.

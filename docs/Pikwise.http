@@ -1,0 +1,65 @@
+@baseUrl = http://localhost:5080
+# Set these IDs to existing lookup rows in your local PikwiseDb.
+@brandId = 1
+@categoryId = 1
+
+### List products
+GET {{baseUrl}}/api/products
+
+### Create a product (201, Location)
+# @name createProduct
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+
+{
+  "name": "Local test laptop",
+  "price": 35000.25,
+  "stock": 4,
+  "isActive": true,
+  "brandId": {{brandId}},
+  "categoryId": {{categoryId}},
+  "specification": {
+    "processor": "Example CPU",
+    "gpu": "Example GPU",
+    "ramGb": 16,
+    "storageGb": 512,
+    "screenSize": 15.6,
+    "resolution": "1920x1080",
+    "refreshRate": 144,
+    "weight": 1.875,
+    "operatingSystem": "Example OS"
+  }
+}
+
+### Read the newly created product
+GET {{baseUrl}}/api/products/{{createProduct.response.body.$.id}}
+
+### Update the same product (200)
+PUT {{baseUrl}}/api/products/{{createProduct.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "name": "Updated local test laptop",
+  "price": 36000.50,
+  "stock": 2,
+  "isActive": true,
+  "brandId": {{brandId}},
+  "categoryId": {{categoryId}},
+  "specification": {
+    "processor": "Example CPU",
+    "gpu": "Example GPU",
+    "ramGb": 32,
+    "storageGb": 1024,
+    "screenSize": 15.6,
+    "resolution": "1920x1080",
+    "refreshRate": 144,
+    "weight": 1.875,
+    "operatingSystem": "Example OS"
+  }
+}
+
+### Delete only the product created above (204)
+DELETE {{baseUrl}}/api/products/{{createProduct.response.body.$.id}}
+
+### Missing product (404)
+GET {{baseUrl}}/api/products/2147483647

@@ -1,5 +1,6 @@
 using Pikwise.Infrastructure;
 using Pikwise.Application.Products;
+using Pikwise.Api.Errors;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -7,7 +8,10 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 var app = builder.Build();
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {

@@ -55,5 +55,12 @@ public class ProductServiceTests
     {
         public Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
             Task.FromResult(product?.Id == id ? product : null);
+        public Task<IReadOnlyList<Product>> GetAllAsync(CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<Product?> GetForUpdateAsync(int id, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<Brand?> GetBrandAsync(int id, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<Category?> GetCategoryAsync(int id, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public void Add(Product value) => throw new NotSupportedException();
+        public void Remove(Product value) => throw new NotSupportedException();
+        public Task SaveChangesAsync(CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }
 }

@@ -47,7 +47,7 @@ MD architecture                  ✅
 Project skeleton                 ✅ Session 1 complete
 Product model                    ✅ Session 3 complete
 GET product by id                ✅ Session 4 complete
-Complete product CRUD            next
+Complete product CRUD            ✅ Session 5 complete
 ```
 
 ## Read order
@@ -59,7 +59,7 @@ Complete product CRUD            next
 6. `TASKS.md`
 7. `docs/DECISIONS.md`
 
-## Run the backend (Session 3)
+## Run the backend (Session 5)
 
 Prerequisite: .NET SDK 10.0.200 (or a newer patch in the same feature band).
 
@@ -73,7 +73,7 @@ dotnet run --project src/Pikwise.Api --no-launch-profile -- --environment Develo
 
 Open http://localhost:5080/health: expected HTTP 200, body `Healthy`.
 Before running, configure ConnectionStrings:DefaultConnection using the User Secrets command in [docs/DATABASE.md](docs/DATABASE.md). A running database is not required for /health.
-The unit test project is intentionally empty until business rules are implemented;
-Eight tests run without SQL Server. Two additional integration tests verify the
-migration, relationships, constraints and `GET /api/products/{id}` on a dedicated
-SQL Server database; see docs/DATABASE.md for the command.
+Fourteen tests run without SQL Server. Three additional integration tests verify
+the migration, relationships and full HTTP CRUD workflow on a dedicated SQL Server
+database; see docs/DATABASE.md for the command. Request examples and error contracts
+are in docs/API.md. CRUD currently serves local development without auth integration.
