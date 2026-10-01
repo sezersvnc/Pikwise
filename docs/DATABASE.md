@@ -437,22 +437,24 @@ or repository is introduced before Session 4.
 
 ### Test commands
 
-Run the five host/configuration tests without SQL Server:
+Run eight tests without SQL Server:
 
 ```powershell
 dotnet test Pikwise.sln --configuration Release --filter 'Category!=SqlServer'
 ```
 
-Run all six tests against a dedicated local database:
+Run all ten tests against a dedicated local database:
 
 ```powershell
 $env:PIKWISE_TEST_CONNECTION = 'Server=localhost;Database=PikwiseSession3Tests;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;'
 dotnet test Pikwise.sln --configuration Release
 ```
 
-The SQL test requires the exact database name PikwiseSession3Tests, applies
-migrations and verifies async writes/queries, unique name and specification
-constraints, all three FKs and deletion behavior. Test data is rolled back; the
-empty migrated test database remains for subsequent runs. The migration and
-model snapshot have no pending differences. Six tests passed; Release build
-completed with zero errors and warnings. UserProfile/Favorite belong to Session 6.
+The SQL tests require the exact database name PikwiseSession3Tests. They apply
+migrations and verify async writes/queries, unique name and specification
+constraints, all three FKs, deletion behavior and the Session 4 HTTP endpoint.
+Test records are removed after use; the empty migrated database remains for
+subsequent runs. The migration and model snapshot have no pending differences.
+Across the solution, ten tests pass: two unit tests and eight integration tests.
+Release build completes with zero errors and warnings. UserProfile/Favorite belong
+to Session 6.

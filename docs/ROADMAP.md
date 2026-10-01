@@ -328,7 +328,9 @@ Browser extension/mobile remain late-stage.
 | 7 | Value-for-Money + tests | Explainable scoring + unit tests |
 | 8 | LLM integration | Natural language -> JSON -> engine -> explanation |
 
-Current position: Week 3 / Stage 5 completed. Session 2 SQL Server + EF Core configuration and tooling are complete. Session 3 entities, relationships and InitialCreate migration are complete and verified on local SQL Server. Session 4 product endpoint has not started.
+Current position: Stage 5 and Sessions 1-3 are complete. Session 4 implements and
+verifies `GET /api/products/{id}` through Controller, Service, Repository, Mapper
+and DTO. The remaining CRUD operations belong to Session 5.
 
 ---
 

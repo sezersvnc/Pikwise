@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pikwise.Infrastructure.Persistence;
+using Pikwise.Application.Products;
+using Pikwise.Infrastructure.Products;
 
 namespace Pikwise.Infrastructure;
 
@@ -19,6 +21,7 @@ public static class DependencyInjection
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
+        services.AddScoped<IProductRepository, ProductRepository>();
 
         return services;
     }

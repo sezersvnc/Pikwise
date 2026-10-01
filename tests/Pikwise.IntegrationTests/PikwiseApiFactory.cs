@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Pikwise.IntegrationTests;
 
-public sealed class PikwiseApiFactory : WebApplicationFactory<Program>
+public sealed class PikwiseApiFactory(string? connectionString = null) : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         // Configuration-only tests: no SQL Server connection is opened.
         builder.UseSetting("ConnectionStrings:DefaultConnection",
+            connectionString ??
             "Server=localhost;Database=PikwiseConfigurationTests;Integrated Security=True;Encrypt=True;");
     }
 }

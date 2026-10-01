@@ -140,3 +140,20 @@ decimal(5,2) for screen inches, decimal(6,3) for weight in kg. Timestamps use
 DateTimeOffset; UpdatedAt is nullable until the first update. The future use case
 owns timestamp assignment. Name uniqueness follows the configured SQL Server
 collation. No speculative filtering indexes, seed catalog or Favorite model is added.
+
+---
+
+## ADR-012 — Session 4 product read slice
+**Status:** Accepted
+
+Keep `IProductRepository`, `IProductService`, response DTOs, mapper and service in
+Application. Keep the EF Core repository implementation in Infrastructure and the
+controller in API. The repository returns the Domain aggregate required by this
+use case using an async, no-tracking query with Brand, Category and
+LaptopSpecification included. The service maps it to an explicit response DTO.
+
+Return 404 when no row matches. A missing LaptopSpecification remains `null` in
+the response because the current relational model can enforce at most one
+specification, while product completeness belongs to the future create use case.
+Expose first-party ASP.NET Core OpenAPI JSON in Development and verify both the
+documented responses and real HTTP behavior with automated integration tests.

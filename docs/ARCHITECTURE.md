@@ -162,3 +162,26 @@ Domain holds Brand, Category, Product and LaptopSpecification without EF depende
 Infrastructure holds Fluent API mappings and migrations. SQL relationship queries
 are verified in integration tests. API and Application gain no product use cases yet.
 See DATABASE.md and ADR-011 for schema choices and relationship explanations.
+
+## Session 4 implementation
+
+`GET /api/products/{id}` is the first complete request path:
+
+```text
+ProductsController
+  -> IProductService / ProductService
+  -> IProductRepository / ProductRepository
+  -> ApplicationDbContext / SQL Server
+  -> ProductMapper
+  -> ProductResponseDto
+```
+
+The controller owns routing and the 200/404 choice. ProductService coordinates
+the repository call and mapping. IProductRepository is an Application abstraction;
+its Infrastructure implementation owns the async EF Core query, `AsNoTracking`
+and related-data loading. ProductMapper lives in Application because it maps the
+Domain result into the use-case response contract. The API never returns an entity.
+
+Registrations follow the dependency direction: Infrastructure registers the
+repository implementation, while the API composition root registers the service.
+The OpenAPI document is exposed only in Development.

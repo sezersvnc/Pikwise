@@ -6,7 +6,7 @@
 Stage 3 — EF Core relationships     🟡 continue inside project
 Stage 4 — MD architecture           ✅ done
 Stage 5 — Project skeleton          ✅ complete
-Stage 6 — Product system            NEXT
+Stage 6 — Product system            🟡 GET by id complete
 ```
 
 ---
@@ -91,24 +91,24 @@ GET /api/products/{id}
 ```
 
 Required:
-- [ ] ProductResponseDto
-- [ ] Product mapper
-- [ ] IProductRepository
-- [ ] ProductRepository
-- [ ] IProductService
-- [ ] ProductService
-- [ ] ProductsController
-- [ ] DI registrations
-- [ ] async EF Core query
-- [ ] 404 behavior
-- [ ] Swagger/Postman test
+- [x] ProductResponseDto
+- [x] Product mapper
+- [x] IProductRepository
+- [x] ProductRepository
+- [x] IProductService
+- [x] ProductService
+- [x] ProductsController
+- [x] DI registrations
+- [x] async EF Core query
+- [x] 404 behavior
+- [x] Swagger/Postman test
 
 Review:
-- [ ] Controller contains HTTP concerns only
-- [ ] Repository contains EF Core query
-- [ ] Service orchestrates the use case
-- [ ] Entity is not blindly returned
-- [ ] mapping location is intentional
+- [x] Controller contains HTTP concerns only
+- [x] Repository contains EF Core query
+- [x] Service orchestrates the use case
+- [x] Entity is not blindly returned
+- [x] mapping location is intentional
 
 ---
 

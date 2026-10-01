@@ -46,7 +46,8 @@ EF Core relationship concepts    🟡 continue in project
 MD architecture                  ✅
 Project skeleton                 ✅ Session 1 complete
 Product model                    ✅ Session 3 complete
-Product endpoint                 next
+GET product by id                ✅ Session 4 complete
+Complete product CRUD            next
 ```
 
 ## Read order
@@ -73,4 +74,6 @@ dotnet run --project src/Pikwise.Api --no-launch-profile -- --environment Develo
 Open http://localhost:5080/health: expected HTTP 200, body `Healthy`.
 Before running, configure ConnectionStrings:DefaultConnection using the User Secrets command in [docs/DATABASE.md](docs/DATABASE.md). A running database is not required for /health.
 The unit test project is intentionally empty until business rules are implemented;
-five host/configuration tests run without SQL Server. The sixth test verifies the migration, relationships, Include/ThenInclude and constraints on a dedicated SQL Server database; see docs/DATABASE.md for the command.
+Eight tests run without SQL Server. Two additional integration tests verify the
+migration, relationships, constraints and `GET /api/products/{id}` on a dedicated
+SQL Server database; see docs/DATABASE.md for the command.
