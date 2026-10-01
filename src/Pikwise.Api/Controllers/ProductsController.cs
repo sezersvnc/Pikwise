@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Pikwise.Application.Products;
+using Pikwise.Application.Products.DTOs;
+using Pikwise.Application.Products.Interfaces;
 
 namespace Pikwise.Api.Controllers;
 

@@ -1,6 +1,6 @@
 using Pikwise.Domain.Entities;
 
-namespace Pikwise.Application.Products;
+namespace Pikwise.Application.Products.Interfaces;
 
 public interface IProductRepository
 {

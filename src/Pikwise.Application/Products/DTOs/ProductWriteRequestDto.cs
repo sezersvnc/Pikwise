@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using Pikwise.Application.Products.Validators;
 
-namespace Pikwise.Application.Products;
+namespace Pikwise.Application.Products.DTOs;
 
 public abstract class ProductWriteRequestDto
 {
@@ -39,14 +40,4 @@ public sealed class LaptopSpecificationRequestDto
     public decimal Weight { get; init; }
     [Required, StringLength(100)]
     public string OperatingSystem { get; init; } = string.Empty;
-}
-
-[AttributeUsage(AttributeTargets.Property)]
-public sealed class DecimalScaleAttribute(int scale) : ValidationAttribute
-{
-    public override bool IsValid(object? value) =>
-        value is decimal number && decimal.Round(number, scale) == number;
-
-    public override string FormatErrorMessage(string name) =>
-        $"{name} must have at most {scale} decimal places.";
 }

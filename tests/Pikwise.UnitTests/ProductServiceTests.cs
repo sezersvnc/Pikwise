@@ -1,4 +1,5 @@
-using Pikwise.Application.Products;
+using Pikwise.Application.Products.Interfaces;
+using Pikwise.Application.Products.Services;
 using Pikwise.Domain.Entities;
 
 namespace Pikwise.UnitTests;

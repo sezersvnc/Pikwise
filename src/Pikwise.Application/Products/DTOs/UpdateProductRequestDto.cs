@@ -1,3 +1,3 @@
-namespace Pikwise.Application.Products;
+namespace Pikwise.Application.Products.DTOs;
 
 public sealed class UpdateProductRequestDto : ProductWriteRequestDto;

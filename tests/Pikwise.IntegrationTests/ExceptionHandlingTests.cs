@@ -2,7 +2,9 @@ using System.Net;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Pikwise.Application.Products;
+using Pikwise.Application.Products.DTOs;
+using Pikwise.Application.Products.Exceptions;
+using Pikwise.Application.Products.Interfaces;
 
 namespace Pikwise.IntegrationTests;
 

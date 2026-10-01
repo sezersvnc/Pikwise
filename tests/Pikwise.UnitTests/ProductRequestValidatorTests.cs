@@ -1,4 +1,6 @@
-using Pikwise.Application.Products;
+using Pikwise.Application.Products.DTOs;
+using Pikwise.Application.Products.Exceptions;
+using Pikwise.Application.Products.Validators;
 
 namespace Pikwise.UnitTests;
 

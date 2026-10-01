@@ -1,4 +1,4 @@
-namespace Pikwise.Application.Products;
+namespace Pikwise.Application.Products.Exceptions;
 
 public sealed class ProductValidationException(IDictionary<string, string[]> errors)
     : Exception("Product validation failed.")

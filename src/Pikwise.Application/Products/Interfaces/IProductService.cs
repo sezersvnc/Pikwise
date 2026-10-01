@@ -1,4 +1,6 @@
-namespace Pikwise.Application.Products;
+using Pikwise.Application.Products.DTOs;
+
+namespace Pikwise.Application.Products.Interfaces;
 
 public interface IProductService
 {

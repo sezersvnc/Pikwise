@@ -1,4 +1,4 @@
-namespace Pikwise.Application.Products;
+namespace Pikwise.Application.Products.DTOs;
 
 public sealed record ProductResponseDto(
     int Id,

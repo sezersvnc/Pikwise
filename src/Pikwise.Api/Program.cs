@@ -1,5 +1,6 @@
 using Pikwise.Infrastructure;
-using Pikwise.Application.Products;
+using Pikwise.Application.Products.Interfaces;
+using Pikwise.Application.Products.Services;
 using Pikwise.Api.Errors;
 
 var builder = WebApplication.CreateBuilder(args);

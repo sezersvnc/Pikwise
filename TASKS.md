@@ -123,6 +123,7 @@ Review:
 - [x] ProductResponseDto
 - [x] validation
 - [x] centralized exception handling baseline
+- [x] Organize Application/Products into DTOs, Interfaces, Services, Mappers, Validators and Exceptions
 
 ---
 

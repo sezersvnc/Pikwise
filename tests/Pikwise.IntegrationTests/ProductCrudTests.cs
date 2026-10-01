@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Pikwise.Application.Products;
+using Pikwise.Application.Products.DTOs;
 using Pikwise.Domain.Entities;
 using Pikwise.Infrastructure.Persistence;
 

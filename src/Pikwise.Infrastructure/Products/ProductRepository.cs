@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
-using Pikwise.Application.Products;
+using Pikwise.Application.Products.Interfaces;
+using Pikwise.Application.Products.Exceptions;
 using Pikwise.Domain.Entities;
 using Pikwise.Infrastructure.Persistence;
 

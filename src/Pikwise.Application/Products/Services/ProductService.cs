@@ -1,6 +1,11 @@
 using Pikwise.Domain.Entities;
+using Pikwise.Application.Products.DTOs;
+using Pikwise.Application.Products.Exceptions;
+using Pikwise.Application.Products.Interfaces;
+using Pikwise.Application.Products.Mappers;
+using Pikwise.Application.Products.Validators;
 
-namespace Pikwise.Application.Products;
+namespace Pikwise.Application.Products.Services;
 
 public sealed class ProductService(IProductRepository productRepository) : IProductService
 {

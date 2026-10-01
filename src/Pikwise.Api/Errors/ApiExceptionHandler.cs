@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Pikwise.Application.Products;
+using Pikwise.Application.Products.Exceptions;
 
 namespace Pikwise.Api.Errors;
 

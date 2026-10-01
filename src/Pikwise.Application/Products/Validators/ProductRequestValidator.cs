@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using Pikwise.Application.Products.DTOs;
+using Pikwise.Application.Products.Exceptions;
 
-namespace Pikwise.Application.Products;
+namespace Pikwise.Application.Products.Validators;
 
 public static class ProductRequestValidator
 {

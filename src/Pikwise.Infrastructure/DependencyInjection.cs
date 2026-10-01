@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pikwise.Infrastructure.Persistence;
-using Pikwise.Application.Products;
+using Pikwise.Application.Products.Interfaces;
 using Pikwise.Infrastructure.Products;
 
 namespace Pikwise.Infrastructure;

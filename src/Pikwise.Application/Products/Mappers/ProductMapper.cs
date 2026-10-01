@@ -1,6 +1,7 @@
 using Pikwise.Domain.Entities;
+using Pikwise.Application.Products.DTOs;
 
-namespace Pikwise.Application.Products;
+namespace Pikwise.Application.Products.Mappers;
 
 public static class ProductMapper
 {

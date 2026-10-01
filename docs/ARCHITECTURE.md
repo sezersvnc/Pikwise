@@ -200,3 +200,23 @@ the existing specification instead of inserting a duplicate. GET all has a stabl
 Id order; filtering/pagination remain roadmap work. The API registers a central
 IExceptionHandler with ProblemDetails. Infrastructure translates FK/concurrent
 write failures into an Application exception without leaking EF dependencies.
+
+## Application folder organization
+
+Group code by feature, then by responsibility inside the feature. Namespaces match
+the directories. Products uses this structure:
+
+```text
+Pikwise.Application/Products/
+  DTOs/
+  Interfaces/
+  Services/
+  Mappers/
+  Validators/
+  Exceptions/
+```
+
+This keeps product code together while making contracts, orchestration, mapping,
+validation and error types easier to find. DecimalScaleAttribute belongs to
+Validators. Repository implementations remain in Infrastructure. This organization
+changes file locations and namespaces without changing HTTP or database behavior.
