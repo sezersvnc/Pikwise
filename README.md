@@ -51,7 +51,8 @@ Complete product CRUD            ✅ Session 5 complete
 User profiles / favorites        ✅ Session 6 complete
 Authentication foundation        ✅ Session 7 complete
 Authenticated favorites API      ✅ Session 8 complete
-Filtering / sorting / pagination ✅ Session 9 implemented; developer review pending
+Filtering / sorting / pagination ✅ Session 9 complete and pushed
+Product comparison               ✅ Session 10 implemented; commit/push approved
 ```
 
 ## Read order
@@ -63,7 +64,7 @@ Filtering / sorting / pagination ✅ Session 9 implemented; developer review pen
 6. `TASKS.md`
 7. `docs/DECISIONS.md`
 
-## Run the backend (Session 9)
+## Run the backend (Session 10)
 
 Prerequisite: .NET SDK 10.0.200 (or a newer patch in the same feature band).
 
@@ -78,8 +79,8 @@ dotnet run --project src/Pikwise.Api --no-launch-profile -- --environment Develo
 Open http://localhost:5080/health: expected HTTP 200, body `Healthy`.
 Before running, configure ConnectionStrings:DefaultConnection using the User Secrets command in [docs/DATABASE.md](docs/DATABASE.md). A running database is not required for /health.
 Also configure Authentication:Supabase:Issuer using [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
-Sixty-seven tests run without SQL Server. Seven additional integration tests verify
-the migration, relationships, HTTP CRUD and catalog query workflow on a dedicated SQL Server
+Eighty-five tests run without SQL Server. Eight additional integration tests verify
+the migration, relationships, HTTP CRUD, catalog queries and comparisons on a dedicated SQL Server
 database; see docs/DATABASE.md for the command. Request examples and error contracts
 are in docs/API.md. Product CRUD retains its public local-development contract.
 
@@ -89,8 +90,10 @@ applied to local PikwiseDb. Session 7 adds protected /api/auth/me and
 /api/auth/admin-check endpoints, validates Supabase JWTs and resolves local
 profiles from sub claims. Session 8 adds protected GET/POST/DELETE favorites,
 owner isolation and controlled duplicate handling. Session 9 adds combined catalog
-filters, explicit sorting and SQL pagination with metadata. All 74 tests pass.
+filters, explicit sorting and SQL pagination with metadata. Session 10 adds structured
+comparison of two or three selected products in one SQL read. All 93 tests pass.
 GET /api/products now returns an object with items instead of a bare array.
-Session 9 is ready for developer review; Session 10 has not started.
-Details and examples are in [docs/PRODUCT_QUERIES.md](docs/PRODUCT_QUERIES.md)
+Session 9 was reviewed and pushed. Session 10 was approved for commit/push;
+Session 11 has not started. Details are in [docs/COMPARISON.md](docs/COMPARISON.md),
+[docs/PRODUCT_QUERIES.md](docs/PRODUCT_QUERIES.md)
 and [docs/Pikwise.http](docs/Pikwise.http).

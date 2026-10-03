@@ -11,6 +11,14 @@ namespace Pikwise.Infrastructure.Products;
 
 public sealed class ProductRepository(ApplicationDbContext context) : IProductRepository
 {
+    // Fetch the small selection in one query rather than making a database round trip per ID.
+    public async Task<IReadOnlyList<Product>> GetByIdsAsync(
+        IReadOnlyList<int> ids, CancellationToken cancellationToken = default) =>
+        await context.Products.AsNoTracking()
+            .Where(product => ids.Contains(product.Id))
+            .Include(product => product.Brand).Include(product => product.LaptopSpecification)
+            .ToListAsync(cancellationToken);
+
     // Read-only queries avoid tracking and load the relationships required by the response mapper.
     public Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
         context.Products

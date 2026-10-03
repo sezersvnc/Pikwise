@@ -9,6 +9,14 @@ namespace Pikwise.Api.Controllers;
 // Keep HTTP routing and status codes here; ProductService handles each use case.
 public sealed class ProductsController(IProductService productService) : ControllerBase
 {
+    [HttpGet("compare")]
+    [ProducesResponseType<ProductComparisonResponseDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProductComparisonResponseDto>> Compare(
+        [FromQuery] ProductComparisonRequestDto request, CancellationToken cancellationToken) =>
+        Ok(await productService.CompareAsync(request, cancellationToken));
+
     [HttpGet]
     [ProducesResponseType<PagedProductResponseDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]

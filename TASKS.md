@@ -13,10 +13,10 @@ Completed:
 - [x] Authentication foundation / local authorization test policy (Session 7)
 - [x] Favorites API (Session 8)
 - [x] Filtering / Sorting / Pagination (Session 9)
+- [x] Product Comparison (Session 10)
 
 Not implemented yet:
 - [ ] Product-write authorization / full role management
-- [ ] Product Comparison
 - [ ] Recommendation Engine
 - [ ] Value-for-Money
 - [ ] LLM integration
@@ -158,8 +158,8 @@ for valid/empty queries and 400 for invalid sizes/ranges. OpenAPI exposes all
 query parameters and the paged response. The local catalog is currently empty;
 populated filter/sort/page behavior was verified by HTTP tests against dedicated
 SQL fixtures. Swagger/Postman developer review remains pending; examples are in
-docs/Pikwise.http. See docs/PRODUCT_QUERIES.md. Commit/push awaits review.
-Session 10 has not started.
+docs/Pikwise.http. See docs/PRODUCT_QUERIES.md. User approved commit/push;
+Session 9 was committed as 5b950a5 and pushed to main. Session 10 is recorded below.
 
 ---
 
@@ -187,19 +187,35 @@ GET /api/products/compare?ids=1&ids=2&ids=3
 - Operating system
 
 ## Tasks
-- [ ] Define comparison request/response DTO.
-- [ ] Support multiple product IDs.
-- [ ] Validate comparison count.
-- [ ] Load required product/spec data efficiently.
-- [ ] Return comparable fields in one response.
-- [ ] Handle nonexistent IDs.
-- [ ] Do not use an LLM.
-- [ ] Do not calculate recommendation scores yet.
-- [ ] Add tests.
-- [ ] Build and run all tests.
+- [x] Define comparison request/response DTO.
+- [x] Support multiple product IDs.
+- [x] Validate comparison count.
+- [x] Load required product/spec data efficiently.
+- [x] Return comparable fields in one response.
+- [x] Handle nonexistent IDs.
+- [x] Do not use an LLM.
+- [x] Do not calculate recommendation scores yet.
+- [x] Add tests.
+- [x] Build and run all tests.
 
 ## Exit Criterion
 Two or three laptops can be compared in one structured response.
+
+## Verification and review status
+
+Implemented and verified on 2026-10-03: public GET /api/products/compare accepts
+2-3 distinct positive IDs, returns stored comparison facts in selection order,
+preserves missing-spec null and reports all missing IDs with 404. One SQL query
+loads the selection. All 93 tests pass (18 unit, 75 integration), including 8
+guarded SQL Server tests. Release build: zero errors/warnings.
+
+Live localhost:5080 checks returned 400 for missing/count/duplicate errors,
+404 with missingProductIds for absent products, and 200 for the unchanged catalog
+list. OpenAPI exposes the comparison query and 200/400/404 responses. The local
+catalog is empty; successful two/three-product HTTP comparisons were verified
+against populated fixtures in the dedicated SQL test database. Swagger/Postman
+developer review remains pending; examples are in docs/Pikwise.http. See
+docs/COMPARISON.md. User approved Session 10 commit/push. Session 11 has not started.
 
 ---
 

@@ -328,11 +328,12 @@ Browser extension/mobile remain late-stage.
 | 7 | Value-for-Money + tests | Explainable scoring + unit tests |
 | 8 | LLM integration | Natural language -> JSON -> engine -> explanation |
 
-Current position: Sessions 1-9 are implemented. Session 9 adds catalog filters,
-explicit sorting and SQL pagination. All 74 tests pass; developer review is
-pending. Session 10 has not started.
+Current position: Sessions 1-10 are implemented. Session 9 catalog queries were
+reviewed and pushed. Session 10 adds structured comparison of 2-3 selected
+products. All 93 tests pass; Session 10 commit/push was approved by the user.
+Session 11 recommendation design has not started.
 TASKS.md defines the current session order: Session 8 Favorites API, Session 9
-filtering/pagination, then comparison and recommendation. The stage numbers above
+filtering/pagination, Session 10 comparison, then recommendation. The stage numbers above
 describe the broader learning roadmap rather than session numbers.
 
 ---

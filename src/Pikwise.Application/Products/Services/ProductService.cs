@@ -10,6 +10,19 @@ namespace Pikwise.Application.Products.Services;
 // Coordinates validation, reference checks, timestamps and mapping for product use cases.
 public sealed class ProductService(IProductRepository productRepository) : IProductService
 {
+    public async Task<ProductComparisonResponseDto> CompareAsync(
+        ProductComparisonRequestDto request, CancellationToken cancellationToken = default)
+    {
+        ProductComparisonValidator.Validate(request);
+        var products = await productRepository.GetByIdsAsync(request.Ids, cancellationToken);
+        var byId = products.ToDictionary(product => product.Id);
+        var missingIds = request.Ids.Where(id => !byId.ContainsKey(id)).ToArray();
+        // A comparison must include every selected product; never silently return a partial result.
+        if (missingIds.Length > 0) throw new ProductsNotFoundException(missingIds);
+        // SQL set queries do not preserve input order, so restore the user's selection order here.
+        return new ProductComparisonResponseDto(request.Ids.Select(id => byId[id].ToComparisonDto()).ToList());
+    }
+
     public async Task<ProductResponseDto?> GetByIdAsync(
         int id, CancellationToken cancellationToken = default)
     {

@@ -61,7 +61,7 @@ paging. No speculative indexes or extra infrastructure are added here.
 
 ## Verification
 
-Release build has zero warnings/errors. All 74 tests pass: 9 unit and 65 integration,
+At Session 9 completion, the Release build had zero warnings/errors and all 74 tests passed: 9 unit and 65 integration,
 including 7 tests on the dedicated PikwiseSession3Tests SQL Server database.
 67 tests need no SQL Server.
 
@@ -75,4 +75,5 @@ The existing CRUD test and OpenAPI contract test were updated.
 
 Local request examples are in [Pikwise.http](Pikwise.http). The automated SQL tests
 exercise the real HTTP pipeline; live endpoint checks are recorded in TASKS.md.
-Swagger/Postman review remains a developer review step. Session 10 has not started.
+Swagger/Postman review remains a developer review step. Session 9 was approved
+for commit/push; Session 10 comparison is documented in [COMPARISON.md](COMPARISON.md).

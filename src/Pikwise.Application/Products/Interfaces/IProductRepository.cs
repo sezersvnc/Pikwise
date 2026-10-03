@@ -8,6 +8,7 @@ namespace Pikwise.Application.Products.Interfaces;
 public interface IProductRepository
 {
     Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Product>> GetByIdsAsync(IReadOnlyList<int> ids, CancellationToken cancellationToken = default);
     Task<ProductPageResult> GetAllAsync(ProductQueryRequestDto query, CancellationToken cancellationToken = default);
     Task<Product?> GetForUpdateAsync(int id, CancellationToken cancellationToken = default);
     Task<Brand?> GetBrandAsync(int id, CancellationToken cancellationToken = default);

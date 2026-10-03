@@ -284,3 +284,26 @@ cancellation. Separate statements can observe concurrent writes; no snapshot
 consistency is promised. Offset and substring costs may require measured future
 optimization. Favorites keep their Session 8 response. Session 10 comparison is
 outside this change. See PRODUCT_QUERIES.md for implementation and verification.
+
+---
+
+## ADR-018 — Session 10 structured product comparison
+**Status:** Accepted
+
+Expose public GET /api/products/compare with repeated ids parameters. Accept
+exactly 2 or 3 distinct positive Int32 IDs; reject duplicates/count/shape errors
+with 400. Preserve input order in the products response. If any product is
+absent, return 404 with all missingProductIds in input order and no partial result.
+Application owns these rules; the API owns HTTP translation.
+
+Reuse IProductService/ProductService for the product use case and add repository
+GetByIdsAsync. Fetch the selection in one AsNoTracking membership query with Brand
+and LaptopSpecification; do not perform per-ID reads. Service restores ordering
+after materialization. Return dedicated comparison response/item DTOs with id,
+name, price, compact brand and the existing LaptopSpecificationDto. Share
+specification mapping with product detail. Omit unrelated fields and user data.
+
+Missing specifications remain null; stored availability does not restrict this
+read. Facts are returned without inferred specs, deltas, scores, ranking or LLM.
+No schema/migration, packages or new DI registrations are required. Recommendation
+design remains Session 11. See COMPARISON.md for verification and review.

@@ -203,15 +203,30 @@ See [FAVORITES.md](FAVORITES.md) for implementation, tests and review guidance.
 
 ## Comparison
 
-Future:
+### GET /api/products/compare (Session 10)
 
-```text
+Public catalog read; no token required. Supply repeated `ids` query parameters:
+
+```http
 GET /api/products/compare?ids=1&ids=2&ids=3
 ```
 
-Returns structured comparable product facts.
+Exactly 2 or 3 distinct positive Int32 IDs are required. Missing/malformed IDs,
+duplicates and an invalid count return 400 ValidationProblemDetails. Comma-separated
+values are not supported. If any selected ID does not exist, return 404 ProblemDetails
+with `missingProductIds` in request order; no partial comparison is returned.
 
-No LLM decision-making.
+200 returns `ProductComparisonResponseDto` with a `products` array in the user's
+selection order. Each item contains id, name, price, brand { id, name } and
+specification. The specification reuses LaptopSpecificationDto: processor, gpu,
+ramGb, storageGb, screenSize, resolution, refreshRate, weight and operatingSystem.
+RAM/storage are GB, screenSize is inches and weight is kg. Missing specifications
+are represented by null, without guessed defaults. Inactive/out-of-stock products
+can be compared. Stock, timestamps, category, favorites and user data are omitted.
+
+The endpoint returns stored facts; it computes no winner, recommendation score,
+price delta or AI explanation. Required relations are loaded in one SQL query.
+See [COMPARISON.md](COMPARISON.md) for review guidance and tests.
 
 ---
 

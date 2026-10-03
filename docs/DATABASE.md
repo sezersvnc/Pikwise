@@ -561,3 +561,17 @@ ProductQuerySqlTests verifies combined HTTP queries and records server SQL to
 prove pagination executes in the database. The current suite has 74 passing tests
 (9 unit, 65 integration): 7 require the guarded PikwiseSession3Tests database and
 67 run without SQL. Query limits and review notes are in PRODUCT_QUERIES.md.
+
+## Session 10 — comparison reads
+
+No schema/migration change. GetByIdsAsync filters Products by the selected IDs
+and loads Brand and optional LaptopSpecification in one AsNoTracking query.
+The selection is bounded to 2-3 distinct IDs by Application validation. The
+repository does not decide request completeness or output order; Service does.
+No Category, Favorite or UserProfile relations are loaded.
+
+ProductComparisonSqlTests verifies selected-only HTTP results, missing-ID errors,
+optional specifications, one SQL command and no tracking. All 93 tests pass
+(18 unit, 75 integration): 8 require the guarded PikwiseSession3Tests database
+and 85 require no SQL. Test fixtures are cleaned up without changing PikwiseDb.
+See COMPARISON.md for the contract and review guide.

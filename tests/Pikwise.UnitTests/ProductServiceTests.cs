@@ -103,6 +103,7 @@ public class ProductServiceTests
 
     private sealed class StubProductRepository(Product? product) : IProductRepository
     {
+        public Task<IReadOnlyList<Product>> GetByIdsAsync(IReadOnlyList<int> ids, CancellationToken cancellationToken = default) => throw new NotSupportedException();
         public Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
             Task.FromResult(product?.Id == id ? product : null);
         public ProductQueryRequestDto? Query { get; private set; }

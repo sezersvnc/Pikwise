@@ -276,3 +276,17 @@ then loads response relationships and materializes only the page. A separate
 CountAsync statement supplies the filtered total. Nonunique sorts use ID as a
 tie-breaker. No Domain/schema changes are required. See PRODUCT_QUERIES.md and
 ADR-017 for the contract change, verification and concurrency limits.
+
+## Session 10 implementation
+
+ProductsController binds comparison IDs and documents HTTP 200/400/404.
+ProductService validates the 2-3 distinct positive selections, calls one batch
+repository method, requires every selected product to exist and restores request
+order. ProductsNotFoundException carries missing IDs without HTTP dependencies;
+API maps it to 404 ProblemDetails.
+
+ProductRepository uses an awaited, untracked membership query with Brand and
+LaptopSpecification loaded. ProductMapper reuses specification conversion for
+detail and comparison DTOs. Category/favorite/profile loading is unnecessary.
+Domain/schema stay unchanged. See COMPARISON.md and ADR-018. Recommendation design
+and implementation remain later sessions.

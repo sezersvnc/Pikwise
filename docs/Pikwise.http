@@ -2,6 +2,10 @@
 # Set these IDs to existing lookup rows in your local PikwiseDb.
 @brandId = 1
 @categoryId = 1
+# Set these to two or three existing, different product IDs.
+@comparisonProductId1 = 1
+@comparisonProductId2 = 2
+@comparisonProductId3 = 3
 
 ### Current profile without a token (401)
 GET {{baseUrl}}/api/auth/me
@@ -30,6 +34,18 @@ GET {{baseUrl}}/api/products?sortBy=ram&sortDirection=desc&page=2&pageSize=5
 
 ### Invalid page size (400 ValidationProblemDetails)
 GET {{baseUrl}}/api/products?pageSize=101
+
+### Compare two products (200, products in selection order)
+GET {{baseUrl}}/api/products/compare?ids={{comparisonProductId2}}&ids={{comparisonProductId1}}
+
+### Compare three products (200)
+GET {{baseUrl}}/api/products/compare?ids={{comparisonProductId1}}&ids={{comparisonProductId2}}&ids={{comparisonProductId3}}
+
+### Duplicate selection (400)
+GET {{baseUrl}}/api/products/compare?ids={{comparisonProductId1}}&ids={{comparisonProductId1}}
+
+### Missing products (404, missingProductIds)
+GET {{baseUrl}}/api/products/compare?ids=2147483647&ids=2147483646
 
 ### Create a product (201, Location)
 # @name createProduct

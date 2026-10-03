@@ -32,6 +32,7 @@ public class ExceptionHandlingTests
 
     private sealed class FailingService(bool conflict) : IProductService
     {
+        public Task<ProductComparisonResponseDto> CompareAsync(ProductComparisonRequestDto request, CancellationToken cancellationToken = default) => throw new NotSupportedException();
         public Task<ProductResponseDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
             throw (conflict ? new PersistenceConflictException(new Exception("secret database details"))
                 : new InvalidOperationException("secret database details"));

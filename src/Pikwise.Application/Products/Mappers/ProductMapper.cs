@@ -42,16 +42,17 @@ public static class ProductMapper
         product.UpdatedAt,
         new ProductBrandDto(product.Brand.Id, product.Brand.Name),
         new ProductCategoryDto(product.Category.Id, product.Category.Name),
-        product.LaptopSpecification is null
-            ? null
-            : new LaptopSpecificationDto(
-                product.LaptopSpecification.Processor,
-                product.LaptopSpecification.GPU,
-                product.LaptopSpecification.RamGb,
-                product.LaptopSpecification.StorageGb,
-                product.LaptopSpecification.ScreenSize,
-                product.LaptopSpecification.Resolution,
-                product.LaptopSpecification.RefreshRate,
-                product.LaptopSpecification.Weight,
-                product.LaptopSpecification.OperatingSystem));
+        product.LaptopSpecification.ToSpecificationDto());
+
+    // Comparison reads need Brand and LaptopSpecification, without Category or favorite loading.
+    public static ProductComparisonItemDto ToComparisonDto(this Product product) => new(
+        product.Id, product.Name, product.Price,
+        new ProductBrandDto(product.Brand.Id, product.Brand.Name),
+        product.LaptopSpecification.ToSpecificationDto());
+
+    private static LaptopSpecificationDto? ToSpecificationDto(this LaptopSpecification? specification) =>
+        specification is null ? null : new LaptopSpecificationDto(
+            specification.Processor, specification.GPU, specification.RamGb, specification.StorageGb,
+            specification.ScreenSize, specification.Resolution, specification.RefreshRate,
+            specification.Weight, specification.OperatingSystem);
 }

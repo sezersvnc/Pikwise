@@ -13,6 +13,11 @@ public sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : I
         // Translate known Application failures into consistent HTTP error responses.
         ProblemDetails problem = exception switch
         {
+            ProductsNotFoundException missing => new ProblemDetails
+            {
+                Status = StatusCodes.Status404NotFound, Title = "One or more requested products do not exist.",
+                Extensions = { ["missingProductIds"] = missing.MissingProductIds }
+            },
             UserProfileUnavailableException => new ProblemDetails
             {
                 Status = StatusCodes.Status403Forbidden, Title = "A local user profile could not be resolved."
