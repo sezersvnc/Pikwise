@@ -39,7 +39,7 @@ No schema change, migration or new package is required.
 GET filters by the resolved UserProfileId before loading results. It uses
 AsNoTracking and Include/ThenInclude for Product, Brand, Category and optional
 LaptopSpecification. Results are ordered by CreatedAt descending, then ProductId
-ascending for ties. Pagination/filtering remains Session 9.
+ascending for ties. Session 9 adds product catalog pagination; favorites retain this array contract.
 
 POST checks that the product exists and inserts one join row using SaveChangesAsync.
 Any existing product is eligible, including inactive/out-of-stock products;
@@ -59,8 +59,8 @@ database cascade. See [EF Core ExecuteDelete](https://learn.microsoft.com/en-us/
 
 ## Verification and review
 
-Release build: zero warnings/errors. All 57 tests pass (6 unit, 51 integration).
-Six SQL integration tests use only PikwiseSession3Tests; 51 tests run without SQL.
+At Session 8 completion: zero build warnings/errors and 57 passing tests (6 unit, 51 integration).
+At that stage, six SQL tests used PikwiseSession3Tests and 51 tests needed no SQL.
 The new tests exercise JWT protection on every verb, unresolved-profile 403,
 first-access provisioning, empty lists, DTO mapping, duplicate/conflict behavior,
 concurrent adds, positive Id validation, missing products, ownership isolation,
@@ -70,9 +70,11 @@ The API was also started with local User Secrets. GET/POST/DELETE favorites with
 a token each returned 401, and both favorite route templates appeared in OpenAPI.
 
 [Pikwise.http](Pikwise.http) contains local requests using PIKWISE_ACCESS_TOKEN.
-Use a Supabase user session access token locally. A real Supabase login/token
-has not been exercised; automated requests use temporary signed JWTs through the
-production Bearer handler. Session 8 is complete; Session 9 has not started.
+Use a Supabase user session access token locally. Real Supabase login and
+GET /api/auth/me were manually verified on 2026-10-03, including the SQL profile
+with Role=User. GET/POST/DELETE favorites with that real token have not yet been
+manually verified; automated requests use temporary signed JWTs through the
+production Bearer handler. Session 8 is complete. Session 9 product queries are documented in PRODUCT_QUERIES.md.
 
 Start code review with Application/Favorites/Services/FavoriteService.cs,
 Infrastructure/Favorites/FavoriteRepository.cs and Api/Controllers/FavoritesController.cs.

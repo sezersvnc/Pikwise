@@ -12,10 +12,10 @@ Completed:
 - [x] Completed Session 6 work pushed to GitHub
 - [x] Authentication foundation / local authorization test policy (Session 7)
 - [x] Favorites API (Session 8)
+- [x] Filtering / Sorting / Pagination (Session 9)
 
 Not implemented yet:
 - [ ] Product-write authorization / full role management
-- [ ] Filtering / Sorting / Pagination
 - [ ] Product Comparison
 - [ ] Recommendation Engine
 - [ ] Value-for-Money
@@ -64,7 +64,9 @@ A protected endpoint identifies the authenticated user from claims and unauthent
 
 Implemented: `/api/auth/me` and `/api/auth/admin-check`. Release build:
 0 errors/warnings; 44 tests passed. Real Supabase JWKS checked and local HTTP
-401 behavior verified; a real Supabase user token remains a manual review step.
+401 behavior verified. On 2026-10-03, a real Supabase user access token was used
+successfully for GET /api/auth/me in Postman, and the user confirmed the SQL
+profile with Role=User. Real-token Favorites/Admin-check manual tests remain pending.
 See `docs/AUTHENTICATION.md`. Favorites API is implemented in Session 8.
 
 ---
@@ -103,7 +105,7 @@ An authenticated user can add, list, and remove only their own favorites.
 
 Implemented: GET/POST/DELETE favorites, with 201/204 success, duplicate
 409 and owner-filtered 404 behavior. All 57 tests pass; Release build has zero
-errors/warnings. See `docs/FAVORITES.md`. Session 9 has not started.
+errors/warnings. See `docs/FAVORITES.md`. Session 9 is recorded below.
 
 ---
 
@@ -129,22 +131,35 @@ GET /api/products?minPrice=20000&maxPrice=50000&brandId=2&minRam=16&sortBy=price
 - pagination metadata
 
 ## Tasks
-- [ ] Create product query/filter request model.
-- [ ] Add min/max price filtering.
-- [ ] Add brand filtering.
-- [ ] Add RAM filtering.
-- [ ] Add selected CPU/GPU/spec filters when useful.
-- [ ] Add sorting.
-- [ ] Add pagination.
-- [ ] Define safe max `pageSize`.
-- [ ] Return pagination metadata.
-- [ ] Keep query composable with `IQueryable`.
-- [ ] Avoid `ToListAsync()` before filters/pagination.
-- [ ] Add combined-filter tests.
-- [ ] Build and run all tests.
+- [x] Create product query/filter request model.
+- [x] Add min/max price filtering.
+- [x] Add brand filtering.
+- [x] Add RAM filtering.
+- [x] Add selected CPU/GPU/spec filters when useful.
+- [x] Add sorting.
+- [x] Add pagination.
+- [x] Define safe max `pageSize`.
+- [x] Return pagination metadata.
+- [x] Keep query composable with `IQueryable`.
+- [x] Avoid `ToListAsync()` before filters/pagination.
+- [x] Add combined-filter tests.
+- [x] Build and run all tests.
 
 ## Exit Criterion
 Combined product queries work predictably through Swagger/Postman.
+
+## Verification and review status
+
+Implemented and verified on 2026-10-03: combined price/brand/RAM/storage/CPU/GPU
+queries, explicit sorting with ID ties, max pageSize 100 and paged metadata.
+Release build: zero errors/warnings; all 74 tests pass (9 unit, 65 integration),
+including 7 guarded SQL Server tests. Live localhost:5080 checks returned 200
+for valid/empty queries and 400 for invalid sizes/ranges. OpenAPI exposes all
+query parameters and the paged response. The local catalog is currently empty;
+populated filter/sort/page behavior was verified by HTTP tests against dedicated
+SQL fixtures. Swagger/Postman developer review remains pending; examples are in
+docs/Pikwise.http. See docs/PRODUCT_QUERIES.md. Commit/push awaits review.
+Session 10 has not started.
 
 ---
 

@@ -95,7 +95,14 @@ duplicate recovery, persistence, separate identities and local role changes.
 The real project's public JWKS was fetched successfully and contains an ES256 key.
 The API was also started with local User Secrets: /health returned 200, protected
 endpoints without a token returned 401, an invalid token returned 401 and OpenAPI
-listed both auth routes. A real Supabase user login/token has not been exercised.
+listed both auth routes.
+
+On 2026-10-03, a manual Postman test used an access token obtained by signing in
+with a real Supabase test user. The user confirmed successful GET /api/auth/me
+and verified the local profile in SQL Server PikwiseDb with Role=User. API logs
+also showed the profile lookup and insertion. No credentials or tokens are stored
+in the repository. Real-token favorite operations and Admin-check remain separate
+manual tests; their automated coverage is described above and in FAVORITES.md.
 
 Use [Pikwise.http](Pikwise.http) with VS Code REST Client or import equivalent
 requests into Postman. Its auth requests read `PIKWISE_ACCESS_TOKEN` from the local

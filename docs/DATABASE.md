@@ -548,3 +548,16 @@ row and preserves parents. Six integration tests require SQL Server, including
 FavoriteApiSqlTests, which verifies the protected HTTP flow using two temporary
 identities, concurrent insertion, isolation, timestamps, mapping and cascade
 cleanup. Test data is removed from PikwiseSession3Tests after use.
+
+## Session 9 — catalog reads
+
+No schema/migration change. ProductRepository adds composable price/brand/spec
+predicates, filtered CountAsync and explicit ordering with ID ties. Skip/Take
+translates to SQL Server OFFSET/FETCH before materialization; includes load only
+the page's response relationships. Count and page are separate statements without
+snapshot consistency. Text predicates/order follow the database collation.
+
+ProductQuerySqlTests verifies combined HTTP queries and records server SQL to
+prove pagination executes in the database. The current suite has 74 passing tests
+(9 unit, 65 integration): 7 require the guarded PikwiseSession3Tests database and
+67 run without SQL. Query limits and review notes are in PRODUCT_QUERIES.md.

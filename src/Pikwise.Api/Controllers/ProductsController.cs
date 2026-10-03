@@ -10,9 +10,11 @@ namespace Pikwise.Api.Controllers;
 public sealed class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpGet]
-    [ProducesResponseType<IReadOnlyList<ProductResponseDto>>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IReadOnlyList<ProductResponseDto>>> GetAll(CancellationToken cancellationToken) =>
-        Ok(await productService.GetAllAsync(cancellationToken));
+    [ProducesResponseType<PagedProductResponseDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<PagedProductResponseDto>> GetAll(
+        [FromQuery] ProductQueryRequestDto query, CancellationToken cancellationToken) =>
+        Ok(await productService.GetAllAsync(query, cancellationToken));
 
     [HttpPost]
     [ProducesResponseType<ProductResponseDto>(StatusCodes.Status201Created)]

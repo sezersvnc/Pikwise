@@ -51,6 +51,7 @@ Complete product CRUD            ✅ Session 5 complete
 User profiles / favorites        ✅ Session 6 complete
 Authentication foundation        ✅ Session 7 complete
 Authenticated favorites API      ✅ Session 8 complete
+Filtering / sorting / pagination ✅ Session 9 implemented; developer review pending
 ```
 
 ## Read order
@@ -62,7 +63,7 @@ Authenticated favorites API      ✅ Session 8 complete
 6. `TASKS.md`
 7. `docs/DECISIONS.md`
 
-## Run the backend (Session 8)
+## Run the backend (Session 9)
 
 Prerequisite: .NET SDK 10.0.200 (or a newer patch in the same feature band).
 
@@ -77,8 +78,8 @@ dotnet run --project src/Pikwise.Api --no-launch-profile -- --environment Develo
 Open http://localhost:5080/health: expected HTTP 200, body `Healthy`.
 Before running, configure ConnectionStrings:DefaultConnection using the User Secrets command in [docs/DATABASE.md](docs/DATABASE.md). A running database is not required for /health.
 Also configure Authentication:Supabase:Issuer using [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
-Fifty-one tests run without SQL Server. Six additional integration tests verify
-the migration, relationships and full HTTP CRUD workflow on a dedicated SQL Server
+Sixty-seven tests run without SQL Server. Seven additional integration tests verify
+the migration, relationships, HTTP CRUD and catalog query workflow on a dedicated SQL Server
 database; see docs/DATABASE.md for the command. Request examples and error contracts
 are in docs/API.md. Product CRUD retains its public local-development contract.
 
@@ -87,6 +88,9 @@ foreign keys and tested Include/ThenInclude queries. The reviewed migration is
 applied to local PikwiseDb. Session 7 adds protected /api/auth/me and
 /api/auth/admin-check endpoints, validates Supabase JWTs and resolves local
 profiles from sub claims. Session 8 adds protected GET/POST/DELETE favorites,
-owner isolation and controlled duplicate handling. All 57 tests pass. No Session 9
-work has started. Session 8 is complete. Details and HTTP examples are
-in [docs/FAVORITES.md](docs/FAVORITES.md).
+owner isolation and controlled duplicate handling. Session 9 adds combined catalog
+filters, explicit sorting and SQL pagination with metadata. All 74 tests pass.
+GET /api/products now returns an object with items instead of a bare array.
+Session 9 is ready for developer review; Session 10 has not started.
+Details and examples are in [docs/PRODUCT_QUERIES.md](docs/PRODUCT_QUERIES.md)
+and [docs/Pikwise.http](docs/Pikwise.http).

@@ -1,4 +1,6 @@
 using Pikwise.Domain.Entities;
+using Pikwise.Application.Products.DTOs;
+using Pikwise.Application.Products.Models;
 
 namespace Pikwise.Application.Products.Interfaces;
 
@@ -6,7 +8,7 @@ namespace Pikwise.Application.Products.Interfaces;
 public interface IProductRepository
 {
     Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
-    Task<IReadOnlyList<Product>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<ProductPageResult> GetAllAsync(ProductQueryRequestDto query, CancellationToken cancellationToken = default);
     Task<Product?> GetForUpdateAsync(int id, CancellationToken cancellationToken = default);
     Task<Brand?> GetBrandAsync(int id, CancellationToken cancellationToken = default);
     Task<Category?> GetCategoryAsync(int id, CancellationToken cancellationToken = default);

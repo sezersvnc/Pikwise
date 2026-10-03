@@ -45,8 +45,8 @@ public class ProductCrudTests
             Assert.Equal($"/api/products/{created.Id}", createdResponse.Headers.Location!.AbsolutePath);
             using var get = await client.GetAsync(createdResponse.Headers.Location);
             Assert.Equal(HttpStatusCode.OK, get.StatusCode);
-            var list = (await client.GetFromJsonAsync<List<ProductResponseDto>>("/api/products"))!;
-            Assert.Contains(list, p => p.Id == created.Id);
+            var list = (await client.GetFromJsonAsync<PagedProductResponseDto>($"/api/products?brandId={brand.Id}"))!;
+            Assert.Contains(list.Items, p => p.Id == created.Id);
 
             var update = new { name = "Updated", price = 36000.50m, stock = 0, isActive = false,
                 brandId = otherBrand.Id, categoryId = otherCategory.Id, specification = body.specification };

@@ -263,3 +263,16 @@ to a FavoriteAlreadyExistsException and API returns 409. Missing local profiles
 raise UserProfileUnavailableException mapped to 403. Owner-scoped ExecuteDeleteAsync
 removes only the join row. No Domain/schema changes or new packages are needed.
 See FAVORITES.md and ADR-016 for behavior and verification.
+
+## Session 9 implementation
+
+ProductsController binds query DTOs and returns a paged response. Application owns
+query validation, page defaults/limits and metadata. ProductService reuses the
+product mapper after retrieving one page. ProductPageResult carries entities and
+the filtered count without exposing IQueryable outside Infrastructure.
+
+ProductRepository composes EF filters, explicit ordering and Skip/Take in SQL,
+then loads response relationships and materializes only the page. A separate
+CountAsync statement supplies the filtered total. Nonunique sorts use ID as a
+tie-breaker. No Domain/schema changes are required. See PRODUCT_QUERIES.md and
+ADR-017 for the contract change, verification and concurrency limits.

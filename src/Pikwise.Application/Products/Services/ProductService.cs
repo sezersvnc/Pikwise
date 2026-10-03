@@ -17,8 +17,14 @@ public sealed class ProductService(IProductRepository productRepository) : IProd
         return product?.ToResponseDto();
     }
 
-    public async Task<IReadOnlyList<ProductResponseDto>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        (await productRepository.GetAllAsync(cancellationToken)).Select(p => p.ToResponseDto()).ToList();
+    public async Task<PagedProductResponseDto> GetAllAsync(ProductQueryRequestDto query, CancellationToken cancellationToken = default)
+    {
+        // Validate here too, so callers outside MVC receive the same query rules.
+        ProductQueryValidator.Validate(query);
+        var result = await productRepository.GetAllAsync(query, cancellationToken);
+        return new PagedProductResponseDto(result.Items.Select(p => p.ToResponseDto()).ToList(),
+            query.Page, query.PageSize, result.TotalCount);
+    }
 
     public async Task<ProductResponseDto> CreateAsync(CreateProductRequestDto request, CancellationToken cancellationToken = default)
     {

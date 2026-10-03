@@ -260,3 +260,27 @@ key, rather than a pre-insert existence check, arbitrates simultaneous inserts.
 No paging/filtering work is included. Session 9 remains separate. HTTP and SQL
 tests verify protection, ownership, DTO output, duplicates, missing/invalid IDs,
 concurrent inserts and parent/cascade behavior. See FAVORITES.md.
+
+---
+
+## ADR-017 — Session 9 catalog filtering and pagination
+**Status:** Accepted
+
+Replace GET /api/products's array with items/page/pageSize/totalCount/totalPages/
+hasPreviousPage/hasNextPage. Reuse ProductResponseDto for items. Default to page 1,
+20 items, ID ascending; reject sizes outside 1..100 and offsets exceeding Int32.
+Application owns validation and metadata; Infrastructure owns IQueryable and EF
+execution. API owns query binding and HTTP outcomes. Keep service validation for
+callers outside MVC. No new packages, Domain changes or migrations are needed.
+
+Combine inclusive min/max prices, brand ID, minimum RAM/storage and trimmed CPU/
+GPU substring filters with AND. Preserve inactive/out-of-stock catalog visibility.
+Specification filters exclude missing specs; no filter requires specs implicitly.
+Allow id/price/name/ram/createdAt ordering and asc/desc using ordinal comparison.
+Append ID ascending for ties. Text matching and NULL ordering follow SQL Server.
+
+Execute filtered CountAsync, then sorted Skip/Take/Include/ToListAsync with awaited
+cancellation. Separate statements can observe concurrent writes; no snapshot
+consistency is promised. Offset and substring costs may require measured future
+optimization. Favorites keep their Session 8 response. Session 10 comparison is
+outside this change. See PRODUCT_QUERIES.md for implementation and verification.

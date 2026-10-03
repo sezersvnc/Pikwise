@@ -35,7 +35,7 @@ public class ExceptionHandlingTests
         public Task<ProductResponseDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
             throw (conflict ? new PersistenceConflictException(new Exception("secret database details"))
                 : new InvalidOperationException("secret database details"));
-        public Task<IReadOnlyList<ProductResponseDto>> GetAllAsync(CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<PagedProductResponseDto> GetAllAsync(ProductQueryRequestDto query, CancellationToken cancellationToken = default) => throw new NotSupportedException();
         public Task<ProductResponseDto> CreateAsync(CreateProductRequestDto request, CancellationToken cancellationToken = default) => throw new NotSupportedException();
         public Task<ProductResponseDto?> UpdateAsync(int id, UpdateProductRequestDto request, CancellationToken cancellationToken = default) => throw new NotSupportedException();
         public Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default) => throw new NotSupportedException();

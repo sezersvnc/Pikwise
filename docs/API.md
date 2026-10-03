@@ -5,21 +5,45 @@ This file becomes the source of truth for public API behavior.
 ## Products
 
 ### GET /api/products
-Purpose: list products.
-Status: implemented in Session 5. Returns 200 with an array, including `[]` for
-an empty catalog. Items are ordered by Id. Filtering and pagination remain future work.
+Status: Session 9 returns 200 with `PagedProductResponseDto`. This replaces the
+Session 5 bare array: clients must read products from `items`.
 
-Future query support:
-- pagination
-- sorting
-- price
-- brand
-- RAM
-- CPU/GPU
-- storage
+| Query parameter | Behavior |
+|---|---|
+| minPrice / maxPrice | Inclusive, nonnegative decimal(18,2); min must not exceed max |
+| brandId | Positive brand ID; an unknown brand yields an empty page |
+| minRam / minStorage | Positive minimum capacity in GB, inclusive |
+| cpu / gpu | Trimmed literal substring, up to 200 characters; blank means no filter |
+| sortBy | id (default), price, name, ram, createdAt |
+| sortDirection | asc (default), desc |
+| page | Positive, default 1; offset must fit Int32 |
+| pageSize | 1..100, default 20 |
 
-Response:
-- collection of `ProductResponseDto`
+Filters combine with AND. Specification filters exclude products without a
+specification. Text matching/name ordering follow SQL Server collation. Sort
+keywords are case-insensitive independently of server culture. Every sort uses
+ascending product ID to break ties; sorting by ID itself respects sortDirection.
+RAM sorting retains products without a specification (SQL NULL ordering).
+Inactive/out-of-stock products remain included.
+
+```http
+GET /api/products?minPrice=20000&maxPrice=50000&brandId=2&minRam=16&sortBy=price&page=1&pageSize=20
+```
+
+Example empty response:
+
+```json
+{
+  "items": [], "page": 1, "pageSize": 20, "totalCount": 0,
+  "totalPages": 0, "hasPreviousPage": false, "hasNextPage": false
+}
+```
+
+`totalCount` counts filtered products before pagination. Pages beyond the last
+return empty items with the requested page and unchanged total. hasPreviousPage
+is true when page > 1 and at least one matching page exists; hasNextPage is true
+when page < totalPages. Invalid fields, sort keywords, ranges or offsets return
+400 ValidationProblemDetails. See [PRODUCT_QUERIES.md](PRODUCT_QUERIES.md).
 
 ### GET /api/products/{id}
 Status: implemented in Session 4.

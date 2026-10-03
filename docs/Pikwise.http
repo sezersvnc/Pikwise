@@ -19,8 +19,17 @@ Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
 GET {{baseUrl}}/api/auth/me
 Authorization: Bearer invalid
 
-### List products
+### List products (paged response; products are in items)
 GET {{baseUrl}}/api/products
+
+### Combined catalog filters, lowest price first
+GET {{baseUrl}}/api/products?minPrice=20000&maxPrice=50000&brandId={{brandId}}&minRam=16&minStorage=512&cpu=Core&gpu=RTX&sortBy=price&page=1&pageSize=20
+
+### Second page, highest RAM first
+GET {{baseUrl}}/api/products?sortBy=ram&sortDirection=desc&page=2&pageSize=5
+
+### Invalid page size (400 ValidationProblemDetails)
+GET {{baseUrl}}/api/products?pageSize=101
 
 ### Create a product (201, Location)
 # @name createProduct

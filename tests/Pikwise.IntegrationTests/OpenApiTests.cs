@@ -30,6 +30,12 @@ public class OpenApiTests
         Assert.True(favoriteWrites.GetProperty("post").GetProperty("responses").TryGetProperty("409", out _));
         Assert.True(favoriteWrites.GetProperty("delete").GetProperty("responses").TryGetProperty("204", out _));
         Assert.True(paths.GetProperty("/api/products").TryGetProperty("get", out _));
+        var catalog = paths.GetProperty("/api/products").GetProperty("get");
+        Assert.True(catalog.GetProperty("responses").TryGetProperty("400", out _));
+        var queryNames = catalog.GetProperty("parameters").EnumerateArray()
+            .Select(p => p.GetProperty("name").GetString()).ToArray();
+        Assert.Contains(queryNames, name => string.Equals(name, "minPrice", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(queryNames, name => string.Equals(name, "pageSize", StringComparison.OrdinalIgnoreCase));
         Assert.True(paths.GetProperty("/api/products").GetProperty("post").GetProperty("responses").TryGetProperty("201", out _));
         Assert.True(paths.GetProperty("/api/products/{id}").TryGetProperty("put", out _));
         Assert.True(paths.GetProperty("/api/products/{id}").GetProperty("delete").GetProperty("responses").TryGetProperty("204", out _));
