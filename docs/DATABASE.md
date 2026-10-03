@@ -437,13 +437,13 @@ or repository is introduced before Session 4.
 
 ### Test commands
 
-Run thirty-nine tests without SQL Server:
+Run fifty-one tests without SQL Server:
 
 ```powershell
 dotnet test Pikwise.sln --configuration Release --filter 'Category!=SqlServer'
 ```
 
-Run all forty-four tests against a dedicated local database:
+Run all fifty-seven tests against a dedicated local database:
 
 ```powershell
 $env:PIKWISE_TEST_CONNECTION = 'Server=localhost;Database=PikwiseSession3Tests;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;'
@@ -455,7 +455,7 @@ migrations and verify async writes/queries, unique name and specification
 constraints, all three FKs, deletion behavior and the Session 4 HTTP endpoint.
 Test records are removed after use; the empty migrated database remains for
 subsequent runs. The migration and model snapshot have no pending differences.
-Across the solution, forty-four tests pass: six unit tests and thirty-eight integration tests.
+Across the solution, fifty-seven tests pass: six unit tests and fifty-one integration tests.
 Release build completes with zero errors and warnings.
 
 Session 5 adds HTTP CRUD without changing the schema. The dedicated SQL test
@@ -533,3 +533,18 @@ Concurrent first requests are resolved by the unique subject index. SQL errors
 subject. The test suite verifies this with concurrent HTTP requests and an explicit
 duplicate insert on the dedicated database. No login credentials or real users
 are inserted as test data in PikwiseDb. See AUTHENTICATION.md for the full flow.
+
+## Session 8 — favorite operations
+
+The existing Favorites composite key and relationships are reused without a new
+migration. List queries filter by the resolved user Id, load product relations
+with Include/ThenInclude and order by CreatedAt descending with ProductId as a
+tie-breaker. Inserts set UTC CreatedAt in Application. Duplicate-key errors become
+a controlled 409; FK errors from concurrent parent deletion also become 409.
+
+Deletion is a single ExecuteDeleteAsync statement whose predicate contains both
+UserProfileId and ProductId. It bypasses tracking/SaveChanges, affects at most one
+row and preserves parents. Six integration tests require SQL Server, including
+FavoriteApiSqlTests, which verifies the protected HTTP flow using two temporary
+identities, concurrent insertion, isolation, timestamps, mapping and cascade
+cleanup. Test data is removed from PikwiseSession3Tests after use.

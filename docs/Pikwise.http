@@ -50,6 +50,22 @@ Content-Type: application/json
 ### Read the newly created product
 GET {{baseUrl}}/api/products/{{createProduct.response.body.$.id}}
 
+### Add the newly created product to the current user's favorites (201)
+POST {{baseUrl}}/api/favorites/{{createProduct.response.body.$.id}}
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
+
+### List only the current user's favorites (200)
+GET {{baseUrl}}/api/favorites
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
+
+### Repeat the add to verify duplicate handling (409)
+POST {{baseUrl}}/api/favorites/{{createProduct.response.body.$.id}}
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
+
+### Remove only this user's favorite; the product remains (204)
+DELETE {{baseUrl}}/api/favorites/{{createProduct.response.body.$.id}}
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
+
 ### Update the same product (200)
 PUT {{baseUrl}}/api/products/{{createProduct.response.body.$.id}}
 Content-Type: application/json

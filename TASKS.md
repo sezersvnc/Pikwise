@@ -11,10 +11,10 @@ Completed:
 - [x] Session 6 tests: 18 passed, 0 build errors, 0 warnings
 - [x] Completed Session 6 work pushed to GitHub
 - [x] Authentication foundation / local authorization test policy (Session 7)
+- [x] Favorites API (Session 8)
 
 Not implemented yet:
 - [ ] Product-write authorization / full role management
-- [ ] Favorite endpoints
 - [ ] Filtering / Sorting / Pagination
 - [ ] Product Comparison
 - [ ] Recommendation Engine
@@ -65,7 +65,7 @@ A protected endpoint identifies the authenticated user from claims and unauthent
 Implemented: `/api/auth/me` and `/api/auth/admin-check`. Release build:
 0 errors/warnings; 44 tests passed. Real Supabase JWKS checked and local HTTP
 401 behavior verified; a real Supabase user token remains a manual review step.
-See `docs/AUTHENTICATION.md`. Session 8 has not started.
+See `docs/AUTHENTICATION.md`. Favorites API is implemented in Session 8.
 
 ---
 
@@ -82,24 +82,28 @@ DELETE /api/favorites/{productId}
 ```
 
 ## Tasks
-- [ ] Add Favorite repository abstraction/implementation if consistent with current architecture.
-- [ ] Add Favorite service.
-- [ ] Add Favorites controller.
-- [ ] Resolve current user from authentication claims.
-- [ ] Add a product to current user's favorites.
-- [ ] Remove a product from current user's favorites.
-- [ ] Return current user's favorites.
-- [ ] Prevent duplicate favorites.
-- [ ] Handle nonexistent products.
-- [ ] Do not receive `UserProfileId` from route/body.
-- [ ] Use DTOs.
-- [ ] Use async EF Core operations.
-- [ ] Pass `CancellationToken`.
-- [ ] Add tests.
-- [ ] Build and run all tests.
+- [x] Add Favorite repository abstraction/implementation if consistent with current architecture.
+- [x] Add Favorite service.
+- [x] Add Favorites controller.
+- [x] Resolve current user from authentication claims.
+- [x] Add a product to current user's favorites.
+- [x] Remove a product from current user's favorites.
+- [x] Return current user's favorites.
+- [x] Prevent duplicate favorites.
+- [x] Handle nonexistent products.
+- [x] Do not receive `UserProfileId` from route/body.
+- [x] Use DTOs.
+- [x] Use async EF Core operations.
+- [x] Pass `CancellationToken`.
+- [x] Add tests.
+- [x] Build and run all tests.
 
 ## Exit Criterion
 An authenticated user can add, list, and remove only their own favorites.
+
+Implemented: GET/POST/DELETE favorites, with 201/204 success, duplicate
+409 and owner-filtered 404 behavior. All 57 tests pass; Release build has zero
+errors/warnings. See `docs/FAVORITES.md`. Session 9 has not started.
 
 ---
 

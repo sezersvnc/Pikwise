@@ -6,6 +6,8 @@ using Pikwise.Application.Products.Interfaces;
 using Pikwise.Infrastructure.Products;
 using Pikwise.Application.Users.Interfaces;
 using Pikwise.Infrastructure.Users;
+using Pikwise.Application.Favorites.Interfaces;
+using Pikwise.Infrastructure.Favorites;
 
 namespace Pikwise.Infrastructure;
 
@@ -27,6 +29,7 @@ public static class DependencyInjection
             options.UseSqlServer(connectionString));
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+        services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 
         return services;
     }

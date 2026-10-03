@@ -146,6 +146,37 @@ Admin policy remains a separate decision.
 
 ---
 
+## Favorites (Session 8)
+
+All routes require `[Authorize]` and resolve the current local profile from the
+validated token's sub claim. No UserProfileId is accepted from route/body/query.
+An unresolved profile returns 403; a missing/invalid/expired token returns 401.
+
+### GET /api/favorites
+
+Returns 200 with an array of FavoriteResponseDto, including [] for an empty list.
+Each item has createdAt and product (the existing ProductResponseDto). Only the
+caller's rows are returned, ordered by favorite creation time descending and
+ProductId ascending for ties. Profile data is excluded. No pagination yet.
+
+### POST /api/favorites/{productId}
+
+No request body. Returns 201 with the new FavoriteResponseDto. ProductId must be
+positive (400 otherwise); a missing product returns 404. A duplicate favorite
+returns 409 ProblemDetails and preserves the original timestamp. Concurrent
+duplicate inserts also return 409. Any existing product can be favorited,
+including an inactive/out-of-stock product. Parent deletion during insertion
+returns a controlled 409 write conflict.
+
+### DELETE /api/favorites/{productId}
+
+Returns 204 when the caller's favorite was deleted. Returns 404 if the caller has
+no such favorite, including when another user has it or the product no longer
+exists. Nonpositive ProductId returns 400. The product and profile remain.
+See [FAVORITES.md](FAVORITES.md) for implementation, tests and review guidance.
+
+---
+
 ## Comparison
 
 Future:
@@ -174,8 +205,8 @@ Output:
 
 ## Authentication
 
-Session 7 exposes the current profile through `GET /api/auth/me`. There are no
-favorite routes yet. ProductResponseDto excludes favorites, user emails and roles.
+Session 7 exposes the current profile through `GET /api/auth/me`. Session 8 adds
+protected favorite routes. ProductResponseDto excludes favorites, user emails and roles.
 UserProfile.Role controls the local Admin-check policy.
 
 Preferred authentication provider: Supabase Auth.

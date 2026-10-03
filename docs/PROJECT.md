@@ -29,7 +29,7 @@ Initial backend capabilities:
 - deterministic recommendation,
 - value-for-money analysis,
 - authentication,
-- later favorites/preferences.
+- authenticated favorites, with preferences later.
 
 ## Out of scope for MVP
 - Microservices
@@ -43,7 +43,7 @@ Initial backend capabilities:
 
 ## Main users
 - Visitor: browse, filter, compare.
-- Authenticated user: later save favorites/preferences.
+- Authenticated user: save favorites; preferences may follow later.
 - Admin: later manage product data.
 
 ## V0.1 success criteria

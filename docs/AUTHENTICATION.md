@@ -80,7 +80,7 @@ existing profile; unrelated failures propagate. No schema migration is needed.
 
 ## Verification and local requests
 
-All 44 tests pass: 6 unit and 38 integration tests. Five integration tests require
+Session 7 verification passed 44 tests: 6 unit and 38 integration tests. Five integration tests require
 the dedicated PikwiseSession3Tests database; 39 tests run without SQL Server.
 The Release build has zero errors and warnings.
 
@@ -114,9 +114,9 @@ caches its public JWKS, so key changes are not instantaneous. Use HTTPS when
 deploying the API.
 
 Product CRUD keeps its existing public development contract; protecting product
-writes with a local Admin policy is a separate decision. Favorites API belongs
-to Session 8 and has not been implemented. Filtering, comparison and recommendation
-remain future sessions. Session 8 has not started.
+writes with a local Admin policy is a separate decision. Session 8 implements
+the protected Favorites API using this current-profile flow; see FAVORITES.md.
+Filtering, comparison and recommendation remain future sessions.
 
 Sources: [Supabase JWT verification](https://supabase.com/docs/guides/auth/jwts),
 [Supabase signing keys](https://supabase.com/docs/guides/auth/signing-keys),

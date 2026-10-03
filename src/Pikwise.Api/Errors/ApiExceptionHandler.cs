@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Pikwise.Application.Products.Exceptions;
+using Pikwise.Application.Favorites.Exceptions;
+using Pikwise.Application.Users.Exceptions;
 
 namespace Pikwise.Api.Errors;
 
@@ -11,6 +13,14 @@ public sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : I
         // Translate known Application failures into consistent HTTP error responses.
         ProblemDetails problem = exception switch
         {
+            UserProfileUnavailableException => new ProblemDetails
+            {
+                Status = StatusCodes.Status403Forbidden, Title = "A local user profile could not be resolved."
+            },
+            FavoriteAlreadyExistsException => new ProblemDetails
+            {
+                Status = StatusCodes.Status409Conflict, Title = "This product is already in your favorites."
+            },
             ProductValidationException validation => new ValidationProblemDetails(validation.Errors)
             {
                 Status = StatusCodes.Status400BadRequest, Title = "Product validation failed."

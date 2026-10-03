@@ -247,3 +247,19 @@ access and returns an explicit DTO. Infrastructure's UserProfileRepository owns
 async SQL access and duplicate-subject race recovery. LocalAdminHandler authorizes
 against the SQL profile role, independent of provider roles/user metadata.
 See AUTHENTICATION.md and ADR-015 for configuration, behavior and limits.
+
+## Session 8 implementation
+
+FavoritesController owns protected routes and HTTP outcomes. FavoriteService
+reuses UserProfileService to derive ownership from validated identity, checks
+product existence through IProductRepository and assigns UTC favorite timestamps.
+Application's IFavoriteService never accepts a client user Id. FavoriteMapper
+combines favorite metadata with the existing product response contract.
+
+Infrastructure's FavoriteRepository filters reads/deletes by resolved UserProfileId,
+loads only product relations needed by the mapper and handles SQL insert constraints.
+The existing composite key rejects duplicates; Application maps duplicate results
+to a FavoriteAlreadyExistsException and API returns 409. Missing local profiles
+raise UserProfileUnavailableException mapped to 403. Owner-scoped ExecuteDeleteAsync
+removes only the join row. No Domain/schema changes or new packages are needed.
+See FAVORITES.md and ADR-016 for behavior and verification.

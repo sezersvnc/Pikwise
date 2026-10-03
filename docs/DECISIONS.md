@@ -230,3 +230,33 @@ remains Session 8. No schema migration or general role-management API is added.
 JWT validation does not check session revocation per request; signing keys are
 cached/refreshed and token lifetime has 30 seconds of clock skew. Configuration
 and verification details are documented in AUTHENTICATION.md.
+
+---
+
+## ADR-016 — Session 8 authenticated favorites
+**Status:** Accepted
+
+Use three protected routes: GET /api/favorites, POST /api/favorites/{productId}
+and DELETE /api/favorites/{productId}. Resolve local ownership through the existing
+current-profile service. The client supplies only a positive product Id; no body
+is required. FavoriteResponseDto contains CreatedAt and the existing product DTO.
+Application owns product-existence checks, UTC timestamps and duplicate behavior;
+Infrastructure owns queries/inserts/deletes. Reuse product lookup/mapping instead
+of adding another product contract. No schema change is needed.
+
+Return 201 for new favorites, 409 for duplicates and concurrent FK write conflicts,
+404 for missing products on insertion, and 204/404 for successful/absent owner-scoped
+deletion. A duplicate preserves the original favorite's creation time. Any existing
+product is eligible, including inactive/out-of-stock ones. New availability rules
+require a later explicit decision.
+
+Filter list/delete SQL by the resolved user Id. Lists use AsNoTracking with the
+product's Brand, Category and specification loaded; order by favorite CreatedAt
+descending, then ProductId ascending. Delete the composite pair with ExecuteDeleteAsync
+and use affected-row count to determine existence. Zero rows never reveals whether
+another user's favorite exists. Parent rows are preserved. The composite primary
+key, rather than a pre-insert existence check, arbitrates simultaneous inserts.
+
+No paging/filtering work is included. Session 9 remains separate. HTTP and SQL
+tests verify protection, ownership, DTO output, duplicates, missing/invalid IDs,
+concurrent inserts and parent/cascade behavior. See FAVORITES.md.
