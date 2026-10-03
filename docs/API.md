@@ -140,8 +140,9 @@ conflicts during a write return 409. Unexpected failures return a generic 500
 ProblemDetails with traceId; exception/SQL details are logged, not exposed.
 Concurrent updates currently use last-write-wins; no row-version contract exists.
 
-Authentication/authorization integration remains a later session. These CRUD
-endpoints currently require no bearer token and are intended for local development.
+Session 7 adds protected authentication endpoints. These CRUD endpoints retain
+their public contract and are intended for local development; a product-write
+Admin policy remains a separate decision.
 
 ---
 
@@ -173,9 +174,9 @@ Output:
 
 ## Authentication
 
-Session 6 implements UserProfile/Favorite persistence only. There are no profile
-or favorite routes yet. ProductResponseDto excludes favorites, user emails and
-roles. UserProfile.Role is stored data; it does not enable authorization.
+Session 7 exposes the current profile through `GET /api/auth/me`. There are no
+favorite routes yet. ProductResponseDto excludes favorites, user emails and roles.
+UserProfile.Role controls the local Admin-check policy.
 
 Preferred authentication provider: Supabase Auth.
 
@@ -186,6 +187,22 @@ Authorization: Bearer <access_token>
 ```
 
 ASP.NET Core validates the token and uses claims such as `sub` to identify the current user.
+
+### GET /api/auth/me
+
+Requires `[Authorize]`. Returns 200 with UserProfileResponseDto: id,
+authProviderUserId, email, role and createdAt. Uses only the validated sub claim;
+no user ID is accepted from the client. First access creates a local User profile
+from a valid email claim. Existing profiles are reused without modifying their
+email, role or creation time. Missing/invalid email for a new profile returns 403.
+
+### GET /api/auth/admin-check
+
+Requires authentication and the LocalAdmin policy. Returns 204 if the current
+SQL profile has Role=Admin, otherwise 403. Provider roles and user_metadata do
+not grant Admin privileges. No token, an invalid token or an expired token returns
+401 with a Bearer challenge on both routes. No login/registration endpoint exists
+in Pikwise. See [AUTHENTICATION.md](AUTHENTICATION.md) for setup and tests.
 
 ## Implemented: health endpoint (Session 1)
 

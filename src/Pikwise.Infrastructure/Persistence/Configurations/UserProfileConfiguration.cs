@@ -10,8 +10,10 @@ public sealed class UserProfileConfiguration : IEntityTypeConfiguration<UserProf
     {
         builder.ToTable("UserProfiles");
         builder.HasKey(u => u.Id);
+        // Preserve case-sensitive external identities even on a case-insensitive database.
         builder.Property(u => u.AuthProviderUserId).HasMaxLength(128).IsRequired()
             .UseCollation("Latin1_General_100_BIN2");
+        // One external user identity maps to one local profile.
         builder.HasIndex(u => u.AuthProviderUserId).IsUnique();
         builder.Property(u => u.Email).HasMaxLength(254).IsRequired();
         builder.Property(u => u.Role).HasMaxLength(32).IsRequired();

@@ -2,6 +2,7 @@ using Pikwise.Domain.Entities;
 
 namespace Pikwise.Application.Products.Interfaces;
 
+// Application defines the data-access contract; Infrastructure supplies the EF implementation.
 public interface IProductRepository
 {
     Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken = default);

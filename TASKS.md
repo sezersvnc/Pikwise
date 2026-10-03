@@ -1,180 +1,373 @@
 # TASKS.md — Pikwise Current Work Queue
 
-## Current roadmap position
+## Current Status
 
+Completed:
+- [x] Project skeleton
+- [x] SQL Server + EF Core setup
+- [x] Core entity model and relationships
+- [x] Product CRUD API
+- [x] UserProfile and Favorite tables
+- [x] Session 6 tests: 18 passed, 0 build errors, 0 warnings
+- [x] Completed Session 6 work pushed to GitHub
+- [x] Authentication foundation / local authorization test policy (Session 7)
+
+Not implemented yet:
+- [ ] Product-write authorization / full role management
+- [ ] Favorite endpoints
+- [ ] Filtering / Sorting / Pagination
+- [ ] Product Comparison
+- [ ] Recommendation Engine
+- [ ] Value-for-Money
+- [ ] LLM integration
+
+> Rule: Complete, review, build, and test each session before starting the next one.
+
+---
+
+# Session 7 — Authentication Foundation
+
+## Goal
+Add authentication without creating a custom password/login system.
+
+Preferred direction:
+- Supabase Auth issues access tokens.
+- ASP.NET Core validates Bearer JWTs.
+- Pikwise owns authorization and business rules.
+- Local `UserProfile` is matched from the authenticated user's `sub` claim.
+- Never store passwords in Pikwise.
+
+## Tasks
+- [x] Review existing auth packages/configuration.
+- [x] Add JWT Bearer authentication.
+- [x] Read Supabase JWT settings from configuration/environment.
+- [x] Configure `UseAuthentication()` and `UseAuthorization()` in the correct order.
+- [x] Add a protected test endpoint.
+- [x] Use `[Authorize]`.
+- [x] Read the authenticated user's `sub` claim.
+- [x] Map the provider user to local `UserProfile`.
+- [x] Do not accept UserProfileId from the client for user-owned operations.
+- [x] Add/update tests.
+- [x] Build the solution and run all tests.
+- [x] Update relevant docs if implementation differs from current decisions.
+
+## Required behavior
 ```text
-Stage 3 — EF Core relationships     ✅ Session 6 complete
-Stage 4 — MD architecture           ✅ done
-Stage 5 — Project skeleton          ✅ complete
-Stage 6 — Product system            ✅ CRUD complete
+Valid token        -> authenticated request succeeds
+No token           -> 401 Unauthorized
+Invalid/expired    -> 401 Unauthorized
+Authenticated but forbidden -> 403 Forbidden
 ```
 
+## Exit Criterion
+A protected endpoint identifies the authenticated user from claims and unauthenticated requests correctly return 401.
+
+Implemented: `/api/auth/me` and `/api/auth/admin-check`. Release build:
+0 errors/warnings; 44 tests passed. Real Supabase JWKS checked and local HTTP
+401 behavior verified; a real Supabase user token remains a manual review step.
+See `docs/AUTHENTICATION.md`. Session 8 has not started.
+
 ---
 
-# Session 1 — Project Skeleton
+# Session 8 — Favorites API
 
-Create:
+## Goal
+Use the existing `UserProfile -> Favorite <- Product` relationship in a real authenticated feature.
 
+## Suggested Endpoints
 ```text
-src/
-  Pikwise.Api/
-  Pikwise.Application/
-  Pikwise.Domain/
-  Pikwise.Infrastructure/
-
-tests/
-  Pikwise.UnitTests/
-  Pikwise.IntegrationTests/
+GET    /api/favorites
+POST   /api/favorites/{productId}
+DELETE /api/favorites/{productId}
 ```
 
-Tasks:
-- [x] Create `Pikwise.sln`
-- [x] Create four source projects
-- [x] Create test projects
-- [x] Add project references
-- [x] Confirm dependency direction from `docs/ARCHITECTURE.md`
-- [x] Build the solution
-- [x] Add a simple health/test endpoint
-- [x] Make the first clean commit
+## Tasks
+- [ ] Add Favorite repository abstraction/implementation if consistent with current architecture.
+- [ ] Add Favorite service.
+- [ ] Add Favorites controller.
+- [ ] Resolve current user from authentication claims.
+- [ ] Add a product to current user's favorites.
+- [ ] Remove a product from current user's favorites.
+- [ ] Return current user's favorites.
+- [ ] Prevent duplicate favorites.
+- [ ] Handle nonexistent products.
+- [ ] Do not receive `UserProfileId` from route/body.
+- [ ] Use DTOs.
+- [ ] Use async EF Core operations.
+- [ ] Pass `CancellationToken`.
+- [ ] Add tests.
+- [ ] Build and run all tests.
 
-Do not build Recommendation Engine or AI yet.
-
----
-
-# Session 2 — SQL Server + EF Core
-
-- [x] Add EF Core packages
-- [x] Add SQL Server provider
-- [x] Create `ApplicationDbContext`
-- [x] Configure connection safely
-- [x] Register DbContext with DI
-- [x] Verify migration commands
-- [x] Never commit secrets
+## Exit Criterion
+An authenticated user can add, list, and remove only their own favorites.
 
 ---
 
-# Session 3 — First Real Data Model
+# Session 9 — Filtering, Sorting and Pagination
 
-Create:
-- [x] Brand
-- [x] Category
-- [x] Product
-- [x] LaptopSpecification
+## Goal
+Turn Product CRUD into a realistic catalog API.
 
-Relationships:
-- [x] Brand 1 -> many Products
-- [x] Category 1 -> many Products
-- [x] Product 1 -> 1 LaptopSpecification
-
-Practice:
-- [x] Foreign keys
-- [x] Navigation properties
-- [x] Fluent API
-- [x] Unique constraints
-- [x] Initial migration
-- [x] Inspect generated schema
-- [x] `Include`
-- [x] `ThenInclude` when needed
-
-Exit check:
-- [x] Explain why each FK is on that entity
-- [x] Explain One-to-One vs One-to-Many without notes
-
----
-
-# Session 4 — First Vertical Feature
-
-Implement:
-
-```text
-GET /api/products/{id}
+## Example
+```http
+GET /api/products?minPrice=20000&maxPrice=50000&brandId=2&minRam=16&sortBy=price&page=1&pageSize=20
 ```
 
-Required:
-- [x] ProductResponseDto
-- [x] Product mapper
-- [x] IProductRepository
-- [x] ProductRepository
-- [x] IProductService
-- [x] ProductService
-- [x] ProductsController
-- [x] DI registrations
-- [x] async EF Core query
-- [x] 404 behavior
-- [x] Swagger/Postman test
+## Topics
+- `IQueryable`
+- deferred execution
+- `Where`
+- `OrderBy`
+- `Skip`
+- `Take`
+- query parameters
+- database-side filtering
+- pagination metadata
 
-Review:
-- [x] Controller contains HTTP concerns only
-- [x] Repository contains EF Core query
-- [x] Service orchestrates the use case
-- [x] Entity is not blindly returned
-- [x] mapping location is intentional
+## Tasks
+- [ ] Create product query/filter request model.
+- [ ] Add min/max price filtering.
+- [ ] Add brand filtering.
+- [ ] Add RAM filtering.
+- [ ] Add selected CPU/GPU/spec filters when useful.
+- [ ] Add sorting.
+- [ ] Add pagination.
+- [ ] Define safe max `pageSize`.
+- [ ] Return pagination metadata.
+- [ ] Keep query composable with `IQueryable`.
+- [ ] Avoid `ToListAsync()` before filters/pagination.
+- [ ] Add combined-filter tests.
+- [ ] Build and run all tests.
 
----
-
-# Session 5 — Complete Product CRUD
-
-- [x] GET all
-- [x] POST
-- [x] PUT
-- [x] DELETE
-- [x] CreateProductRequestDto
-- [x] UpdateProductRequestDto
-- [x] ProductResponseDto
-- [x] validation
-- [x] centralized exception handling baseline
-- [x] Organize Application/Products into DTOs, Interfaces, Services, Mappers, Validators and Exceptions
+## Exit Criterion
+Combined product queries work predictably through Swagger/Postman.
 
 ---
 
-# Session 6 — Complete Relationship Practice
+# Session 10 — Product Comparison
 
-Create:
-- [x] UserProfile
-- [x] Favorite
+## Goal
+Compare 2–3 laptops using verified structured data.
 
-Relationship:
-
-```text
-UserProfile 1 -> many Favorite <- many-to-1 Product
+## Suggested Endpoint
+```http
+GET /api/products/compare?ids=1&ids=2&ids=3
 ```
 
-Practice:
-- [x] explicit join entity
-- [x] composite key
-- [x] prevent duplicate favorite
-- [x] Include
-- [x] ThenInclude
+## Comparison Fields
+- Price
+- Brand
+- Processor
+- GPU
+- RAM
+- Storage
+- Screen size
+- Resolution
+- Refresh rate
+- Weight
+- Operating system
 
-Auth integration can follow once the core product/data model is stable.
+## Tasks
+- [ ] Define comparison request/response DTO.
+- [ ] Support multiple product IDs.
+- [ ] Validate comparison count.
+- [ ] Load required product/spec data efficiently.
+- [ ] Return comparable fields in one response.
+- [ ] Handle nonexistent IDs.
+- [ ] Do not use an LLM.
+- [ ] Do not calculate recommendation scores yet.
+- [ ] Add tests.
+- [ ] Build and run all tests.
+
+## Exit Criterion
+Two or three laptops can be compared in one structured response.
 
 ---
 
-# After Product CRUD
+# Session 11 — Recommendation Engine Design
 
-Follow `docs/ROADMAP.md`:
+## Goal
+Design the algorithm before implementing it.
 
-1. Filtering / Sorting / Pagination
-2. Product Comparison
-3. Recommendation Engine V1
-4. Value-for-Money
-5. LLM fundamentals
-6. AI explanation
-7. Frontend
-8. Store / offers
-9. Price history / background jobs
-10. Alerts / periodic advisor
+> Do not ask Codex to invent the scoring formula.
 
-## Codex rule
-Do not implement the whole roadmap at once. Finish and review one vertical slice before moving to the next.
+## Decisions
+- [ ] Define `UserRequirements`.
+- [ ] Define hard constraints.
+- [ ] Define weighted-score properties.
+- [ ] Define score range.
+- [ ] Define normalization rules.
+- [ ] Define missing-data behavior.
+- [ ] Define default weights.
+- [ ] Define score-component output.
+- [ ] Define deterministic tie-breaking.
+- [ ] Verify sample rankings manually.
+- [ ] Update `docs/RECOMMENDATION_ENGINE.md`.
+- [ ] Record important choices in `docs/DECISIONS.md`.
 
-## SQL Server package note
-
-For the Infrastructure project, Codex should use:
-
+## Target Flow
 ```text
-Microsoft.EntityFrameworkCore.SqlServer
-Microsoft.EntityFrameworkCore.Design
+User Requirements
+        ↓
+Hard Filters
+        ↓
+Normalization
+        ↓
+Weighted Scoring
+        ↓
+Ranking
+        ↓
+Top 3
 ```
 
-Do not add the PostgreSQL/Npgsql provider.
+## Exit Criterion
+We can manually explain why Product A ranks above Product B for a sample user.
+
+---
+
+# Session 12 — Recommendation Engine V1
+
+## Goal
+Implement the deterministic engine designed in Session 11.
+
+## Tasks
+- [ ] Implement hard filters.
+- [ ] Implement normalization.
+- [ ] Implement weighted scoring.
+- [ ] Preserve score components.
+- [ ] Rank eligible products.
+- [ ] Return Top 3.
+- [ ] Add deterministic tie-breaking.
+- [ ] Add unit tests and boundary tests.
+- [ ] Verify same input produces same output.
+- [ ] Keep LLM outside the scoring decision.
+- [ ] Build and run all tests.
+
+## Exit Criterion
+The same input and database state always produce the same ranking, with numerical score explanations.
+
+---
+
+# Session 13 — Value-for-Money
+
+## Goal
+Distinguish best fit from best value.
+
+## Tasks
+- [ ] Define price-vs-score gain.
+- [ ] Detect expensive upgrades with small gain.
+- [ ] Detect cheaper near-equal alternatives.
+- [ ] Return value analysis as structured data.
+- [ ] Add unit tests.
+- [ ] Update docs.
+
+## Example
+```text
+Laptop A -> 90 points -> 40,000 TL
+Laptop B -> 92 points -> 48,000 TL
+
+Extra 8,000 TL -> only +2 suitability points
+```
+
+## Exit Criterion
+The API can show whether paying more produces meaningful benefit.
+
+---
+
+# Session 14 — LLM Structured Input
+
+## Goal
+Use an LLM only to convert natural-language needs into structured recommendation criteria.
+
+## Tasks
+- [ ] Define JSON Schema / structured output.
+- [ ] Create LLM service abstraction.
+- [ ] Keep provider details outside core business logic.
+- [ ] Convert natural language to `UserRequirements`.
+- [ ] Validate LLM output before Recommendation Engine.
+- [ ] Add timeout/error handling.
+- [ ] Never let LLM bypass hard constraints.
+
+## Exit Criterion
+Natural-language input becomes validated structured criteria.
+
+---
+
+# Session 15 — AI Explanation
+
+## Goal
+Explain deterministic Recommendation Engine results.
+
+## LLM Input
+Only:
+- UserNeeds
+- verified ProductFacts
+- EngineScore
+- score components
+- value-for-money analysis
+
+## Tasks
+- [ ] Build explanation input DTO.
+- [ ] Add explanation service.
+- [ ] Prevent unsupported facts.
+- [ ] Handle missing information honestly.
+- [ ] Ensure ranking exists before LLM call.
+- [ ] Add tests where practical.
+
+## Architectural Rule
+```text
+Product DB            = facts
+Recommendation Engine = decision
+LLM                   = understanding + explanation
+```
+
+## Exit Criterion
+AI can explain "Why A?" or "Is B worth 5,000 TL more?" using only verified data.
+
+---
+
+# Later Roadmap — Do Not Start Yet
+
+- [ ] Frontend
+- [ ] Store / ProductOffer system
+- [ ] Permitted product-data integrations
+- [ ] PriceHistory
+- [ ] Background jobs
+- [ ] Price alerts
+- [ ] Periodic advisor
+- [ ] Additional product categories
+
+Do not add yet:
+- microservices
+- Kafka/event bus
+- Redis without measured need
+- browser extension
+- mobile app
+- all categories at once
+
+---
+
+# Session Completion Rule
+
+At the end of every session:
+1. Build the complete solution.
+2. Run all tests.
+3. Test affected endpoints through Swagger/Postman.
+4. Review layer responsibilities.
+5. Review EF Core queries and relationships.
+6. Check build warnings.
+7. Check no secret is committed.
+8. Update `TASKS.md`.
+9. Update relevant files under `docs/`.
+10. Commit/push only after review.
+
+## Learning Rule
+Do not move on just because Codex finished coding.
+
+Before marking a session complete, be able to answer:
+- What was added?
+- Why does it belong in that layer?
+- What request flow does it follow?
+- What database query is produced conceptually?
+- What could go wrong?
+- Which tests prove it works?

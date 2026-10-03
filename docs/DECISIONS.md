@@ -49,7 +49,7 @@ AI explains; engine decides.
 ---
 
 ## ADR-005 — Supabase Auth
-**Status:** Proposed
+**Status:** Accepted for Session 7; details in ADR-015
 
 Direction:
 - Supabase handles registration/login/session/token issuance.
@@ -203,3 +203,30 @@ timestamps follow the existing model; future Application use cases must assign U
 timestamps and validate profile/favorite input. No database defaults or auth routes
 are added. Include/ThenInclude, uniqueness, orphan rejection and delete behavior
 are verified against SQL Server. Stored Role does not yet authorize requests.
+
+---
+
+## ADR-015 — Session 7 Bearer validation and local profiles
+**Status:** Accepted
+
+Use Microsoft.AspNetCore.Authentication.JwtBearer 10.0.11 in API. Configure an
+external HTTPS Supabase issuer and audience (default authenticated), validate
+signature/issuer/audience/lifetime and allow ES256/RS256. Retrieve public JWKS
+through IdentityModel's caching configuration manager; a provider-specific adapter
+is necessary because the configured address serves JWKS directly. Do not introduce
+passwords, token issuance or a legacy shared signing secret. Keep raw sub claims.
+
+Reject tokens without one valid subject or provider role authenticated. API's
+ICurrentUser implementation provides identity to Application without accepting a
+client UserProfileId. Application provisions a local profile on first protected
+access, requires a valid email for new profiles, sets UTC CreatedAt and Role=User.
+Existing profiles retain their local fields. SQL's unique subject index arbitrates
+concurrent inserts; Infrastructure retrieves the winner after duplicate errors.
+
+Pikwise Admin access uses the local SQL role, not Supabase's database role or
+user_metadata. Verify 401 and 403 separately with protected /api/auth/me and
+/api/auth/admin-check. Product CRUD retains its current contract; Favorites API
+remains Session 8. No schema migration or general role-management API is added.
+JWT validation does not check session revocation per request; signing keys are
+cached/refreshed and token lifetime has 30 seconds of clock skew. Configuration
+and verification details are documented in AUTHENTICATION.md.

@@ -328,10 +328,12 @@ Browser extension/mobile remain late-stage.
 | 7 | Value-for-Money + tests | Explainable scoring + unit tests |
 | 8 | LLM integration | Natural language -> JSON -> engine -> explanation |
 
-Current position: Sessions 1-6 are complete. Product CRUD, validation, the
-central exception handler and UserProfile/Favorite relationships are verified on
-SQL Server. Work pauses here for the user's code review. Filtering/pagination
-and auth remain future roadmap work.
+Current position: Sessions 1-7 are implemented. Session 7 adds Supabase Bearer JWT
+validation, current-profile provisioning and a local Admin-check policy. All 44
+tests pass. Session 7 is complete; Session 8 has not started.
+TASKS.md defines the current session order: Session 8 Favorites API, Session 9
+filtering/pagination, then comparison and recommendation. The stage numbers above
+describe the broader learning roadmap rather than session numbers.
 
 ---
 

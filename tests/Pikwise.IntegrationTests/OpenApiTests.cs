@@ -19,6 +19,12 @@ public class OpenApiTests
         Assert.True(operation.GetProperty("responses").TryGetProperty("200", out _));
         Assert.True(operation.GetProperty("responses").TryGetProperty("404", out _));
         var paths = document.RootElement.GetProperty("paths");
+        var me = paths.GetProperty("/api/auth/me").GetProperty("get").GetProperty("responses");
+        Assert.True(me.TryGetProperty("200", out _));
+        Assert.True(me.TryGetProperty("401", out _));
+        Assert.True(me.TryGetProperty("403", out _));
+        Assert.True(paths.TryGetProperty("/api/auth/admin-check", out _));
+        Assert.False(paths.TryGetProperty("/api/favorites", out _));
         Assert.True(paths.GetProperty("/api/products").TryGetProperty("get", out _));
         Assert.True(paths.GetProperty("/api/products").GetProperty("post").GetProperty("responses").TryGetProperty("201", out _));
         Assert.True(paths.GetProperty("/api/products/{id}").TryGetProperty("put", out _));

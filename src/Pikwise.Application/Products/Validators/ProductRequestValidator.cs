@@ -4,12 +4,14 @@ using Pikwise.Application.Products.Exceptions;
 
 namespace Pikwise.Application.Products.Validators;
 
+// Apply DTO validation to service callers, including those outside the HTTP pipeline.
 public static class ProductRequestValidator
 {
     public static void Validate(ProductWriteRequestDto request)
     {
         var errors = new Dictionary<string, string[]>();
         ValidateObject(request, "", errors);
+        // TryValidateObject does not recursively validate nested objects.
         if (request.Specification is not null)
             ValidateObject(request.Specification, "Specification.", errors);
         if (errors.Count > 0) throw new ProductValidationException(errors);

@@ -16,9 +16,11 @@ public sealed class LaptopSpecificationConfiguration : IEntityTypeConfiguration<
         builder.Property(s => s.OperatingSystem).HasMaxLength(100).IsRequired();
         builder.Property(s => s.ScreenSize).HasPrecision(5, 2);
         builder.Property(s => s.Weight).HasPrecision(6, 3);
+        // The specification depends on its product and is removed when that product is deleted.
         builder.HasOne(s => s.Product).WithOne(p => p.LaptopSpecification)
             .HasForeignKey<LaptopSpecification>(s => s.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
+        // Enforce at most one specification per product; creation validates its presence.
         builder.HasIndex(s => s.ProductId).IsUnique();
     }
 }

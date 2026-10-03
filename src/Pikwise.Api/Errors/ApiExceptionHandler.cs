@@ -8,6 +8,7 @@ public sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : I
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
     {
+        // Translate known Application failures into consistent HTTP error responses.
         ProblemDetails problem = exception switch
         {
             ProductValidationException validation => new ValidationProblemDetails(validation.Errors)
@@ -20,6 +21,7 @@ public sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : I
             },
             _ => new ProblemDetails { Status = StatusCodes.Status500InternalServerError, Title = "An unexpected error occurred." }
         };
+        // Keep unexpected exception details in logs; traceId links the response to the log entry.
         if (problem.Status == StatusCodes.Status500InternalServerError)
             logger.LogError(exception, "Unhandled request error. Trace: {TraceId}", context.TraceIdentifier);
         problem.Extensions["traceId"] = context.TraceIdentifier;

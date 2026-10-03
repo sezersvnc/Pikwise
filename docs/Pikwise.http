@@ -3,6 +3,22 @@
 @brandId = 1
 @categoryId = 1
 
+### Current profile without a token (401)
+GET {{baseUrl}}/api/auth/me
+
+### Current profile with a Supabase user access token (200)
+# Set PIKWISE_ACCESS_TOKEN in the local environment; do not save a token here.
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
+
+### Local Admin policy (403 for User, 204 for local Admin)
+GET {{baseUrl}}/api/auth/admin-check
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
+
+### Invalid token (401)
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer invalid
+
 ### List products
 GET {{baseUrl}}/api/products
 

@@ -6,6 +6,7 @@ namespace Pikwise.Api.Controllers;
 
 [ApiController]
 [Route("api/products")]
+// Keep HTTP routing and status codes here; ProductService handles each use case.
 public sealed class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpGet]
@@ -20,6 +21,7 @@ public sealed class ProductsController(IProductService productService) : Control
     public async Task<ActionResult<ProductResponseDto>> Create(CreateProductRequestDto request, CancellationToken cancellationToken)
     {
         var product = await productService.CreateAsync(request, cancellationToken);
+        // Include the new resource's GET URL in the 201 response's Location header.
         return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
     }
 

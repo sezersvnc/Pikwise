@@ -232,3 +232,18 @@ This session completes persistence relationships. Application/API gain no profil
 or favorite use cases yet. Product responses continue to use explicit DTO mapping,
 so the new navigation graph does not expose profile emails or roles. Authentication
 and authorization require a later use case and pipeline integration.
+
+## Session 7 implementation
+
+API registers JWT Bearer validation and runs authentication before authorization.
+SupabaseJwksRetriever adapts the provider's public key document to IdentityModel's
+configuration cache. HttpCurrentUser implements Application's ICurrentUser using
+validated claims. API owns protocol details; no JWT or HttpContext types enter
+Application or Domain.
+
+AuthController exposes protected current-profile and Admin-check endpoints.
+UserProfileService resolves the subject, provisions a default User profile on first
+access and returns an explicit DTO. Infrastructure's UserProfileRepository owns
+async SQL access and duplicate-subject race recovery. LocalAdminHandler authorizes
+against the SQL profile role, independent of provider roles/user metadata.
+See AUTHENTICATION.md and ADR-015 for configuration, behavior and limits.

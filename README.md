@@ -49,6 +49,7 @@ Product model                    ✅ Session 3 complete
 GET product by id                ✅ Session 4 complete
 Complete product CRUD            ✅ Session 5 complete
 User profiles / favorites        ✅ Session 6 complete
+Authentication foundation        ✅ Session 7 complete
 ```
 
 ## Read order
@@ -60,7 +61,7 @@ User profiles / favorites        ✅ Session 6 complete
 6. `TASKS.md`
 7. `docs/DECISIONS.md`
 
-## Run the backend (Session 6)
+## Run the backend (Session 7)
 
 Prerequisite: .NET SDK 10.0.200 (or a newer patch in the same feature band).
 
@@ -74,12 +75,16 @@ dotnet run --project src/Pikwise.Api --no-launch-profile -- --environment Develo
 
 Open http://localhost:5080/health: expected HTTP 200, body `Healthy`.
 Before running, configure ConnectionStrings:DefaultConnection using the User Secrets command in [docs/DATABASE.md](docs/DATABASE.md). A running database is not required for /health.
-Fourteen tests run without SQL Server. Four additional integration tests verify
+Also configure Authentication:Supabase:Issuer using [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
+Thirty-nine tests run without SQL Server. Five additional integration tests verify
 the migration, relationships and full HTTP CRUD workflow on a dedicated SQL Server
 database; see docs/DATABASE.md for the command. Request examples and error contracts
-are in docs/API.md. CRUD currently serves local development without auth integration.
+are in docs/API.md. Product CRUD retains its public local-development contract.
 
 Session 6 adds UserProfiles and Favorites with a composite favorite key, explicit
 foreign keys and tested Include/ThenInclude queries. The reviewed migration is
-applied to local PikwiseDb. Profile/favorite HTTP endpoints and authentication
-remain future work. Sessions 1-6 are ready for code review.
+applied to local PikwiseDb. Session 7 adds protected /api/auth/me and
+/api/auth/admin-check endpoints, validates Supabase JWTs and resolves local
+profiles from sub claims. All 44 tests pass. Favorites API remains Session 8;
+no Session 8 work has started. Session 7 includes English comments explaining
+the main layer responsibilities and implementation decisions.

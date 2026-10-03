@@ -7,6 +7,7 @@ using Pikwise.Application.Products.Validators;
 
 namespace Pikwise.Application.Products.Services;
 
+// Coordinates validation, reference checks, timestamps and mapping for product use cases.
 public sealed class ProductService(IProductRepository productRepository) : IProductService
 {
     public async Task<ProductResponseDto?> GetByIdAsync(
@@ -28,6 +29,7 @@ public sealed class ProductService(IProductRepository productRepository) : IProd
         product.Brand = brand;
         product.Category = category;
         productRepository.Add(product);
+        // Persist the product and its specification together in one SaveChanges call.
         await productRepository.SaveChangesAsync(cancellationToken);
         return product.ToResponseDto();
     }
@@ -41,6 +43,7 @@ public sealed class ProductService(IProductRepository productRepository) : IProd
         request.ApplyTo(product);
         product.Brand = brand;
         product.Category = category;
+        // ApplyTo leaves CreatedAt unchanged; only the modification time advances.
         product.UpdatedAt = DateTimeOffset.UtcNow;
         await productRepository.SaveChangesAsync(cancellationToken);
         return product.ToResponseDto();
@@ -60,6 +63,7 @@ public sealed class ProductService(IProductRepository productRepository) : IProd
         var brand = await productRepository.GetBrandAsync(request.BrandId, cancellationToken);
         var category = await productRepository.GetCategoryAsync(request.CategoryId, cancellationToken);
         var errors = new Dictionary<string, string[]>();
+        // Field validation cannot prove that referenced lookup rows exist.
         if (brand is null) errors[nameof(request.BrandId)] = ["Brand does not exist."];
         if (category is null) errors[nameof(request.CategoryId)] = ["Category does not exist."];
         if (errors.Count > 0) throw new ProductValidationException(errors);

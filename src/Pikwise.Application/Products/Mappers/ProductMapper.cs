@@ -14,6 +14,7 @@ public static class ProductMapper
         product.BrandId = request.BrandId;
         product.CategoryId = request.CategoryId;
         var input = request.Specification;
+        // Reuse the existing specification on update to preserve its identity.
         var specification = product.LaptopSpecification ??= new LaptopSpecification
         {
             Processor = input.Processor.Trim(), GPU = input.GPU.Trim(),
@@ -30,6 +31,7 @@ public static class ProductMapper
         specification.OperatingSystem = input.OperatingSystem.Trim();
     }
 
+    // Read queries must load Brand, Category and LaptopSpecification before mapping.
     public static ProductResponseDto ToResponseDto(this Product product) => new(
         product.Id,
         product.Name,

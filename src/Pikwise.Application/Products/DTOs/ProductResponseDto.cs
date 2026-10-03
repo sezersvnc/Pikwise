@@ -1,5 +1,6 @@
 namespace Pikwise.Application.Products.DTOs;
 
+// Expose catalog fields explicitly, keeping favorites and user profiles out of responses.
 public sealed record ProductResponseDto(
     int Id,
     string Name,

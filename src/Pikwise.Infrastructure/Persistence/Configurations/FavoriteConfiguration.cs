@@ -9,7 +9,9 @@ public sealed class FavoriteConfiguration : IEntityTypeConfiguration<Favorite>
     public void Configure(EntityTypeBuilder<Favorite> builder)
     {
         builder.ToTable("Favorites");
+        // SQL Server rejects duplicate user-product pairs, including concurrent inserts.
         builder.HasKey(f => new { f.UserProfileId, f.ProductId });
+        // Deleting either parent removes its favorites while preserving the other parent.
         builder.HasOne(f => f.UserProfile).WithMany(u => u.Favorites)
             .HasForeignKey(f => f.UserProfileId).OnDelete(DeleteBehavior.Cascade);
         builder.HasOne(f => f.Product).WithMany(p => p.Favorites)

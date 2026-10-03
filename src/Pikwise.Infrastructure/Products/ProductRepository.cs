@@ -9,6 +9,7 @@ namespace Pikwise.Infrastructure.Products;
 
 public sealed class ProductRepository(ApplicationDbContext context) : IProductRepository
 {
+    // Read-only queries avoid tracking and load the relationships required by the response mapper.
     public Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
         context.Products
             .AsNoTracking()
@@ -21,6 +22,7 @@ public sealed class ProductRepository(ApplicationDbContext context) : IProductRe
         await context.Products.AsNoTracking().Include(p => p.Brand).Include(p => p.Category)
             .Include(p => p.LaptopSpecification).OrderBy(p => p.Id).ToListAsync(cancellationToken);
 
+    // Writes use tracked entities so SaveChanges detects changes to the product and specification.
     public Task<Product?> GetForUpdateAsync(int id, CancellationToken cancellationToken = default) =>
         context.Products.Include(p => p.Brand).Include(p => p.Category).Include(p => p.LaptopSpecification)
             .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
@@ -40,10 +42,12 @@ public sealed class ProductRepository(ApplicationDbContext context) : IProductRe
         {
             await context.SaveChangesAsync(cancellationToken);
         }
+        // Translate persistence failures into an Application exception; API chooses the HTTP status.
         catch (DbUpdateConcurrencyException exception)
         {
             throw new PersistenceConflictException(exception);
         }
+        // SQL error 547 covers constraint conflicts, including a referenced row deleted after validation.
         catch (DbUpdateException exception) when (exception.InnerException is SqlException { Number: 547 })
         {
             throw new PersistenceConflictException(exception);

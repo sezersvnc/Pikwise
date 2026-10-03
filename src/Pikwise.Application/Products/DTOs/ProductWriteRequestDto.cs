@@ -3,10 +3,12 @@ using Pikwise.Application.Products.Validators;
 
 namespace Pikwise.Application.Products.DTOs;
 
+// Shared editable fields for POST and PUT. The server owns Id and timestamps.
 public abstract class ProductWriteRequestDto
 {
     [Required, StringLength(200)]
     public string Name { get; init; } = string.Empty;
+    // Match decimal(18,2); parse limits consistently across system cultures.
     [Range(typeof(decimal), "0", "9999999999999999.99", ParseLimitsInInvariantCulture = true), DecimalScale(2)]
     public decimal Price { get; init; }
     [Range(0, int.MaxValue)]
