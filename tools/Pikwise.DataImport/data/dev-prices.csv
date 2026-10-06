@@ -1,0 +1,28 @@
+# DEVELOPMENT/TEST DATA ONLY. Not real market prices. Removed in Session 13.
+# Prices are rough illustrative TRY values chosen by the assistant for testing; never show them as market data.
+ExternalId,Price,Stock,IsActive,Note
+153108520,62000.00,8,true,ThinkPad T14 Gen 7 (AMD)
+153001651,32000.00,12,true,ASUS S1407AA
+153001706,70000.00,5,true,Dell PW516265
+153001273,52000.00,7,true,HP EliteBook 6 G2a 14
+153001641,27000.00,15,true,MSI Modern A16 J1M-011BEN
+145241422,45000.00,4,true,Fujitsu UQ-L1
+152548271,33000.00,9,true,Samsung Galaxy Book4 Edge
+152488280,58000.00,6,true,Alienware DA15265 RTX 5050
+145202565,48000.00,3,true,Dynabook VZ/HY
+152426976,38000.00,10,true,GIGABYTE EAGLE
+153108519,64000.00,6,true,ThinkPad T16 Gen 5 (Intel)
+153001643,115000.00,2,true,ASUS GU405AP-SY019W 32GB
+153001270,68000.00,5,true,Dell PW514265
+153001260,82000.00,3,true,HP ZBook 8 G2i 16
+153001622,27500.00,8,false,MSI Modern A16 J1M-010NLN - inactive on purpose (eligibility test)
+145241416,55000.00,4,true,Fujitsu UH90/J3
+152483329,85000.00,3,true,Alienware AC16250
+145202560,22000.00,0,true,Dynabook PZ/LY - zero stock on purpose (eligibility test)
+149635437,62000.00,5,true,GIGABYTE AERO X16
+153108518,165000.00,2,true,ThinkPad T16g Gen 3
+153001632,102000.00,4,true,ASUS GU405AP-SY016W 16GB
+153000438,30000.00,11,true,Dell PC16250
+152972861,50000.00,6,true,HP EliteBook 6 G1i 14
+153001620,26000.00,14,true,MSI Modern A14
+145241383,36000.00,7,true,Fujitsu UH90/G2

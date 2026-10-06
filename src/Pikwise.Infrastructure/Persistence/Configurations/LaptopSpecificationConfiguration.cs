@@ -10,10 +10,11 @@ public sealed class LaptopSpecificationConfiguration : IEntityTypeConfiguration<
     {
         builder.ToTable("LaptopSpecifications");
         builder.HasKey(s => s.Id);
-        builder.Property(s => s.Processor).HasMaxLength(200).IsRequired();
-        builder.Property(s => s.GPU).HasMaxLength(200).IsRequired();
-        builder.Property(s => s.Resolution).HasMaxLength(50).IsRequired();
-        builder.Property(s => s.OperatingSystem).HasMaxLength(100).IsRequired();
+        // Specification values are nullable because external sources may not supply every field.
+        builder.Property(s => s.Processor).HasMaxLength(200);
+        builder.Property(s => s.GPU).HasMaxLength(200);
+        builder.Property(s => s.Resolution).HasMaxLength(50);
+        builder.Property(s => s.OperatingSystem).HasMaxLength(100);
         builder.Property(s => s.ScreenSize).HasPrecision(5, 2);
         builder.Property(s => s.Weight).HasPrecision(6, 3);
         // The specification depends on its product and is removed when that product is deleted.

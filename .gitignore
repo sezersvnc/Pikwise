@@ -9,3 +9,5 @@ TestResults/
 .env.*
 !.env.example
 **/appsettings.Local.json
+# DataImport tool logs (local output)
+tools/Pikwise.DataImport/data/*.txt

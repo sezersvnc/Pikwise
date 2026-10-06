@@ -22,24 +22,26 @@ public abstract class ProductWriteRequestDto
     public LaptopSpecificationRequestDto Specification { get; init; } = null!;
 }
 
+// Every field is optional so a specification can be stored with only the values that are known.
+// Range and length rules apply only to values that are supplied.
 public sealed class LaptopSpecificationRequestDto
 {
-    [Required, StringLength(200)]
-    public string Processor { get; init; } = string.Empty;
-    [Required, StringLength(200)]
-    public string GPU { get; init; } = string.Empty;
+    [StringLength(200)]
+    public string? Processor { get; init; }
+    [StringLength(200)]
+    public string? GPU { get; init; }
     [Range(1, int.MaxValue)]
-    public int RamGb { get; init; }
+    public int? RamGb { get; init; }
     [Range(1, int.MaxValue)]
-    public int StorageGb { get; init; }
+    public int? StorageGb { get; init; }
     [Range(typeof(decimal), "0.01", "999.99", ParseLimitsInInvariantCulture = true), DecimalScale(2)]
-    public decimal ScreenSize { get; init; }
-    [Required, StringLength(50)]
-    public string Resolution { get; init; } = string.Empty;
+    public decimal? ScreenSize { get; init; }
+    [StringLength(50)]
+    public string? Resolution { get; init; }
     [Range(1, int.MaxValue)]
-    public int RefreshRate { get; init; }
+    public int? RefreshRate { get; init; }
     [Range(typeof(decimal), "0.001", "999.999", ParseLimitsInInvariantCulture = true), DecimalScale(3)]
-    public decimal Weight { get; init; }
-    [Required, StringLength(100)]
-    public string OperatingSystem { get; init; } = string.Empty;
+    public decimal? Weight { get; init; }
+    [StringLength(100)]
+    public string? OperatingSystem { get; init; }
 }

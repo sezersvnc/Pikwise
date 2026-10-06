@@ -575,3 +575,55 @@ optional specifications, one SQL command and no tracking. All 93 tests pass
 (18 unit, 75 integration): 8 require the guarded PikwiseSession3Tests database
 and 85 require no SQL. Test fixtures are cleaned up without changing PikwiseDb.
 See COMPARISON.md for the contract and review guide.
+
+---
+
+## Session 11.5 — external reference data (Open Icecat)
+
+### Schema changes (migration created locally, not applied until reviewed)
+- `LaptopSpecifications`: Processor, GPU, Resolution, OperatingSystem become nullable
+  strings; RamGb, StorageGb, RefreshRate become `int?`; ScreenSize, Weight become
+  `decimal?`. Column names, lengths and precisions are unchanged. Null means unknown.
+- New table `ProductExternalReferences` (Id, ProductId FK cascade, Provider nvarchar(50),
+  ExternalId nvarchar(100) with a binary collation, ImportedAt). Unique index on
+  `(Provider, ExternalId)`; index on ProductId.
+- `Products.Price` stays non-nullable.
+
+### Data source and license
+Specifications are imported from Open Icecat (https://icecat.biz) for development and
+testing. Required obligations: attribute Icecat as the source; the data is under the Open
+Content License (v1.4), which has share-alike terms and requires modifications to be
+marked (Pikwise normalizes names and units, so imported values are modified data); fair-use
+rate limits apply. The license prohibits using the data for machine learning/AI purposes,
+so Icecat-derived data must NOT be used as generative-AI/LLM explanation input. Before
+Session 15, get written permission from Icecat or use a different, suitably licensed source.
+
+### Development price data
+Open Icecat provides no price or stock. Price, Stock and IsActive come from a companion
+CSV (`ExternalId,Price,Stock,IsActive`) and are **development/test data, not real market
+data**. They must not be presented to users as such and the temporary layer is removed in
+Session 13.
+
+### Import tool
+`tools/Pikwise.DataImport`: `discover` (stream index, write manifest), `inspect` (print raw
+Icecat features of one product), `import` (dry run by default; `--apply` writes). Icecat
+username/password are read from User Secrets or environment variables
+(`Icecat__Username`, `Icecat__Password`), never from files in the repository.
+
+### Dataset produced in Session 11.5
+- Discovery: `discover --category-id 151 --exclude-suppliers 7,9,30492,41668` streamed ~7.8 million
+  index entries. Icecat category 151 is laptops (its English name is not "Notebooks").
+  Selection takes the 12 suppliers with the most laptop entries and their newest products
+  (highest Product_ID), one entry per model name per supplier.
+- Excluded suppliers: 9 (Apple) and 7 (Acer) return no or empty records in Open Icecat;
+  30492 and 41668 are refurbishers that list other brands' products under their own name.
+- The manifest was then reviewed by hand: two more refurbishers (Flex IT, upcycle it) and one
+  record without hardware data were removed. The committed manifest holds 25 laptops.
+- Result: 25 laptops, 10 brands (Lenovo, ASUS, Dell, HP, MSI, Fujitsu, Alienware, Dynabook,
+  GIGABYTE, Samsung). Missing values: CPU 1, GPU 2, refresh rate 10, screen size 2.
+  RAM 8-64 GB, storage 256-1000 GB, weight 0.828-2.54 kg, refresh rate 60-165 Hz.
+- Known source issues kept as supplied: Fujitsu UQ-L1 lists an Intel GPU with a Snapdragon CPU;
+  Icecat stores SKUs as Dell product names (e.g. "PW516265").
+- `dev-prices.csv` holds illustrative TRY prices chosen for testing. One product is inactive and
+  one has zero stock on purpose, to exercise recommendation eligibility. Not market data.
+- Tool logs (`tools/Pikwise.DataImport/data/*.txt`) are local output and are not committed.

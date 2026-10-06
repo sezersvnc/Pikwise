@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Pikwise.Application\Pikwise.Application.csproj" />
     <ProjectReference Include="..\..\src\Pikwise.Domain\Pikwise.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Pikwise.Infrastructure\Pikwise.Infrastructure.csproj" />
   </ItemGroup>
 
-</Project>
+</Project>

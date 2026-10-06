@@ -52,7 +52,9 @@ User profiles / favorites        ✅ Session 6 complete
 Authentication foundation        ✅ Session 7 complete
 Authenticated favorites API      ✅ Session 8 complete
 Filtering / sorting / pagination ✅ Session 9 complete and pushed
-Product comparison               ✅ Session 10 implemented; commit/push approved
+Product comparison               ✅ Session 10 complete and pushed
+Recommendation engine design     ✅ Session 11 complete (implementation: Session 12)
+Real laptop dataset (Icecat)     ✅ Session 11.5 complete (25 laptops, dev prices)
 ```
 
 ## Read order
@@ -94,6 +96,6 @@ filters, explicit sorting and SQL pagination with metadata. Session 10 adds stru
 comparison of two or three selected products in one SQL read. All 93 tests pass.
 GET /api/products now returns an object with items instead of a bare array.
 Session 9 was reviewed and pushed. Session 10 was approved for commit/push;
-Session 11 (recommendation design) is in progress and documentation-only; see docs/RECOMMENDATION_ENGINE.md. Details are in [docs/COMPARISON.md](docs/COMPARISON.md),
+Session 11 (recommendation design) is complete; see docs/RECOMMENDATION_ENGINE.md. Session 12 (implementation) has not started. Session 11.5 imported 25 real laptop specifications from Open Icecat with `tools/Pikwise.DataImport` (prices are development/test data); see docs/DATABASE.md. Details are in [docs/COMPARISON.md](docs/COMPARISON.md),
 [docs/PRODUCT_QUERIES.md](docs/PRODUCT_QUERIES.md)
 and [docs/Pikwise.http](docs/Pikwise.http).

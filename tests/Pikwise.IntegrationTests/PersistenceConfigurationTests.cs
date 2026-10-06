@@ -19,8 +19,9 @@ public class PersistenceConfigurationTests
         Assert.Same(context, firstScope.ServiceProvider.GetRequiredService<ApplicationDbContext>());
         Assert.NotSame(context, secondScope.ServiceProvider.GetRequiredService<ApplicationDbContext>());
         Assert.Equal("Microsoft.EntityFrameworkCore.SqlServer", context.Database.ProviderName);
-        Assert.Equal(6, context.Model.GetEntityTypes().Count());
-        Assert.Equal(2, context.Database.GetMigrations().Count());
+        // Session 11.5 adds ProductExternalReference and its migration.
+        Assert.Equal(7, context.Model.GetEntityTypes().Count());
+        Assert.Equal(3, context.Database.GetMigrations().Count());
     }
 
     [Theory]

@@ -27,10 +27,9 @@ Optional AI Explanation (Session 15)
 
 ## Session 11 — design decisions
 
-Status: **design in progress.** Decisions below were made by the project owner in
-Session 11 (see ADR-019). Items under "Open decisions" are intentionally not decided;
-nothing in this file is implemented yet and no formula constant (range, weight,
-tier) has been chosen beyond what is written here.
+Status: **design complete (Session 11 closed).** All decisions below were made by
+the project owner (see ADR-019 and ADR-021). Nothing in this file is implemented
+yet; implementation is Session 12.
 
 ### Decided
 
@@ -56,15 +55,96 @@ tier) has been chosen beyond what is written here.
    out of that product's score and the remaining weights are rescaled so they
    again sum to 1. The result must report which criteria were unknown and the
    share of the original weight that was actually known. Nothing is guessed and
-   no penalty is applied.
+   no penalty is applied. A product whose known-weight share is below 50% is not
+   recommended (decision 16).
 7. **CPU and GPU.** Free-text `Processor` and `GPU` are scored through a
-   manually maintained, deterministic tier table. A model that is not in the
-   table is treated as unknown (rule 6). The table and its tiers are not defined yet.
+   manually maintained, deterministic tier table (decision 15). A model that is not
+   in the table is treated as unknown (rule 6).
 8. **Tie-breaking.** Equal scores are ordered by price ascending, then by
    product Id ascending.
 9. **Output.** The engine returns the Top 3 with per-criterion components
    (raw value, normalized value, weight, contribution), unknown criteria and the
    known-weight share.
+10. **Scored criteria (V1).** Six criteria are scored: RAM (`RamGb`, higher is
+    better), storage (`StorageGb`, higher is better), CPU tier (from `Processor`,
+    higher is better), GPU tier (from `GPU`, higher is better), weight (`Weight`,
+    lower is better) and refresh rate (`RefreshRate`, higher is better). Screen
+    size, resolution, operating system and price are not scored in V1; they remain
+    verified facts shown with the result.
+11. **Hard constraints (V1).** Budget ceiling (`Price <= BudgetMax`), minimum RAM
+    (`RamGb >= MinRamGb`), minimum storage (`StorageGb >= MinStorageGb`) and maximum
+    weight (`Weight <= MaxWeightKg`). Operating-system and GPU-requirement
+    constraints are not part of V1.
+12. **Price in V1.** Price only acts as the budget hard filter and is not a score
+    component. Price/performance (value-for-money) analysis is a planned, central
+    Pikwise capability and must be added in Session 13; it is kept out of the base
+    fit score so that "best fit" and "best value" stay separate.
+13. **Unknown hard-constraint field.** If a field needed by an active hard
+    constraint is unknown for a product (including a missing specification), the
+    product is removed. It cannot be shown to satisfy the constraint.
+14. **Reference ranges.** Values are clamped to the range, then mapped to 0..1.
+
+    | Criterion | Range | Direction |
+    |---|---|---|
+    | RAM | 8 .. 32 GB | higher is better |
+    | Storage | 256 .. 1024 GB | higher is better |
+    | Weight | 1.0 .. 2.5 kg | lower is better |
+    | Refresh rate | 60 .. 165 Hz | higher is better |
+    | CPU tier | 1 .. 5 | higher is better, `n = (tier - 1) / 4` |
+    | GPU tier | 1 .. 5 | higher is better, `n = (tier - 1) / 4` |
+
+    Chosen after reviewing the Session 11.5 dataset (RAM 8-64 GB, storage
+    256-1000 GB, weight 0.828-2.54 kg, refresh 60-165 Hz). RAM tops out at 32 GB so
+    that 16 GB is not scored as nearly worthless; 64 GB clamps to 1.0.
+15. **CPU/GPU tier table (V1).** Five tiers. A name matches only by exact,
+    case-insensitive comparison with the normalized names produced by the importer;
+    there is no fuzzy matching. The table lives in code (a static class in the
+    Application layer, unit tested), not in the database. It is maintained by hand
+    and extended when new models are imported. Tiers reflect general performance
+    class and were approved by the project owner.
+
+    | Tier | CPU |
+    |---|---|
+    | 1 | Intel Core i3-1305U |
+    | 2 | Intel Core i7-1255U, Intel Core i7-1265U, Intel Core 5 120U, Qualcomm Snapdragon X1-26-100, Intel Core Ultra 5 325 |
+    | 3 | AMD Ryzen 7 170, AMD Ryzen 5 7533HS, Intel Core Ultra 7 155U, Intel Core Ultra 7 355, AMD Ryzen AI 5 PRO 435 |
+    | 4 | Intel Core Ultra 7 155H, Intel Core Ultra 7 366H, AMD Ryzen AI 7 350, AMD Ryzen AI 7 PRO 450, AMD Ryzen 7 260 |
+    | 5 | Intel Core Ultra 9 386H, Intel Core 9 270H, Intel Core Ultra 7 255HX |
+
+    | Tier | GPU |
+    |---|---|
+    | 1 | Intel UHD Graphics |
+    | 2 | Intel Iris Xe Graphics, AMD Radeon 680M, AMD Radeon 840M |
+    | 3 | AMD Radeon 860M, Intel Arc Graphics |
+    | 4 | NVIDIA GeForce RTX 4050, NVIDIA GeForce RTX 5050, NVIDIA GeForce RTX 5060 |
+    | 5 | NVIDIA GeForce RTX 5070, NVIDIA GeForce RTX 5070 Laptop GPU, NVIDIA GeForce RTX 5080 Laptop GPU |
+
+    "Intel Graphics" is deliberately not listed: Icecat uses that name for very
+    different integrated GPUs, so it does not identify a model and stays unknown.
+16. **Minimum known-weight share.** A product is not recommended when the criteria
+    known for it carry less than 50% of the total importance.
+17. **Rounding.** Scores are computed with `decimal`, rounded half-up to two decimals,
+    and compared after rounding; ties then fall to decision 8.
+18. **UserRequirements (confirmed).** All hard constraints are optional (absent means
+    not applied); a budget is not mandatory. Importance levels are integers 1..5 and
+    default to 3.
+
+```text
+UserRequirements
+  Hard constraints (each optional)
+    BudgetMax      decimal   Price ceiling
+    MinRamGb       int       Minimum RAM
+    MinStorageGb   int       Minimum storage
+    MaxWeightKg    decimal   Maximum weight
+  Importance, integer 1..5, default 3 when absent
+    Ram, Storage, Cpu, Gpu, Weight, RefreshRate
+```
+
+A usage type (school, gaming, development) is not a field of this model.
+Translating a described need into importance levels and constraints is the
+Session 14 LLM step; the engine only receives the structured values above.
+Validation limits of the request (for example the maximum accepted budget) are an
+implementation detail for Session 12.
 
 ### Formula
 
@@ -97,30 +177,49 @@ Ranking for this example: B, A, D, C. A ranks above C because both have the same
 RAM and storage but A is lighter. D is scored only on RAM and storage with
 weights 5/8 and 3/8 and is reported with a known-weight share of 8/11.
 
-### Open decisions (not decided, do not implement)
+### Verification with real data (Session 11 exit criterion)
 
-- The set of scored criteria and the direction of each (for example whether
-  screen size, resolution or refresh rate score at all, and how).
-- The reference range `[min, max]` of every criterion. Intended to be chosen
-  together with the Session 11.5 dataset, not guessed.
-- The CPU and GPU tier table: tier scale, which models, where it is stored.
-- Whether price is also a scored criterion or only a hard filter (budget ceiling)
-  in V1. Value-for-money is Session 13.
-- Behavior when a hard-constraint field is unknown for a product (for example
-  the product has no specification). Safest candidate: it cannot be shown to
-  satisfy the constraint, so it is removed; not confirmed.
-- Minimum known-weight share below which a product is not recommended.
-- Rounding rule for comparing scores (candidate: decimal arithmetic, compare
-  scores rounded to two decimals before tie-breaking).
-- Concrete hard constraints list and request model (`UserRequirements`):
-  budget ceiling, minimum RAM and storage, maximum weight, required OS and GPU
-  class are candidates from the original draft.
-- Battery life and usage type appear in the original candidate inputs but there
-  is no battery field in `LaptopSpecification`; they cannot be scored until
-  verified data exists.
-- Current schema note: all `LaptopSpecification` fields are non-null, so
-  field-level missing data cannot occur today; only a missing specification
-  can. Session 11.5 may need nullable fields or a skip-record rule.
+Hand calculation on the 25 laptops imported in Session 11.5, using the decisions
+above. Prices are development/test data, not market prices.
+
+Sample user: budget 70,000, minimum RAM 16 GB; importance RAM 3, storage 3, CPU 4,
+GPU 2, weight 5, refresh rate 1 (total 18).
+
+Removed before scoring: 2 by eligibility (MSI Modern A16 J1M-010NLN inactive,
+Dynabook PZ/LY zero stock), 5 by budget, 1 by minimum RAM (Fujitsu UH90/G2, 8 GB).
+17 products were scored.
+
+| Rank | Product | Price | Known share | Score |
+|---|---|---|---|---|
+| 1 | Dell PW514265 | 68,000 | 18/18 | 75.41 |
+| 2 | Dell PW516265 | 70,000 | 18/18 | 66.33 |
+| 3 | Fujitsu UH90/J3 | 55,000 | 17/18 | 64.71 |
+| 4 | GIGABYTE AERO X16 | 62,000 | 18/18 | 63.37 |
+
+Why 1 ranks above 2: the two Dell models have identical RAM (32 GB), storage
+(1000 GB), CPU (Ryzen AI 7 PRO 450, tier 4) and GPU (Radeon 860M, tier 3). Only
+weight differs: 1.40 kg (n = 0.733) versus 1.89 kg (n = 0.407). With weight
+importance 5 of 18: `100 * 5/18 * (0.733 - 0.407) = 9.07` points, which matches
+75.41 - 66.33.
+
+Check for rank 1: `100 * (3*1.000 + 3*0.969 + 4*0.750 + 2*0.500 + 5*0.733 + 1*0.000) / 18 = 75.41`.
+
+Why 3 ranks above 4: Fujitsu UH90/J3 (0.858 kg, weight n = 1.000) beats GIGABYTE
+AERO X16 (1.9 kg, n = 0.400) by `5 * 0.6 = 3.0` weighted points, more than the AERO's
+advantage in storage, GPU and refresh rate. The Fujitsu's refresh rate is unknown,
+so it is scored on 17/18 of the importance and the weights are rescaled.
+
+Observation for Session 12 tests: HP EliteBook 6 G1i has no CPU or GPU data, is
+scored on 12/18 of the importance, and still ranks 5th. That is the agreed
+missing-data rule (no guess, no penalty, share reported). The 50% threshold
+removes products with less data. Fujitsu UQ-L1 carries an Icecat data error (Intel
+GPU listed with a Snapdragon CPU) and is scored as supplied.
+
+### Not in V1 (by decision)
+
+- Battery life and usage type: there is no verified battery field, so they cannot
+  be scored until such data exists.
+- Value-for-money analysis: Session 13.
 
 ## Candidate user inputs
 - budget
@@ -144,7 +243,9 @@ It should be able to identify:
 - cheaper product with nearly equal fit,
 - meaningful vs meaningless upgrades.
 
-Designed in Session 13, after the base engine exists.
+Designed in Session 13, after the base engine exists. Price/performance is a core
+Pikwise differentiator (see decision 12) and must not be dropped.
 
 ## Rule
-Do not implement scoring before the open decisions above are explicitly defined.
+Implement exactly the decisions above in Session 12. Any change to a range, tier or
+rule is a new owner decision recorded in DECISIONS.md.

@@ -311,7 +311,7 @@ design remains Session 11. See COMPARISON.md for verification and review.
 ---
 
 ## ADR-019 — Session 11 recommendation engine design
-**Status:** Accepted (partial); open items are listed in RECOMMENDATION_ENGINE.md
+**Status:** Accepted; completed by ADR-021
 
 The engine is a deterministic pipeline: eligibility and hard filters, fixed-range
 normalization, weighted scoring, ranking, Top 3. Products with IsActive=false or
@@ -330,6 +330,56 @@ value is guessed and no penalty is applied. CPU and GPU free text is scored thro
 manually maintained tier table; unlisted models are unknown. Ties are broken by price
 ascending, then product Id ascending.
 
-Not decided here: the criteria set, reference ranges, tier table, whether price is
-scored, behavior for unknown hard-constraint fields, and rounding. No implementation,
-schema change or package is part of this session. Implementation is Session 12.
+The V1 scored criteria are RAM, storage, CPU tier, GPU tier, weight and refresh rate.
+Supported hard constraints are budget ceiling, minimum RAM and storage, and maximum
+weight. Price is only a hard filter in V1; price/performance analysis is a core
+planned capability for Session 13 and stays separate from the fit score. A product
+whose field is unknown for an active hard constraint is removed. A usage type is not
+part of UserRequirements; the LLM step (Session 14) maps described needs to
+importance levels and constraints. The remaining constants are in ADR-021.
+
+---
+
+## ADR-020 — Session 11.5 external product data provider and Open Icecat
+**Status:** Accepted for development/test data only
+
+Real laptop specifications enter Pikwise through a provider abstraction:
+`Open Icecat -> Icecat DTO/JSON -> Mapper/Normalizer -> Pikwise domain model -> SQL Server`.
+Application defines IExternalLaptopProvider and a provider-neutral ExternalLaptopRecord;
+Infrastructure holds the Icecat client, discovery and mapper; Domain and the
+recommendation engine never see Icecat. The importer is a console tool
+(tools/Pikwise.DataImport), not an API endpoint. It runs as a dry run by default and
+writes to the database only with --apply.
+
+Specification columns become nullable (unknown stays null, nothing is guessed).
+Product.Price stays non-nullable. Open Icecat has no price or stock, so these come from
+a companion CSV that is development/test data, not market data, and is removed in
+Session 13. Provider links live in ProductExternalReferences with a unique
+(Provider, ExternalId); Product gets no Icecat-specific fields and no Model column
+(Name is "Brand Model"). Discovery streams the Icecat index only to select ~20-30
+notebook IDs, saved in a manifest; the catalog is not imported.
+
+Licensing: Open Icecat is accepted as a Session 11.5 dev/test spec source under the
+Open Content License (attribution, share-alike, modifications marked). Using
+Icecat-derived data as input to generative AI/LLM explanations is NOT approved (license
+article 10). Before Session 15, obtain written permission from Icecat or use another
+suitably licensed source. Credentials live only in User Secrets or environment
+variables.
+
+---
+
+## ADR-021 — Session 11 completion: ranges, tiers and thresholds
+**Status:** Accepted
+
+Chosen after reviewing the 25 laptops imported in Session 11.5. Reference ranges:
+RAM 8-32 GB, storage 256-1024 GB, weight 1.0-2.5 kg (lower is better), refresh rate
+60-165 Hz; values are clamped. CPU and GPU are mapped to five tiers through a
+hand-maintained table in code (Application layer, unit tested), matched by exact
+case-insensitive name; tier n = (tier - 1) / 4. Unlisted or ambiguous names (for
+example "Intel Graphics") are unknown. A product with less than 50% of the total
+importance known is not recommended. Scores use decimal arithmetic, are rounded
+half-up to two decimals and compared after rounding. All UserRequirements hard
+constraints are optional; importance levels are 1-5 with default 3.
+
+The full tables and a hand-verified ranking on real data are in
+RECOMMENDATION_ENGINE.md. Implementation is Session 12.

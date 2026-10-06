@@ -150,12 +150,13 @@ such as the VS Code REST Client extension. Set the lookup IDs before running the
 
 ### Validation and errors
 
-Names/CPU/GPU/OS/resolution must be nonblank and fit the mapped string lengths.
-Price and stock must be nonnegative; FK IDs, RAM, storage and refresh rate must be
-positive. ScreenSize is 0.01..999.99 inches; Weight is 0.001..999.999 kg. Price
+Names must be nonblank. Since Session 11.5 every specification field is optional
+(null = unknown); when supplied, text must fit the mapped string lengths and be
+non-blank (blank text is stored as null). Price and stock must be nonnegative; FK IDs
+and, when supplied, RAM, storage and refresh rate must be positive. ScreenSize is 0.01..999.99 inches; Weight is 0.001..999.999 kg. Price
 fits decimal(18,2); price/screen allow two decimal places and weight allows three.
-Names and specification strings are trimmed. A specification is required for
-create/update. Missing fields with valid CLR defaults (price/stock/IsActive) use
+Names and specification strings are trimmed. The `specification` object itself is required for
+create/update (its fields may be null). Missing fields with valid CLR defaults (price/stock/IsActive) use
 those defaults; the JSON body itself and required strings/specification are required.
 
 Malformed requests and invalid fields/references return 400 with

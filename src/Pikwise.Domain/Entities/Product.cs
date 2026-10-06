@@ -15,4 +15,5 @@ public sealed class Product
     public Category Category { get; set; } = null!;
     public LaptopSpecification? LaptopSpecification { get; set; }
     public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
+    public ICollection<ProductExternalReference> ExternalReferences { get; set; } = new List<ProductExternalReference>();
 }

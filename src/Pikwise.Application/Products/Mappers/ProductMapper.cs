@@ -15,21 +15,21 @@ public static class ProductMapper
         product.CategoryId = request.CategoryId;
         var input = request.Specification;
         // Reuse the existing specification on update to preserve its identity.
-        var specification = product.LaptopSpecification ??= new LaptopSpecification
-        {
-            Processor = input.Processor.Trim(), GPU = input.GPU.Trim(),
-            Resolution = input.Resolution.Trim(), OperatingSystem = input.OperatingSystem.Trim()
-        };
-        specification.Processor = input.Processor.Trim();
-        specification.GPU = input.GPU.Trim();
+        var specification = product.LaptopSpecification ??= new LaptopSpecification();
+        // Blank text is stored as null (unknown) rather than as an empty string.
+        specification.Processor = NullIfBlank(input.Processor);
+        specification.GPU = NullIfBlank(input.GPU);
         specification.RamGb = input.RamGb;
         specification.StorageGb = input.StorageGb;
         specification.ScreenSize = input.ScreenSize;
-        specification.Resolution = input.Resolution.Trim();
+        specification.Resolution = NullIfBlank(input.Resolution);
         specification.RefreshRate = input.RefreshRate;
         specification.Weight = input.Weight;
-        specification.OperatingSystem = input.OperatingSystem.Trim();
+        specification.OperatingSystem = NullIfBlank(input.OperatingSystem);
     }
+
+    private static string? NullIfBlank(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
     // Read queries must load Brand, Category and LaptopSpecification before mapping.
     public static ProductResponseDto ToResponseDto(this Product product) => new(

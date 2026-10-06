@@ -1,0 +1,156 @@
+{
+  "Provider": "icecat",
+  "CreatedAt": "2026-10-06T18:33:30.0228059+00:00",
+  "Entries": [
+    {
+      "ExternalId": "153108520",
+      "SupplierId": "728",
+      "BrandPartCode": null,
+      "ModelName": "ThinkPad T14 Gen 7 (AMD) Copilot+ PC"
+    },
+    {
+      "ExternalId": "153001651",
+      "SupplierId": "161",
+      "BrandPartCode": null,
+      "ModelName": "S1407AA-LY066W Copilot+ PC"
+    },
+    {
+      "ExternalId": "153001706",
+      "SupplierId": "292",
+      "BrandPartCode": null,
+      "ModelName": "PW516265"
+    },
+    {
+      "ExternalId": "153001273",
+      "SupplierId": "1",
+      "BrandPartCode": null,
+      "ModelName": "EliteBook 6 G2a 14 Next Gen AI PC"
+    },
+    {
+      "ExternalId": "153001641",
+      "SupplierId": "278",
+      "BrandPartCode": null,
+      "ModelName": "Modern A16 LE J1M-011BEN"
+    },
+    {
+      "ExternalId": "145241422",
+      "SupplierId": "15",
+      "BrandPartCode": null,
+      "ModelName": "UQ-L1"
+    },
+    {
+      "ExternalId": "152548271",
+      "SupplierId": "26",
+      "BrandPartCode": null,
+      "ModelName": "NP750XQB-KA4UK"
+    },
+    {
+      "ExternalId": "152488280",
+      "SupplierId": "4701",
+      "BrandPartCode": null,
+      "ModelName": "DA15265"
+    },
+    {
+      "ExternalId": "145202565",
+      "SupplierId": "30558",
+      "BrandPartCode": null,
+      "ModelName": "VZ/HY"
+    },
+    {
+      "ExternalId": "152426976",
+      "SupplierId": "739",
+      "BrandPartCode": null,
+      "ModelName": "GIGABYTE EAGLE 9MJR2UKF93SH"
+    },
+    {
+      "ExternalId": "153108519",
+      "SupplierId": "728",
+      "BrandPartCode": null,
+      "ModelName": "ThinkPad T16 Gen 5 (Intel) Copilot+ PC"
+    },
+    {
+      "ExternalId": "153001643",
+      "SupplierId": "161",
+      "BrandPartCode": null,
+      "ModelName": "GU405AP-SY019W"
+    },
+    {
+      "ExternalId": "153001270",
+      "SupplierId": "292",
+      "BrandPartCode": null,
+      "ModelName": "PW514265"
+    },
+    {
+      "ExternalId": "153001260",
+      "SupplierId": "1",
+      "BrandPartCode": null,
+      "ModelName": "ZBook 8 G2i 16"
+    },
+    {
+      "ExternalId": "153001622",
+      "SupplierId": "278",
+      "BrandPartCode": null,
+      "ModelName": "Modern A16 LE J1M-010NLN"
+    },
+    {
+      "ExternalId": "145241416",
+      "SupplierId": "15",
+      "BrandPartCode": null,
+      "ModelName": "UH90/J3"
+    },
+    {
+      "ExternalId": "152483329",
+      "SupplierId": "4701",
+      "BrandPartCode": null,
+      "ModelName": "AC16250"
+    },
+    {
+      "ExternalId": "145202560",
+      "SupplierId": "30558",
+      "BrandPartCode": null,
+      "ModelName": "PZ/LY"
+    },
+    {
+      "ExternalId": "149635437",
+      "SupplierId": "739",
+      "BrandPartCode": null,
+      "ModelName": "AERO X16 1VH93NEC94AH"
+    },
+    {
+      "ExternalId": "153108518",
+      "SupplierId": "728",
+      "BrandPartCode": null,
+      "ModelName": "ThinkPad T16g Gen 3"
+    },
+    {
+      "ExternalId": "153001632",
+      "SupplierId": "161",
+      "BrandPartCode": null,
+      "ModelName": "GU405AP-SY016W"
+    },
+    {
+      "ExternalId": "153000438",
+      "SupplierId": "292",
+      "BrandPartCode": null,
+      "ModelName": "PC16250"
+    },
+    {
+      "ExternalId": "152972861",
+      "SupplierId": "1",
+      "BrandPartCode": null,
+      "ModelName": "EliteBook 6 G1i 14 AI PC"
+    },
+    {
+      "ExternalId": "153001620",
+      "SupplierId": "278",
+      "BrandPartCode": null,
+      "ModelName": "Modern A14 LE J1M-014BEN"
+    },
+    {
+      "ExternalId": "145241383",
+      "SupplierId": "15",
+      "BrandPartCode": null,
+      "ModelName": "UH90/G2"
+    }
+  ]
+}

@@ -41,12 +41,12 @@ public sealed class ProductRepository(ApplicationDbContext context) : IProductRe
         if (!string.IsNullOrWhiteSpace(query.Cpu))
         {
             var cpu = query.Cpu.Trim();
-            products = products.Where(p => p.LaptopSpecification != null && p.LaptopSpecification.Processor.Contains(cpu));
+            products = products.Where(p => p.LaptopSpecification != null && p.LaptopSpecification.Processor != null && p.LaptopSpecification.Processor.Contains(cpu));
         }
         if (!string.IsNullOrWhiteSpace(query.Gpu))
         {
             var gpu = query.Gpu.Trim();
-            products = products.Where(p => p.LaptopSpecification != null && p.LaptopSpecification.GPU.Contains(gpu));
+            products = products.Where(p => p.LaptopSpecification != null && p.LaptopSpecification.GPU != null && p.LaptopSpecification.GPU.Contains(gpu));
         }
 
         // Count the filtered catalog, then fetch only the requested page. Both execute in SQL.

@@ -6,8 +6,8 @@ Completed:
 - [x] Session 10 — Product Comparison
 
 Current focus:
-- [ ] Session 11 — Recommendation Engine Design
-- [ ] Session 11.5 — Open Dataset Bootstrap
+- [x] Session 11 — Recommendation Engine Design
+- [x] Session 11.5 — Open Dataset Bootstrap
 
 This file continues from Recommendation Engine onward.
 
@@ -21,18 +21,18 @@ Design the recommendation algorithm before implementing it.
 > Do not ask Codex to invent the scoring formula.
 
 ## Decisions To Make
-Status: design in progress. Decisions are recorded in `docs/RECOMMENDATION_ENGINE.md` and ADR-019.
-- [ ] Define `UserRequirements`. (open: request model not decided)
-- [ ] Define hard constraints. (decided: strict elimination, IsActive/Stock eligibility; open: concrete constraint list and unknown-field behavior)
-- [ ] Define weighted-score properties. (open: criteria set and directions)
+Status: complete. Decisions are recorded in `docs/RECOMMENDATION_ENGINE.md`, ADR-019 and ADR-021.
+- [x] Define `UserRequirements`. (all hard constraints optional; importance 1..5, default 3)
+- [x] Define hard constraints. (budget, min RAM, min storage, max weight; strict; unknown field removes the product; IsActive/Stock eligibility)
+- [x] Define weighted-score properties. (RAM, storage, CPU tier, GPU tier, weight, refresh rate; price only a hard filter)
 - [x] Define score range. (components 0..1, shown 0..100)
-- [ ] Define normalization rules. (decided: fixed reference ranges with clamping, inverted for lower-is-better; open: the ranges themselves, CPU/GPU tier table)
-- [x] Define missing-data behavior. (exclude unknown criteria, rescale weights, report unknowns and known-weight share)
+- [x] Define normalization rules. (fixed clamped ranges: RAM 8-32, storage 256-1024, weight 1.0-2.5 inverted, refresh 60-165; CPU/GPU five-tier table)
+- [x] Define missing-data behavior. (exclude unknown criteria, rescale weights, report unknowns; minimum known share 50%)
 - [x] Define default weights. (equal: every criterion defaults to importance level 3)
 - [x] Define how user importance affects weights. (levels 1..5, weight = level / sum of levels)
 - [x] Define score-component output.
-- [x] Define deterministic tie-breaking. (price ascending, then Id ascending)
-- [ ] Verify sample rankings manually. (mechanics shown with illustrative numbers; real check needs reference ranges and Session 11.5 data)
+- [x] Define deterministic tie-breaking. (decimal, rounded to 2 decimals; then price ascending, then Id ascending)
+- [x] Verify sample rankings manually. (real 25-laptop ranking in RECOMMENDATION_ENGINE.md)
 - [x] Update `docs/RECOMMENDATION_ENGINE.md`.
 - [x] Record important decisions in `docs/DECISIONS.md`.
 
@@ -102,31 +102,43 @@ Prefer a dataset that includes as many of these fields as possible:
 
 Before importing a dataset:
 
-- [ ] Verify the dataset license.
-- [ ] Verify whether commercial use is allowed.
-- [ ] Record the source and license in project documentation.
-- [ ] Do not treat a random public CSV as automatically open/licensed data.
-- [ ] Avoid importing restricted or unclear data into the real product.
+- [x] Verify the dataset license. (Open Icecat, Open Content License v1.4; see DATABASE.md / ADR-020)
+- [x] Verify whether commercial use is allowed. (accepted for dev/test only; LLM use not approved; Session 15 needs permission or another source)
+- [x] Record the source and license in project documentation.
+- [x] Do not treat a random public CSV as automatically open/licensed data.
+- [x] Avoid importing restricted or unclear data into the real product.
 
 ## Tasks
 
-- [ ] Select a laptop/e-commerce dataset with clear usage terms.
-- [ ] Save source URL/name/license information in documentation.
-- [ ] Define `LaptopImportDto` or equivalent import model.
-- [ ] Build an import service.
-- [ ] Map external field names to Pikwise fields.
-- [ ] Normalize RAM values.
-- [ ] Normalize storage values.
-- [ ] Normalize CPU names.
-- [ ] Normalize GPU names.
-- [ ] Normalize price values.
-- [ ] Handle missing fields explicitly.
-- [ ] Prevent duplicate imports where practical.
-- [ ] Import an initial realistic sample into SQL Server.
-- [ ] Validate imported products through existing Product endpoints.
-- [ ] Add tests for normalization/import behavior.
-- [ ] Update `docs/DATABASE.md` if import assumptions affect the data model.
-- [ ] Add a short dataset/source note to project documentation.
+- [x] Select a laptop/e-commerce dataset with clear usage terms. (Open Icecat)
+- [x] Save source URL/name/license information in documentation.
+- [x] Define `LaptopImportDto` or equivalent import model. (`ExternalLaptopRecord`)
+- [x] Build an import service. (`LaptopImportPreparer`, `LaptopImportService`, `tools/Pikwise.DataImport`)
+- [x] Map external field names to Pikwise fields. (Icecat names verified with `inspect` on live data)
+- [x] Normalize RAM values. (GB; TB x1000; sub-GB values dropped and reported)
+- [x] Normalize storage values. (GB; "1 TB" -> 1000)
+- [x] Normalize CPU names. (manufacturer + family + model, e.g. "Intel Core Ultra 7 155H")
+- [x] Normalize GPU names. (discrete model preferred; placeholders and "UMA" treated as missing)
+- [x] Normalize price values. (development CSV, invariant culture, 2 decimals; not market data)
+- [x] Handle missing fields explicitly. (null = unknown; nothing guessed)
+- [x] Prevent duplicate imports where practical. (unique (Provider, ExternalId); second run: 25 AlreadyImported)
+- [x] Import an initial realistic sample into SQL Server. (25 laptops, 10 brands, into PikwiseDb)
+- [x] Validate imported products through existing Product endpoints. (Postman: list, RTX filter + price sort, min RAM, null refresh rate, compare; all 200)
+- [x] Add tests for normalization/import behavior. (unit tests pass locally)
+- [x] Update `docs/DATABASE.md` if import assumptions affect the data model.
+- [x] Add a short dataset/source note to project documentation.
+
+## Session 11.5 decisions (approved)
+- Provider abstraction with Open Icecat first; see ADR-020. Importer is a console tool, dry run first.
+- Price/Stock/IsActive from a development CSV (not market data; removed in Session 13).
+- Dry-run report must be reviewed before any CPU/GPU tier table or reference range is defined.
+- Migration is created but NOT applied until the user approves its SQL/schema impact. (approved and applied)
+- Icecat data must not feed LLM explanations (Session 15 needs permission or another source).
+
+## Session 11.5 verification (run locally by the user)
+- Build and unit tests pass; full test suite 123/123 with the new migration on the test database.
+- Migration `Session115_ExternalReferencesAndNullableSpecs` reviewed, then applied to PikwiseDb.
+- Dry run: 25 of 25 usable; import: 25 Imported; repeated import: 25 AlreadyImported.
 
 ## Example
 

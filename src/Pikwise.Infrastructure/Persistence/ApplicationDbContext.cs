@@ -12,6 +12,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<LaptopSpecification> LaptopSpecifications => Set<LaptopSpecification>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<Favorite> Favorites => Set<Favorite>();
+    public DbSet<ProductExternalReference> ProductExternalReferences => Set<ProductExternalReference>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
