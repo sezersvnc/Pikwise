@@ -21,19 +21,20 @@ Design the recommendation algorithm before implementing it.
 > Do not ask Codex to invent the scoring formula.
 
 ## Decisions To Make
-- [ ] Define `UserRequirements`.
-- [ ] Define hard constraints.
-- [ ] Define weighted-score properties.
-- [ ] Define score range.
-- [ ] Define normalization rules.
-- [ ] Define missing-data behavior.
-- [ ] Define default weights.
-- [ ] Define how user importance affects weights.
-- [ ] Define score-component output.
-- [ ] Define deterministic tie-breaking.
-- [ ] Verify sample rankings manually.
-- [ ] Update `docs/RECOMMENDATION_ENGINE.md`.
-- [ ] Record important decisions in `docs/DECISIONS.md`.
+Status: design in progress. Decisions are recorded in `docs/RECOMMENDATION_ENGINE.md` and ADR-019.
+- [ ] Define `UserRequirements`. (open: request model not decided)
+- [ ] Define hard constraints. (decided: strict elimination, IsActive/Stock eligibility; open: concrete constraint list and unknown-field behavior)
+- [ ] Define weighted-score properties. (open: criteria set and directions)
+- [x] Define score range. (components 0..1, shown 0..100)
+- [ ] Define normalization rules. (decided: fixed reference ranges with clamping, inverted for lower-is-better; open: the ranges themselves, CPU/GPU tier table)
+- [x] Define missing-data behavior. (exclude unknown criteria, rescale weights, report unknowns and known-weight share)
+- [x] Define default weights. (equal: every criterion defaults to importance level 3)
+- [x] Define how user importance affects weights. (levels 1..5, weight = level / sum of levels)
+- [x] Define score-component output.
+- [x] Define deterministic tie-breaking. (price ascending, then Id ascending)
+- [ ] Verify sample rankings manually. (mechanics shown with illustrative numbers; real check needs reference ranges and Session 11.5 data)
+- [x] Update `docs/RECOMMENDATION_ENGINE.md`.
+- [x] Record important decisions in `docs/DECISIONS.md`.
 
 ## Target Flow
 

@@ -307,3 +307,29 @@ Missing specifications remain null; stored availability does not restrict this
 read. Facts are returned without inferred specs, deltas, scores, ranking or LLM.
 No schema/migration, packages or new DI registrations are required. Recommendation
 design remains Session 11. See COMPARISON.md for verification and review.
+
+---
+
+## ADR-019 — Session 11 recommendation engine design
+**Status:** Accepted (partial); open items are listed in RECOMMENDATION_ENGINE.md
+
+The engine is a deterministic pipeline: eligibility and hard filters, fixed-range
+normalization, weighted scoring, ranking, Top 3. Products with IsActive=false or
+Stock=0 are not recommended; this does not change catalog, favorites or comparison.
+Hard constraints are strict eliminations with no tolerance.
+
+Normalization maps each criterion through a documented fixed reference range with
+clamping, so scores do not change when the catalog changes. Lower-is-better criteria
+use the inverted value. Component scores are 0..1; the displayed score is 0..100.
+Each criterion receives an importance level 1..5, defaulting to 3, and weights are
+the level divided by the sum of levels of the criteria scored for that product.
+
+Unknown values are excluded from that product's score and the remaining weights are
+rescaled; the result reports the unknown criteria and the known-weight share. No
+value is guessed and no penalty is applied. CPU and GPU free text is scored through a
+manually maintained tier table; unlisted models are unknown. Ties are broken by price
+ascending, then product Id ascending.
+
+Not decided here: the criteria set, reference ranges, tier table, whether price is
+scored, behavior for unknown hard-constraint fields, and rounding. No implementation,
+schema change or package is part of this session. Implementation is Session 12.

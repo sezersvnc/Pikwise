@@ -94,6 +94,6 @@ filters, explicit sorting and SQL pagination with metadata. Session 10 adds stru
 comparison of two or three selected products in one SQL read. All 93 tests pass.
 GET /api/products now returns an object with items instead of a bare array.
 Session 9 was reviewed and pushed. Session 10 was approved for commit/push;
-Session 11 has not started. Details are in [docs/COMPARISON.md](docs/COMPARISON.md),
+Session 11 (recommendation design) is in progress and documentation-only; see docs/RECOMMENDATION_ENGINE.md. Details are in [docs/COMPARISON.md](docs/COMPARISON.md),
 [docs/PRODUCT_QUERIES.md](docs/PRODUCT_QUERIES.md)
 and [docs/Pikwise.http](docs/Pikwise.http).
