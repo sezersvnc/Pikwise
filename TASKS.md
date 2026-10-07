@@ -137,7 +137,7 @@ Before importing a dataset:
 - Icecat data must not feed LLM explanations (Session 15 needs permission or another source).
 
 ## Session 11.5 verification (run locally by the user)
-- Build and unit tests pass; full test suite 123/123 with the new migration on the test database.
+- Build and unit tests pass; full test suite passed with the new migration on the test database. (Originally recorded as 123/123; recounted in Session 12 on the same code: 132 tests, 124 without SQL Server + 8 SqlServer.)
 - Migration `Session115_ExternalReferencesAndNullableSpecs` reviewed, then applied to PikwiseDb.
 - Dry run: 25 of 25 usable; import: 25 Imported; repeated import: 25 AlreadyImported.
 
