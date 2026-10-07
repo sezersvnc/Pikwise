@@ -120,3 +120,25 @@ DELETE {{baseUrl}}/api/products/{{createProduct.response.body.$.id}}
 
 ### Missing product (404)
 GET {{baseUrl}}/api/products/2147483647
+
+### Recommendation: Session 11 sample user (200, Top 3 with score components)
+POST {{baseUrl}}/api/recommendations
+Content-Type: application/json
+
+{
+  "budgetMax": 70000,
+  "minRamGb": 16,
+  "importance": { "ram": 3, "storage": 3, "cpu": 4, "gpu": 2, "weight": 5, "refreshRate": 1 }
+}
+
+### Recommendation with defaults only (200)
+POST {{baseUrl}}/api/recommendations
+Content-Type: application/json
+
+{}
+
+### Recommendation with an invalid importance level (400)
+POST {{baseUrl}}/api/recommendations
+Content-Type: application/json
+
+{ "importance": { "ram": 9 } }

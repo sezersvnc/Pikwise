@@ -53,8 +53,9 @@ Authentication foundation        ✅ Session 7 complete
 Authenticated favorites API      ✅ Session 8 complete
 Filtering / sorting / pagination ✅ Session 9 complete and pushed
 Product comparison               ✅ Session 10 complete and pushed
-Recommendation engine design     ✅ Session 11 complete (implementation: Session 12)
+Recommendation engine design     ✅ Session 11 complete
 Real laptop dataset (Icecat)     ✅ Session 11.5 complete (25 laptops, dev prices)
+Recommendation Engine V1         ✅ Session 12 complete (POST /api/recommendations)
 ```
 
 ## Read order
@@ -66,24 +67,26 @@ Real laptop dataset (Icecat)     ✅ Session 11.5 complete (25 laptops, dev pric
 6. `TASKS.md`
 7. `docs/DECISIONS.md`
 
-## Run the backend (Session 10)
+## Run the backend
 
 Prerequisite: .NET SDK 10.0.200 (or a newer patch in the same feature band).
 
-```powershell
+```bat
 dotnet tool restore
 dotnet restore Pikwise.sln
 dotnet build Pikwise.sln --configuration Release --no-restore
-dotnet test Pikwise.sln --configuration Release --no-build --filter 'Category!=SqlServer'
+dotnet test Pikwise.sln --configuration Release --no-build --filter "Category!=SqlServer"
 dotnet run --project src/Pikwise.Api --no-launch-profile -- --environment Development --urls http://localhost:5080
 ```
 
-Open http://localhost:5080/health: expected HTTP 200, body `Healthy`.
+The commands work in both CMD and PowerShell.
+Open http://localhost:5080/health: expected HTTP 200, body `Healthy`. Without
+`--no-launch-profile`, the `http` launch profile serves the API on http://localhost:5157.
 Before running, configure ConnectionStrings:DefaultConnection using the User Secrets command in [docs/DATABASE.md](docs/DATABASE.md). A running database is not required for /health.
 Also configure Authentication:Supabase:Issuer using [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
-Eighty-five tests run without SQL Server. Eight additional integration tests verify
-the migration, relationships, HTTP CRUD, catalog queries and comparisons on a dedicated SQL Server
-database; see docs/DATABASE.md for the command. Request examples and error contracts
+229 tests run without SQL Server (148 unit, 81 integration). Nine additional integration
+tests (`Category=SqlServer`) verify the migrations, relationships, HTTP CRUD, favorites, catalog
+queries, comparisons and recommendations on a dedicated SQL Server database; see docs/DATABASE.md for the command. Request examples and error contracts
 are in docs/API.md. Product CRUD retains its public local-development contract.
 
 Session 6 adds UserProfiles and Favorites with a composite favorite key, explicit
@@ -93,9 +96,9 @@ applied to local PikwiseDb. Session 7 adds protected /api/auth/me and
 profiles from sub claims. Session 8 adds protected GET/POST/DELETE favorites,
 owner isolation and controlled duplicate handling. Session 9 adds combined catalog
 filters, explicit sorting and SQL pagination with metadata. Session 10 adds structured
-comparison of two or three selected products in one SQL read. All 93 tests pass.
+comparison of two or three selected products in one SQL read.
 GET /api/products now returns an object with items instead of a bare array.
 Session 9 was reviewed and pushed. Session 10 was approved for commit/push;
-Session 11 (recommendation design) is complete; see docs/RECOMMENDATION_ENGINE.md. Session 12 (implementation) has not started. Session 11.5 imported 25 real laptop specifications from Open Icecat with `tools/Pikwise.DataImport` (prices are development/test data); see docs/DATABASE.md. Details are in [docs/COMPARISON.md](docs/COMPARISON.md),
+Session 11 (recommendation design) is complete; see docs/RECOMMENDATION_ENGINE.md. Session 12 implements the deterministic engine as `POST /api/recommendations` (Top 3 with score components; no LLM); see docs/API.md. Session 11.5 imported 25 real laptop specifications from Open Icecat with `tools/Pikwise.DataImport` (prices are development/test data); see docs/DATABASE.md. Details are in [docs/COMPARISON.md](docs/COMPARISON.md),
 [docs/PRODUCT_QUERIES.md](docs/PRODUCT_QUERIES.md)
 and [docs/Pikwise.http](docs/Pikwise.http).

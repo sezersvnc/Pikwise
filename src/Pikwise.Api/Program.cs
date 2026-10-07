@@ -5,6 +5,8 @@ using Pikwise.Api.Errors;
 using Pikwise.Api.Authentication;
 using Pikwise.Application.Favorites.Interfaces;
 using Pikwise.Application.Favorites.Services;
+using Pikwise.Application.Recommendations.Interfaces;
+using Pikwise.Application.Recommendations.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Compose dependencies at startup; controllers receive their services through DI.
@@ -12,6 +14,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddSupabaseAuthentication(builder.Configuration);
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();

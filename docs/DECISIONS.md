@@ -383,3 +383,28 @@ constraints are optional; importance levels are 1-5 with default 3.
 
 The full tables and a hand-verified ranking on real data are in
 RECOMMENDATION_ENGINE.md. Implementation is Session 12.
+
+---
+
+## ADR-022 — Session 12 Recommendation Engine V1 implementation
+**Status:** Accepted
+
+Implements ADR-019 and ADR-021 without changing any rule, range, tier or threshold.
+Public `POST /api/recommendations` takes the optional UserRequirements as a JSON body
+(POST because the structured body does not fit a query string; the request has no
+side effects). Request limits: budgetMax 0.01..10,000,000 with 2 decimals, minRamGb
+1..256, minStorageGb 1..16384, maxWeightKg 0.1..10 with 2 decimals, importance 1..5.
+
+The engine is a static, pure Application function (RecommendationEngine) with the CPU/GPU
+table in LaptopPerformanceTiers. The repository loads every product with Brand and
+LaptopSpecification in one AsNoTracking query; eligibility and hard constraints are
+applied in Application, keeping all rules in one unit-tested place. Moving filters to
+SQL is a later decision if the catalog grows.
+
+The score uses full decimal precision and is rounded half-up to 2 decimals; component
+values are rounded to 4 decimals for display only. The 50% known-share threshold compares
+integer importance sums, so exactly 50% qualifies. The response returns at most three
+items with components, unknown criteria and known importance, plus a summary of how many
+products each rule removed. Unit tests reproduce the Session 11 hand ranking on the 25
+Session 11.5 laptops, including HP EliteBook 6 G1i in 5th place on 12/18 known importance.
+No schema change, migration or package was added. Value-for-money remains Session 13.

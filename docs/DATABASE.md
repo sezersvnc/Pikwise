@@ -580,7 +580,7 @@ See COMPARISON.md for the contract and review guide.
 
 ## Session 11.5 — external reference data (Open Icecat)
 
-### Schema changes (migration created locally, not applied until reviewed)
+### Schema changes (migration `Session115_ExternalReferencesAndNullableSpecs`, reviewed and applied to PikwiseDb)
 - `LaptopSpecifications`: Processor, GPU, Resolution, OperatingSystem become nullable
   strings; RamGb, StorageGb, RefreshRate become `int?`; ScreenSize, Weight become
   `decimal?`. Column names, lengths and precisions are unchanged. Null means unknown.

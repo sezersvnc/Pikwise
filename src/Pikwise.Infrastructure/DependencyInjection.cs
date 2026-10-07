@@ -8,6 +8,8 @@ using Pikwise.Application.Users.Interfaces;
 using Pikwise.Infrastructure.Users;
 using Pikwise.Application.Favorites.Interfaces;
 using Pikwise.Infrastructure.Favorites;
+using Pikwise.Application.Recommendations.Interfaces;
+using Pikwise.Infrastructure.Recommendations;
 
 namespace Pikwise.Infrastructure;
 
@@ -30,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
         services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+        services.AddScoped<IRecommendationRepository, RecommendationRepository>();
 
         return services;
     }

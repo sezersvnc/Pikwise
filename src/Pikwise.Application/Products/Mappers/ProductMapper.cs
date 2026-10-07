@@ -50,7 +50,8 @@ public static class ProductMapper
         new ProductBrandDto(product.Brand.Id, product.Brand.Name),
         product.LaptopSpecification.ToSpecificationDto());
 
-    private static LaptopSpecificationDto? ToSpecificationDto(this LaptopSpecification? specification) =>
+    // Shared with recommendation results so every read exposes the same specification contract.
+    internal static LaptopSpecificationDto? ToSpecificationDto(this LaptopSpecification? specification) =>
         specification is null ? null : new LaptopSpecificationDto(
             specification.Processor, specification.GPU, specification.RamGb, specification.StorageGb,
             specification.ScreenSize, specification.Resolution, specification.RefreshRate,

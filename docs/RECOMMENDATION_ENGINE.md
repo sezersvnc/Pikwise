@@ -27,9 +27,9 @@ Optional AI Explanation (Session 15)
 
 ## Session 11 — design decisions
 
-Status: **design complete (Session 11 closed).** All decisions below were made by
-the project owner (see ADR-019 and ADR-021). Nothing in this file is implemented
-yet; implementation is Session 12.
+Status: **design complete (Session 11 closed); implemented in Session 12.** All
+decisions below were made by the project owner (see ADR-019 and ADR-021). The
+implementation follows them exactly; see "Session 12 — implementation" below and ADR-022.
 
 ### Decided
 
@@ -44,7 +44,7 @@ yet; implementation is Session 12.
 4. **Normalization uses fixed reference ranges.** Every scored criterion has a
    documented `[min, max]` reference range. A value is clamped to the range and
    mapped to 0..1. Scores therefore do not shift when the catalog changes. The
-   concrete ranges are not chosen yet (see Open decisions).
+   concrete ranges are listed in decision 14.
    - Higher-is-better criteria: `n = (clamp(v) - min) / (max - min)`
    - Lower-is-better criteria (for example weight): `n = 1 - (clamp(v) - min) / (max - min)`
 5. **Importance and weights.** Each criterion receives an importance level from
@@ -214,6 +214,45 @@ scored on 12/18 of the importance, and still ranks 5th. That is the agreed
 missing-data rule (no guess, no penalty, share reported). The 50% threshold
 removes products with less data. Fujitsu UQ-L1 carries an Icecat data error (Intel
 GPU listed with a Snapdragon CPU) and is scored as supplied.
+
+## Session 12 — implementation
+
+Endpoint: `POST /api/recommendations` (contract in API.md).
+
+```text
+RecommendationsController (Api)          HTTP binding, 200/400
+  -> RecommendationService (Application) validate, load candidates, run engine, map
+       -> IRecommendationRepository      Infrastructure: one AsNoTracking query,
+                                         all products with Brand + LaptopSpecification
+       -> RecommendationEngine           pure static function, decisions 1-18
+            LaptopPerformanceTiers       CPU/GPU tier table (decision 15)
+  -> RecommendationMapper                Top 3 + summary -> response DTOs
+```
+
+Code lives in `src/Pikwise.Application/Recommendations/` (DTOs, Interfaces, Models,
+Scoring, Services, Validators, Exceptions, Mappers). The engine has no I/O, clock,
+randomness or LLM, so the same candidates and requirements always give the same result.
+
+Implementation choices (owner-approved, ADR-022):
+- Eligibility and hard constraints run in Application on the loaded candidates, not
+  in SQL, so every rule sits in one unit-tested place. Revisit when the catalog grows.
+- Request limits: budgetMax 0.01..10,000,000 (2 decimals), minRamGb 1..256,
+  minStorageGb 1..16384, maxWeightKg 0.1..10 (2 decimals), importance 1..5.
+- The score is computed at full decimal precision and then rounded (decision 17).
+  Component normalized value, weight and contribution (in score points) are rounded
+  to 4 decimals for display only.
+- The 50% threshold compares integer importance sums, so exactly 50% is kept.
+- The response includes a summary of how many products each rule removed.
+
+Verification:
+- `RecommendationEngineTests` reproduces the hand calculation above on the 25 Session
+  11.5 laptops: 2 + 6 removed, 17 ranked, 75.41 / 66.33 / 64.71 / 63.37. HP EliteBook
+  6 G1i ranks 5th with 12/18 known importance, CPU and GPU reported unknown, weights
+  rescaled over 12 levels and no penalty. Other tests cover each rule and boundary
+  (eligibility, inclusive constraints, unknown constraint fields, clamping, inverted
+  weight, tiers, rescaling, exactly 50%, half-up rounding, ties after rounding, Top 3,
+  input-order independence).
+- The same request against local PikwiseDb returned the same ranking and summary.
 
 ### Not in V1 (by decision)
 

@@ -233,13 +233,70 @@ See [COMPARISON.md](COMPARISON.md) for review guidance and tests.
 
 ## Recommendation
 
-Future endpoint receives structured needs or normalized criteria.
+### POST /api/recommendations
+Status: Session 12. Public (no token), read-only. Runs the deterministic engine described
+in [RECOMMENDATION_ENGINE.md](RECOMMENDATION_ENGINE.md); no LLM is involved.
 
-Output:
-- ranked Top 3
-- score breakdown
-- value-for-money information
-- verified product facts
+Request body (every field optional; `{}` is valid):
+
+| Field | Rule | Meaning |
+|---|---|---|
+| budgetMax | 0.01..10,000,000, at most 2 decimals | Hard constraint `price <= budgetMax` |
+| minRamGb | 1..256 | Hard constraint `ramGb >= minRamGb` |
+| minStorageGb | 1..16384 | Hard constraint `storageGb >= minStorageGb` |
+| maxWeightKg | 0.1..10, at most 2 decimals | Hard constraint `weight <= maxWeightKg` |
+| importance.ram / storage / cpu / gpu / weight / refreshRate | 1..5, default 3 | Importance level of each scored criterion |
+
+An absent constraint is not applied. A product whose field is unknown for an active
+constraint is removed. Inactive and zero-stock products are never recommended.
+
+```http
+POST /api/recommendations
+Content-Type: application/json
+
+{ "budgetMax": 70000, "minRamGb": 16,
+  "importance": { "ram": 3, "storage": 3, "cpu": 4, "gpu": 2, "weight": 5, "refreshRate": 1 } }
+```
+
+200 response (shortened):
+
+```json
+{
+  "items": [
+    {
+      "rank": 1, "productId": 13, "name": "DELL PW514265", "price": 68000.00,
+      "brand": { "id": 3, "name": "DELL" },
+      "specification": { "processor": "AMD Ryzen AI 7 PRO 450", "...": "..." },
+      "score": 75.41, "knownImportance": 18, "totalImportance": 18, "knownWeightShare": 1,
+      "unknownCriteria": [],
+      "components": [
+        { "criterion": "ram", "value": 32, "normalizedValue": 1, "weight": 0.1667, "contribution": 16.6667 }
+      ]
+    }
+  ],
+  "summary": { "candidateCount": 25, "removedByEligibility": 2, "removedByConstraints": 6,
+               "removedByKnownShare": 0, "rankedCount": 17 }
+}
+```
+
+- `items`: at most 3, best first. Fewer (or none) when fewer products qualify; still 200.
+- `score`: 0..100, rounded half-up to 2 decimals. Ties: price ascending, then product id.
+- `components`: only known criteria, in the order ram, storage, cpu, gpu, weight,
+  refreshRate. `value` is GB, GB, tier (1..5), tier (1..5), kg or Hz. `normalizedValue`,
+  `weight` and `contribution` (score points) are rounded to 4 decimals for display; the
+  score uses full precision.
+- `unknownCriteria`: criteria left out of the score because the value is unknown
+  (a null field or a CPU/GPU name not in the tier table).
+- `knownImportance / totalImportance`: sums of importance levels; `knownWeightShare` is
+  their ratio (4 decimals). Products below 50% are removed and counted in
+  `removedByKnownShare`.
+- `specification`: stored facts; null fields are unknown. Prices of the Session 11.5
+  dataset are development/test data, not market prices.
+
+400 `application/problem+json` with `errors` for invalid JSON, out-of-range values or
+excess decimals (for example `errors["Importance.Ram"]`).
+
+Value-for-money information is Session 13; LLM explanations are Session 15.
 
 ---
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pikwise.Application.Products.Exceptions;
 using Pikwise.Application.Favorites.Exceptions;
 using Pikwise.Application.Users.Exceptions;
+using Pikwise.Application.Recommendations.Exceptions;
 
 namespace Pikwise.Api.Errors;
 
@@ -29,6 +30,10 @@ public sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : I
             ProductValidationException validation => new ValidationProblemDetails(validation.Errors)
             {
                 Status = StatusCodes.Status400BadRequest, Title = "Product validation failed."
+            },
+            RecommendationValidationException validation => new ValidationProblemDetails(validation.Errors)
+            {
+                Status = StatusCodes.Status400BadRequest, Title = "Recommendation request validation failed."
             },
             PersistenceConflictException => new ProblemDetails
             {

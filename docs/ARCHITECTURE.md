@@ -288,5 +288,40 @@ API maps it to 404 ProblemDetails.
 ProductRepository uses an awaited, untracked membership query with Brand and
 LaptopSpecification loaded. ProductMapper reuses specification conversion for
 detail and comparison DTOs. Category/favorite/profile loading is unnecessary.
-Domain/schema stay unchanged. See COMPARISON.md and ADR-018. Recommendation design
-and implementation remain later sessions.
+Domain/schema stay unchanged. See COMPARISON.md and ADR-018.
+
+## Session 11 design
+
+Session 11 designed the recommendation engine without adding code. See
+RECOMMENDATION_ENGINE.md, ADR-019 and ADR-021.
+
+## Session 11.5 implementation
+
+External laptop data enters through a provider abstraction. Application/ExternalProducts
+owns the provider-neutral contracts and rules: IExternalLaptopProvider,
+ExternalLaptopRecord, LaptopNormalizer, LaptopImportPreparer, LaptopImportService,
+DevelopmentPriceCsvParser, LaptopImportReport and ILaptopImportRepository.
+Infrastructure/ExternalProducts owns the Icecat specifics (IcecatLaptopProvider,
+IcecatLaptopMapper, IcecatIndexDiscovery, IcecatOptions) and LaptopImportRepository,
+which writes products and ProductExternalReferences through ApplicationDbContext.
+
+Domain gains ProductExternalReference and nullable LaptopSpecification fields; it has
+no Icecat types. The importer is the console tool tools/Pikwise.DataImport, which
+references Application and Infrastructure; the API exposes no import endpoint. See
+DATABASE.md and ADR-020.
+
+## Session 12 implementation
+
+RecommendationsController binds the POST body and returns 200/400; it holds no
+scoring logic. RecommendationService validates the request (RecommendationValidationException,
+mapped to 400 by the API), loads candidates through IRecommendationRepository and runs
+RecommendationEngine. The engine and the LaptopPerformanceTiers table are static,
+pure Application code: eligibility, hard constraints, normalization, weighting,
+missing-data handling, rounding and tie-breaking are all there and unit tested
+without EF Core. RecommendationMapper builds the response and reuses the product
+specification DTO mapping.
+
+Infrastructure's RecommendationRepository loads all products with Brand and
+LaptopSpecification in one untracked query; it applies no business filter. Domain and
+schema are unchanged; no migration or package was added. The LLM is not involved.
+See RECOMMENDATION_ENGINE.md and ADR-022.

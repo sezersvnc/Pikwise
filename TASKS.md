@@ -8,6 +8,7 @@ Completed:
 Current focus:
 - [x] Session 11 — Recommendation Engine Design
 - [x] Session 11.5 — Open Dataset Bootstrap
+- [x] Session 12 — Recommendation Engine V1 (not yet committed)
 
 This file continues from Recommendation Engine onward.
 
@@ -218,18 +219,25 @@ Pikwise contains a clean, normalized, legally usable development dataset large e
 Implement the deterministic engine designed in Session 11.
 
 ## Tasks
-- [ ] Implement hard filters.
-- [ ] Implement normalization.
-- [ ] Implement weighted scoring.
-- [ ] Preserve score components.
-- [ ] Rank eligible products.
-- [ ] Return Top 3.
-- [ ] Add deterministic tie-breaking.
-- [ ] Add unit tests.
-- [ ] Add boundary tests.
-- [ ] Verify same input produces same output.
-- [ ] Keep the LLM completely outside the scoring decision.
-- [ ] Build and run all tests.
+- [x] Implement hard filters. (eligibility + budget/min RAM/min storage/max weight, strict, unknown field removes)
+- [x] Implement normalization. (fixed clamped ranges, inverted weight, CPU/GPU tier table)
+- [x] Implement weighted scoring. (importance 1..5, default 3; unknown criteria rescaled; 50% known-share minimum)
+- [x] Preserve score components. (value, normalized value, weight, contribution; unknown criteria; known importance)
+- [x] Rank eligible products.
+- [x] Return Top 3. (`POST /api/recommendations`)
+- [x] Add deterministic tie-breaking. (rounded score, then price, then Id)
+- [x] Add unit tests. (engine, tier table, service/validation; real 25-laptop hand ranking incl. HP EliteBook 6 G1i 5th)
+- [x] Add boundary tests. (inclusive constraints, range clamps, exactly 50%, half-up rounding, ties after rounding, request limits)
+- [x] Verify same input produces same output. (input-order independence test; same result on local PikwiseDb)
+- [x] Keep the LLM completely outside the scoring decision.
+- [x] Build and run all tests. (build OK; 148 unit + 81 integration pass without SQL Server; the 9 `SqlServer` tests, including RecommendationSqlTests, pass on PikwiseSession3Tests (run by the user); 238 in total)
+
+## Session 12 decisions (approved)
+- Public `POST /api/recommendations`, JSON body; all fields optional.
+- Eligibility and constraints applied in Application on candidates loaded by one untracked query.
+- Request limits: budget 0.01..10,000,000 (2 decimals), RAM 1..256, storage 1..16384, weight 0.1..10 (2 decimals), importance 1..5.
+- Components rounded to 4 decimals for display; score at full precision, then 2 decimals.
+- Response includes a summary of removals per rule. See ADR-022.
 
 ## Exit Criterion
 The same input and database state always produce the same ranking, with numerical score explanations.
