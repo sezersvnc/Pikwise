@@ -2,6 +2,7 @@ using Pikwise.Application.Products.DTOs;
 using Pikwise.Application.Products.Mappers;
 using Pikwise.Application.Recommendations.DTOs;
 using Pikwise.Application.Recommendations.Models;
+using Pikwise.Application.Recommendations.Scoring;
 
 namespace Pikwise.Application.Recommendations.Mappers;
 
@@ -27,10 +28,21 @@ public static class RecommendationMapper
     }
 
     // Candidates must be loaded with Brand and LaptopSpecification before mapping.
-    public static RecommendationResponseDto ToResponseDto(this RecommendationResult result) => new(
+    public static RecommendationResponseDto ToResponseDto(this RecommendationResult result, ValueAnalysis? value) => new(
         result.Top.Select((item, index) => item.ToDto(index + 1)).ToList(),
         new RecommendationSummaryDto(result.CandidateCount, result.RemovedByEligibility,
-            result.RemovedByConstraints, result.RemovedByKnownShare, result.Ranked.Count));
+            result.RemovedByConstraints, result.RemovedByKnownShare, result.Ranked.Count),
+        value?.ToDto());
+
+    private static ValueAnalysisDto ToDto(this ValueAnalysis value) => new(
+        value.BestFit.Product.Id,
+        value.BestValue.Product.Id,
+        value.IsSmallGainUpgrade,
+        ValueAnalyzer.NearEqualScoreGap,
+        value.CheaperAlternatives.Select(alternative => new CheaperAlternativeDto(
+            alternative.Rank, alternative.Product.Product.Id, alternative.Product.Product.Name,
+            alternative.Product.Product.Price, alternative.Product.Score, alternative.ScoreGap,
+            alternative.PriceDifference, alternative.PricePerPoint)).ToList());
 
     private static RecommendedProductDto ToDto(this ScoredProduct item, int rank) => new(
         rank,

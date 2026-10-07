@@ -8,7 +8,8 @@ Completed:
 Current focus:
 - [x] Session 11 — Recommendation Engine Design
 - [x] Session 11.5 — Open Dataset Bootstrap
-- [x] Session 12 — Recommendation Engine V1 (not yet committed)
+- [x] Session 12 — Recommendation Engine V1
+- [x] Session 13 — Value-for-Money (not yet committed)
 
 This file continues from Recommendation Engine onward.
 
@@ -131,7 +132,7 @@ Before importing a dataset:
 
 ## Session 11.5 decisions (approved)
 - Provider abstraction with Open Icecat first; see ADR-020. Importer is a console tool, dry run first.
-- Price/Stock/IsActive from a development CSV (not market data; removed in Session 13).
+- Price/Stock/IsActive from a development CSV (not market data; originally to be removed in Session 13, kept until a real price source exists per ADR-024).
 - Dry-run report must be reviewed before any CPU/GPU tier table or reference range is defined.
 - Migration is created but NOT applied until the user approves its SQL/schema impact. (approved and applied)
 - Icecat data must not feed LLM explanations (Session 15 needs permission or another source).
@@ -250,12 +251,19 @@ The same input and database state always produce the same ranking, with numerica
 Distinguish best fit from best value.
 
 ## Tasks
-- [ ] Define price-vs-score gain.
-- [ ] Detect expensive upgrades with small suitability gain.
-- [ ] Detect cheaper near-equal alternatives.
-- [ ] Return value analysis as structured data.
-- [ ] Add unit tests.
-- [ ] Update recommendation documentation.
+- [x] Define price-vs-score gain. (score gap, price difference, price per point vs the best fit)
+- [x] Detect expensive upgrades with small suitability gain. (`isSmallGainUpgrade`)
+- [x] Detect cheaper near-equal alternatives. (cheaper and at most 3.00 points lower, whole ranking)
+- [x] Return value analysis as structured data. (`valueAnalysis` in POST /api/recommendations)
+- [x] Add unit tests. (ValueAnalyzerTests, service mapping, real dataset; SQL test checks the JSON shape)
+- [x] Update recommendation documentation. (RECOMMENDATION_ENGINE.md, API.md, ADR-024, DATABASE.md)
+- [x] Run all tests. (build OK; 241 pass without SQL Server: 160 unit, 81 integration; the 9 SqlServer tests, including the updated RecommendationSqlTests, pass on PikwiseSession3Tests (run by the user); 250 in total)
+
+## Session 13 decisions (approved)
+- One near-equal threshold (3 points, rounded scores) plus price per point; best fit = rank 1.
+- Best value = cheapest of the best fit and its alternatives; ties by score, then Id.
+- Returned inside the existing recommendation response; the ranking is unchanged.
+- The development price CSV layer stays until a real price source exists (ADR-024).
 
 ## Example
 

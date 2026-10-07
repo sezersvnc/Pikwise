@@ -38,8 +38,50 @@ public class RecommendationServiceTests
         Assert.Equal(18, third.TotalImportance);
         Assert.Equal(0.9444m, third.KnownWeightShare);
         Assert.Equal(new RecommendationSummaryDto(25, 2, 6, 0, 17), response.Summary);
+        var value = response.ValueAnalysis!;
+        Assert.Equal(13, value.BestFitProductId);
+        Assert.Equal(13, value.BestValueProductId);
+        Assert.False(value.IsSmallGainUpgrade);
+        Assert.Equal(3m, value.NearEqualScoreGap);
+        Assert.Empty(value.CheaperAlternatives);
         Assert.Equal(1, repository.CallCount);
         Assert.Equal(cancellation.Token, repository.Cancellation);
+    }
+
+    [Fact]
+    public async Task Value_analysis_maps_a_cheaper_near_equal_alternative_outside_the_top_three()
+    {
+        // With default importance, 1.0 kg scores 49.80 and 1.2 kg scores 47.58 (2.22 points lower).
+        Product Laptop(int id, decimal price, decimal weight) => new()
+        {
+            Id = id, Name = "Laptop " + id, Price = price, Stock = 5, IsActive = true,
+            Brand = new Brand { Id = 1, Name = "Test brand" },
+            LaptopSpecification = new LaptopSpecification
+            {
+                Processor = "AMD Ryzen 7 170", GPU = "AMD Radeon 680M", RamGb = 16, StorageGb = 512, Weight = weight, RefreshRate = 120
+            }
+        };
+        var repository = new CandidateRepository(
+            [Laptop(1, 60000m, 1.0m), Laptop(2, 70000m, 1.05m), Laptop(3, 70000m, 1.1m), Laptop(4, 50000m, 1.2m)]);
+
+        var response = await new RecommendationService(repository).RecommendAsync(new RecommendationRequestDto());
+
+        Assert.Equal(new[] { 1, 2, 3 }, response.Items.Select(item => item.ProductId));
+        var value = response.ValueAnalysis!;
+        Assert.Equal(1, value.BestFitProductId);
+        Assert.Equal(4, value.BestValueProductId);
+        Assert.True(value.IsSmallGainUpgrade);
+        Assert.Equal(new CheaperAlternativeDto(4, 4, "Laptop 4", 50000m, 47.58m, 2.22m, 10000m, 4504.50m),
+            Assert.Single(value.CheaperAlternatives));
+    }
+
+    [Fact]
+    public async Task No_qualifying_product_returns_null_value_analysis()
+    {
+        var response = await new RecommendationService(new CandidateRepository([])).RecommendAsync(new RecommendationRequestDto());
+
+        Assert.Empty(response.Items);
+        Assert.Null(response.ValueAnalysis);
     }
 
     [Fact]

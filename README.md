@@ -56,6 +56,7 @@ Product comparison               ✅ Session 10 complete and pushed
 Recommendation engine design     ✅ Session 11 complete
 Real laptop dataset (Icecat)     ✅ Session 11.5 complete (25 laptops, dev prices)
 Recommendation Engine V1         ✅ Session 12 complete (POST /api/recommendations)
+Value-for-money analysis         ✅ Session 13 complete (valueAnalysis in recommendations)
 ```
 
 ## Read order
@@ -84,7 +85,7 @@ Open http://localhost:5080/health: expected HTTP 200, body `Healthy`. Without
 `--no-launch-profile`, the `http` launch profile serves the API on http://localhost:5157.
 Before running, configure ConnectionStrings:DefaultConnection using the User Secrets command in [docs/DATABASE.md](docs/DATABASE.md). A running database is not required for /health.
 Also configure Authentication:Supabase:Issuer using [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
-229 tests run without SQL Server (148 unit, 81 integration). Nine additional integration
+241 tests run without SQL Server (160 unit, 81 integration). Nine additional integration
 tests (`Category=SqlServer`) verify the migrations, relationships, HTTP CRUD, favorites, catalog
 queries, comparisons and recommendations on a dedicated SQL Server database; see docs/DATABASE.md for the command. Request examples and error contracts
 are in docs/API.md. Product CRUD retains its public local-development contract.
@@ -99,6 +100,6 @@ filters, explicit sorting and SQL pagination with metadata. Session 10 adds stru
 comparison of two or three selected products in one SQL read.
 GET /api/products now returns an object with items instead of a bare array.
 Session 9 was reviewed and pushed. Session 10 was approved for commit/push;
-Session 11 (recommendation design) is complete; see docs/RECOMMENDATION_ENGINE.md. Session 12 implements the deterministic engine as `POST /api/recommendations` (Top 3 with score components; no LLM); see docs/API.md. Session 11.5 imported 25 real laptop specifications from Open Icecat with `tools/Pikwise.DataImport` (prices are development/test data); see docs/DATABASE.md. Details are in [docs/COMPARISON.md](docs/COMPARISON.md),
+Session 11 (recommendation design) is complete; see docs/RECOMMENDATION_ENGINE.md. Session 12 implements the deterministic engine as `POST /api/recommendations` (Top 3 with score components; no LLM). Session 13 adds `valueAnalysis` (best fit vs best value, cheaper near-equal alternatives within 3 points, price per point); see docs/API.md. Session 11.5 imported 25 real laptop specifications from Open Icecat with `tools/Pikwise.DataImport` (prices are development/test data); see docs/DATABASE.md. Details are in [docs/COMPARISON.md](docs/COMPARISON.md),
 [docs/PRODUCT_QUERIES.md](docs/PRODUCT_QUERIES.md)
 and [docs/Pikwise.http](docs/Pikwise.http).

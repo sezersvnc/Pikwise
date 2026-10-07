@@ -282,9 +282,42 @@ It should be able to identify:
 - cheaper product with nearly equal fit,
 - meaningful vs meaningless upgrades.
 
-Designed in Session 13, after the base engine exists. Price/performance is a core
-Pikwise differentiator (see decision 12) and must not be dropped.
+Price/performance is a core Pikwise differentiator (see decision 12) and must not be dropped.
+
+### Session 13 — value analysis (implemented, ADR-024)
+
+Owner decisions: one near-equal threshold plus price per point; threshold 3 points;
+returned inside the existing recommendation response; the development price layer stays.
+
+Rules (`ValueAnalyzer`, pure static Application code, runs after the engine):
+1. Best fit = rank 1 of the full ranking. No ranked product → `valueAnalysis` is null.
+2. Every other ranked product (not only the Top 3) that is cheaper than the best fit and
+   whose rounded score is at most 3.00 points lower is a near-equal cheaper alternative.
+   Gaps use the displayed, rounded scores.
+3. For each alternative: score gap, price difference and price per point
+   (price difference / score gap, rounded half-up to 2 decimals). A cheaper product with an
+   equal score would already rank first, so the gap is always positive.
+4. `isSmallGainUpgrade` is true when at least one alternative exists: paying for the best
+   fit buys at most 3 points.
+5. Best value = the cheapest of the best fit and its alternatives; ties by higher score,
+   then lower Id. Without alternatives the best fit is also the best value.
+6. Alternatives are listed in ranking order. The ranking itself never changes: best fit
+   and best value stay separate answers.
+
+Example (unit test, default importance, products differ only in weight and price):
+
+| Rank | Price | Score | Gap | Price difference | Price per point |
+|---|---|---|---|---|---|
+| 1 (best fit) | 60,000 | 49.80 | — | — | — |
+| 4 | 50,000 | 47.58 | 2.22 | 10,000 | 4,504.50 |
+
+Rank 4 is a near-equal alternative and the best value; `isSmallGainUpgrade = true`.
+
+On the 25 Session 11.5 laptops the tested requests (the Session 11 sample user, `{}`,
+budget 60,000, weight importance 5) produce no alternative: the nearest cheaper product is
+at least 7.8 points below rank 1. Prices there are development/test data, so value results
+on that dataset are for testing only.
 
 ## Rule
-Implement exactly the decisions above in Session 12. Any change to a range, tier or
-rule is a new owner decision recorded in DECISIONS.md.
+The code implements exactly the decisions above (Sessions 12 and 13). Any change to a
+range, tier, threshold or rule is a new owner decision recorded in DECISIONS.md.

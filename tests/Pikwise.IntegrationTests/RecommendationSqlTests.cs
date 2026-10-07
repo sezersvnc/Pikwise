@@ -67,8 +67,16 @@ public class RecommendationSqlTests
             Assert.Equal("AMD Ryzen AI 7 PRO 450", result.Items[0].Specification!.Processor);
             Assert.True(result.Summary.RemovedByEligibility >= 2);
             Assert.True(result.Summary.RankedCount >= 4);
+            // Best and Second differ by 10 points (RAM), so no cheaper product is near-equal.
+            Assert.Equal(best.Id, result.ValueAnalysis!.BestFitProductId);
+            Assert.Equal(best.Id, result.ValueAnalysis.BestValueProductId);
+            Assert.False(result.ValueAnalysis.IsSmallGainUpgrade);
+            Assert.Empty(result.ValueAnalysis.CheaperAlternatives);
 
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            Assert.Equal(new[] { "items", "summary", "valueAnalysis" }, json.RootElement.EnumerateObject().Select(p => p.Name));
+            Assert.Equal(new[] { "bestFitProductId", "bestValueProductId", "cheaperAlternatives", "isSmallGainUpgrade", "nearEqualScoreGap" },
+                json.RootElement.GetProperty("valueAnalysis").EnumerateObject().Select(p => p.Name).Order());
             var item = json.RootElement.GetProperty("items")[0];
             Assert.Equal(new[] { "brand", "components", "knownImportance", "knownWeightShare", "name", "price", "productId",
                 "rank", "score", "specification", "totalImportance", "unknownCriteria" }, item.EnumerateObject().Select(p => p.Name).Order());

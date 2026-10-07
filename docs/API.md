@@ -275,8 +275,19 @@ Content-Type: application/json
     }
   ],
   "summary": { "candidateCount": 25, "removedByEligibility": 2, "removedByConstraints": 6,
-               "removedByKnownShare": 0, "rankedCount": 17 }
+               "removedByKnownShare": 0, "rankedCount": 17 },
+  "valueAnalysis": { "bestFitProductId": 13, "bestValueProductId": 13, "isSmallGainUpgrade": false,
+                     "nearEqualScoreGap": 3, "cheaperAlternatives": [] }
 }
+```
+
+`valueAnalysis` when a cheaper near-equal product exists (shape only):
+
+```json
+{ "bestFitProductId": 1, "bestValueProductId": 4, "isSmallGainUpgrade": true, "nearEqualScoreGap": 3,
+  "cheaperAlternatives": [
+    { "rank": 4, "productId": 4, "name": "...", "price": 50000.00, "score": 47.58,
+      "scoreGap": 2.22, "priceDifference": 10000.00, "pricePerPoint": 4504.50 } ] }
 ```
 
 - `items`: at most 3, best first. Fewer (or none) when fewer products qualify; still 200.
@@ -293,10 +304,18 @@ Content-Type: application/json
 - `specification`: stored facts; null fields are unknown. Prices of the Session 11.5
   dataset are development/test data, not market prices.
 
+- `valueAnalysis` (Session 13): null when no product qualifies. The best fit is rank 1.
+  `cheaperAlternatives` lists every ranked product (also beyond the Top 3; `rank` is its
+  position) that is cheaper and at most `nearEqualScoreGap` (3) points lower, with the
+  score gap, price difference and price per score point (2 decimals). `isSmallGainUpgrade`
+  is true when the list is not empty. `bestValueProductId` is the cheapest of the best fit
+  and its alternatives (ties: higher score, then lower id). The ranking in `items` is never
+  changed by this analysis. With development/test prices the result is for testing only.
+
 400 `application/problem+json` with `errors` for invalid JSON, out-of-range values or
 excess decimals (for example `errors["Importance.Ram"]`).
 
-Value-for-money information is Session 13; LLM explanations are Session 15.
+LLM explanations are Session 15.
 
 ---
 

@@ -408,3 +408,52 @@ items with components, unknown criteria and known importance, plus a summary of 
 products each rule removed. Unit tests reproduce the Session 11 hand ranking on the 25
 Session 11.5 laptops, including HP EliteBook 6 G1i in 5th place on 12/18 known importance.
 No schema change, migration or package was added. Value-for-money remains Session 13.
+
+---
+
+## ADR-023 — Future decision: where CPU/GPU tiers live when more categories arrive
+**Status:** Deferred (no code change); decide when the second product category starts
+
+Context: the CPU/GPU tier table is a hand-maintained static class in Application
+(ADR-021). Processor and GPU are free text, so some source must map a name to a
+performance level. Roadmap rule: do not generalize before a second category exists.
+
+Options considered:
+- A. Keep a code table per category (current; simple, needs a deploy per change).
+- B. Database table (Category, Component, Name, Tier), seeded with the current laptop
+  table; no deploy to add models; one mechanism for every category. Preferred when the
+  need is real.
+- C. Numeric benchmark score per component instead of a tier, normalized with a fixed
+  range like RAM or weight. Finer than five tiers, but needs a reliable, licensed data
+  source (see the Icecat license lesson in ADR-020).
+- D. An LLM assigns tiers. Rejected: product facts and ranking inputs must not come from
+  an LLM (ADR-004).
+
+Rules that hold for any option: every tier or score is a recorded human decision, the
+engine only reads it and never guesses, and an unlisted name stays unknown. Numeric
+criteria (RAM, storage, weight, refresh rate) already follow a generic value/range/direction
+pattern and can be configured per category later. A second category also needs its own
+specification model (see TASKS.md "Additional Product Categories"). Revisit then, record a
+new ADR and do not change the laptop behavior without an owner decision.
+
+---
+
+## ADR-024 — Session 13 value-for-money analysis
+**Status:** Accepted
+
+The fit ranking (ADR-019/021/022) is unchanged; price/performance is reported beside it.
+A pure Application function (ValueAnalyzer) reads the engine's full ranking. The best fit
+is rank 1. Every other ranked product that is cheaper and at most 3.00 points lower
+(rounded scores) is a near-equal cheaper alternative, also when it ranks below the Top 3.
+Each alternative reports score gap, price difference and price per point (half-up, 2
+decimals). isSmallGainUpgrade is true when an alternative exists. Best value is the
+cheapest of the best fit and its alternatives (ties: higher score, then lower Id).
+The result is returned as `valueAnalysis` in the existing POST /api/recommendations
+response; null when nothing qualifies. Percentage rules and a TL-per-point ceiling were
+considered and not chosen. No schema change, migration, repository or controller change.
+
+The development price CSV layer stays. ADR-020 planned to remove it in Session 13, but value
+analysis needs prices and no real price source exists before the post-MVP store/price
+tracking work. It is removed when a real, suitably licensed price source replaces it. Test
+prices must never be shown to users as market prices, so value results on the Session 11.5
+dataset are for development and testing only.

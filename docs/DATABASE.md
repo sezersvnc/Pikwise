@@ -437,8 +437,8 @@ or repository is introduced before Session 4.
 
 ### Test commands
 
-Current counts (Session 12): 229 tests run without SQL Server; 9 more are marked
-`Category=SqlServer`; 238 in total.
+Current counts (Session 13): 241 tests run without SQL Server; 9 more are marked
+`Category=SqlServer`; 250 in total.
 
 Run the tests that need no SQL Server (CMD or PowerShell):
 
@@ -617,8 +617,9 @@ Session 15, get written permission from Icecat or use a different, suitably lice
 ### Development price data
 Open Icecat provides no price or stock. Price, Stock and IsActive come from a companion
 CSV (`ExternalId,Price,Stock,IsActive`) and are **development/test data, not real market
-data**. They must not be presented to users as such and the temporary layer is removed in
-Session 13.
+data**. They must not be presented to users as such. The layer stays until a real,
+suitably licensed price source exists (post-MVP store/price tracking); Session 13 value
+analysis uses these test prices (ADR-024). It was originally planned to be removed in Session 13.
 
 ### Import tool
 `tools/Pikwise.DataImport`: `discover` (stream index, write manifest), `inspect` (print raw
