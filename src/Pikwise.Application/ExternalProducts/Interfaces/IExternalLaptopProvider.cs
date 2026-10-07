@@ -1,4 +1,6 @@
-namespace Pikwise.Application.ExternalProducts;
+using Pikwise.Application.ExternalProducts.Models;
+
+namespace Pikwise.Application.ExternalProducts.Interfaces;
 
 // Application-side contract for an external laptop data source. Implementations live in
 // Infrastructure so no provider schema, URL or credential reaches Application or Domain.

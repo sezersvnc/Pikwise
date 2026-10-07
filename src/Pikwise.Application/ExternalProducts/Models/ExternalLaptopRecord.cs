@@ -1,4 +1,4 @@
-namespace Pikwise.Application.ExternalProducts;
+namespace Pikwise.Application.ExternalProducts.Models;
 
 // Provider-neutral laptop data. Providers parse their own formats into these typed, nullable
 // values; null always means "not supplied", never a guess.

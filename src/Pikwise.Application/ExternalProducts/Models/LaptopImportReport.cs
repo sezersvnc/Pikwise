@@ -1,4 +1,4 @@
-namespace Pikwise.Application.ExternalProducts;
+namespace Pikwise.Application.ExternalProducts.Models;
 
 public sealed record FieldNullSummary(string Field, int NullCount, int Total)
 {

@@ -1,4 +1,8 @@
-namespace Pikwise.Application.ExternalProducts;
+using Pikwise.Application.ExternalProducts.Interfaces;
+using Pikwise.Application.ExternalProducts.Models;
+using Pikwise.Application.ExternalProducts.Normalization;
+
+namespace Pikwise.Application.ExternalProducts.Services;
 
 // Fetches records from a provider and normalizes them. It never touches the database,
 // so the same step powers the dry run and the real import.

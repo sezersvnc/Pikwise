@@ -1,6 +1,6 @@
 using Pikwise.Domain.Entities;
 
-namespace Pikwise.Application.ExternalProducts;
+namespace Pikwise.Application.ExternalProducts.Interfaces;
 
 // Data access needed by the import use case. Infrastructure supplies the EF implementation.
 public interface ILaptopImportRepository

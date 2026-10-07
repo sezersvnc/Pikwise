@@ -1,4 +1,5 @@
-using Pikwise.Application.ExternalProducts;
+using Pikwise.Application.ExternalProducts.Models;
+using Pikwise.Application.ExternalProducts.Normalization;
 
 namespace Pikwise.DataImport;
 

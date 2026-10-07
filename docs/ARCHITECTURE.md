@@ -298,10 +298,18 @@ RECOMMENDATION_ENGINE.md, ADR-019 and ADR-021.
 ## Session 11.5 implementation
 
 External laptop data enters through a provider abstraction. Application/ExternalProducts
-owns the provider-neutral contracts and rules: IExternalLaptopProvider,
-ExternalLaptopRecord, LaptopNormalizer, LaptopImportPreparer, LaptopImportService,
-DevelopmentPriceCsvParser, LaptopImportReport and ILaptopImportRepository.
-Infrastructure/ExternalProducts owns the Icecat specifics (IcecatLaptopProvider,
+owns the provider-neutral contracts and rules, grouped like the other features:
+
+```text
+Pikwise.Application/ExternalProducts/
+  Interfaces/     IExternalLaptopProvider, ILaptopImportRepository
+  Models/         ExternalLaptopRecord, PreparedLaptop, LaptopImportReport
+  Services/       LaptopImportService, LaptopImportPreparer
+  Normalization/  LaptopNormalizer, DevelopmentPriceCsvParser
+```
+
+Namespaces match the directories (for example
+Pikwise.Application.ExternalProducts.Services). Infrastructure/ExternalProducts owns the Icecat specifics (IcecatLaptopProvider,
 IcecatLaptopMapper, IcecatIndexDiscovery, IcecatOptions) and LaptopImportRepository,
 which writes products and ProductExternalReferences through ApplicationDbContext.
 

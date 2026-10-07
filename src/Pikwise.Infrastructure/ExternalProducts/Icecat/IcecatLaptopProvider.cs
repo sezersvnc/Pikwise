@@ -1,7 +1,8 @@
 using System.Net;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
-using Pikwise.Application.ExternalProducts;
+using Pikwise.Application.ExternalProducts.Interfaces;
+using Pikwise.Application.ExternalProducts.Models;
 
 namespace Pikwise.Infrastructure.ExternalProducts.Icecat;
 

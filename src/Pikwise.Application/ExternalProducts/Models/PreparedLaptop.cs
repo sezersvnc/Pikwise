@@ -1,4 +1,4 @@
-namespace Pikwise.Application.ExternalProducts;
+namespace Pikwise.Application.ExternalProducts.Models;
 
 // One manifest entry after fetching and normalizing. Record is null when nothing usable was obtained.
 public sealed record PreparedLaptop(

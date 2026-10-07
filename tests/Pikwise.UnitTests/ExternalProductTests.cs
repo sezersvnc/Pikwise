@@ -1,5 +1,8 @@
 using System.Text.Json;
-using Pikwise.Application.ExternalProducts;
+using Pikwise.Application.ExternalProducts.Interfaces;
+using Pikwise.Application.ExternalProducts.Models;
+using Pikwise.Application.ExternalProducts.Normalization;
+using Pikwise.Application.ExternalProducts.Services;
 using Pikwise.Domain.Entities;
 using Pikwise.Infrastructure.ExternalProducts.Icecat;
 

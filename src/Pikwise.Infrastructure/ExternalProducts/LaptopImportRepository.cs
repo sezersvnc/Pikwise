@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Pikwise.Application.ExternalProducts;
+using Pikwise.Application.ExternalProducts.Interfaces;
 using Pikwise.Domain.Entities;
 using Pikwise.Infrastructure.Persistence;
 

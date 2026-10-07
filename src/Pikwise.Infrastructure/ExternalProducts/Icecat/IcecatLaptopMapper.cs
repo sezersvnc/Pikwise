@@ -1,7 +1,8 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Pikwise.Application.ExternalProducts;
+using Pikwise.Application.ExternalProducts.Models;
+using Pikwise.Application.ExternalProducts.Normalization;
 
 namespace Pikwise.Infrastructure.ExternalProducts.Icecat;
 

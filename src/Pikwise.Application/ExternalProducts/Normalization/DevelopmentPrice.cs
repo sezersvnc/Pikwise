@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Pikwise.Application.ExternalProducts;
+namespace Pikwise.Application.ExternalProducts.Normalization;
 
 // Price, stock and active flag for one imported laptop. Open Icecat supplies no commercial data,
 // so these values come from a companion CSV and are DEVELOPMENT/TEST data, not market data.

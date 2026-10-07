@@ -1,6 +1,9 @@
 using Pikwise.Domain.Entities;
+using Pikwise.Application.ExternalProducts.Interfaces;
+using Pikwise.Application.ExternalProducts.Models;
+using Pikwise.Application.ExternalProducts.Normalization;
 
-namespace Pikwise.Application.ExternalProducts;
+namespace Pikwise.Application.ExternalProducts.Services;
 
 public enum ImportStatus { Imported, AlreadyImported, SkippedNoDevelopmentPrice, SkippedUnusable }
 

@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
+using Pikwise.Application.ExternalProducts.Models;
 
-namespace Pikwise.Application.ExternalProducts;
+namespace Pikwise.Application.ExternalProducts.Normalization;
 
 // Result of normalization: the cleaned record and notes about values that were dropped.
 public sealed record NormalizedLaptop(ExternalLaptopRecord Record, IReadOnlyList<string> Issues);
