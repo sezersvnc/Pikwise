@@ -53,9 +53,8 @@ separate call: the client reviews the criteria and sends them to the engine itse
 - Vague wishes become importance levels, not hard constraints; uncovered wishes are
   reported in `unsupported` instead of being guessed.
 - Timeout 15 s; provider failures and timeouts answer 503. The user's text is never logged.
-- No provider is configured yet (`UnconfiguredRequirementExtractor`, 503). Before a real
-  provider is enabled: owner approval, authentication plus rate limiting on the endpoint,
-  and the provider's retention/training terms checked (ADR-026).
+- Provider: Groq since Session 15.5 (see "Provider" below); without a key the
+  `UnconfiguredRequirementExtractor` answers 503.
 
 ## Explanation (Session 15)
 `POST /api/recommendations/explanation` implements the last arrows of the flow.
@@ -74,9 +73,23 @@ separate call: the client reviews the criteria and sends them to the engine itse
 - Known limits: numbers written as words and invented facts without digits are not
   detected; a number is checked against the whole input, not per product. The
   instructions forbid both, and the ranking never depends on the model.
-- No provider yet (`UnconfiguredExplanationGenerator`, 503). This is the first feature that
-  sends Icecat data, so the ADR-025 conditions (zero retention, no training, request-time
-  input only) must be verified when the provider is chosen.
+- Provider: Groq since Session 15.5; without a key the `UnconfiguredExplanationGenerator`
+  answers 503. This is the feature that sends Icecat-sourced facts; the ADR-025 conditions
+  are met as described below.
+
+## Provider (Session 15.5, ADR-028)
+- Groq free plan (no payment details: no charges; at the limit Groq answers 429, which
+  Pikwise reports as 503). Model `openai/gpt-oss-120b` with strict `json_schema` output,
+  reasoning effort low and reasoning excluded from the response.
+- ADR-025: organization-wide Zero Data Retention was enabled by the owner on 8 October
+  2026, so Groq does not log inputs or outputs; Groq does not train on API data unless the
+  customer permits it. Every call is a single request-time chat completion; nothing is
+  stored, embedded or batched.
+- The key lives only in User Secrets / environment (`Groq:ApiKey`, `Groq__ApiKey`), the
+  Authorization header is redacted in HttpClient logs, and only status codes are logged.
+- Both endpoints require a signed-in user and share a rate limit (5 per user, 25 in total
+  per minute). Tests clear the key, so they never call Groq.
+- Switching providers means one new adapter in Infrastructure/Llm; Application is unchanged.
 
 ## Safety against hallucination
 When generating explanations, provide only:

@@ -11,7 +11,8 @@ Current focus:
 - [x] Session 12 — Recommendation Engine V1
 - [x] Session 13 — Value-for-Money
 - [x] Session 14 — LLM Structured Input (no real provider yet)
-- [x] Session 15 — AI Explanation (no real provider yet; ADR-025 provider tasks open)
+- [x] Session 15 — AI Explanation
+- [x] Session 15.5 — LLM provider (Groq)
 
 This file continues from Recommendation Engine onward.
 
@@ -333,8 +334,8 @@ Only provide:
 - [x] Prevent unsupported product facts. (`ExplanationFactChecker`: every product exactly once, no other product id, every number must appear in the input (Turkish/English formats, "bin", rounding allowed); any failure rejects the whole explanation with 502)
 - [x] Handle missing information honestly. (null fields and unknownCriteria are sent as unknown; the instructions require "bilgi yok"; invented numbers are rejected)
 - [x] Ensure ranking exists before the LLM call. (the service ranks through IRecommendationService first and returns that ranking with the explanation; empty ranking = no LLM call)
-- [ ] Configure the LLM provider for zero data retention / no training before sending Icecat data (ADR-025). (open: no real provider yet; the owner chooses it)
-- [ ] Send Icecat data only as request-time input; no storage, embeddings or training (ADR-025). (open until a provider exists; the contract sends input per request only)
+- [x] Configure the LLM provider for zero data retention / no training before sending Icecat data (ADR-025). (Session 15.5: Groq, organization-wide ZDR enabled by the owner on 8 October 2026; Groq does not train on API data)
+- [x] Send Icecat data only as request-time input; no storage, embeddings or training (ADR-025). (Session 15.5: one chat completion per request; nothing stored or embedded)
 - [x] Add tests where practical. (39 unit, 8 integration with fake generator and fake ranking; build OK, 330 pass without SQL Server: 232 unit, 98 integration; the 9 SqlServer tests pass on PikwiseSession3Tests (run by the user); 339 in total)
 
 ## Session 15 decisions (approved)
@@ -353,6 +354,32 @@ LLM                   = understanding + explanation
 
 ## Exit Criterion
 AI can explain "Why A?" or "Is B worth 5,000 TL more?" using only verified data.
+
+---
+
+# Session 15.5 — LLM provider (Groq)
+
+## Goal
+Connect the Session 14/15 abstractions to a real, free language model without cost or data-retention risk.
+
+## Tasks
+- [x] Choose a free provider that satisfies ADR-025. (Groq free plan: no card, no charges, 429 at the limit; ZDR available; no training on API data; see ADR-028)
+- [x] Owner enables Zero Data Retention and creates an API key. (organization-wide ZDR enabled 8 October 2026; key stored in User Secrets as `Groq:ApiKey` by the owner; never in the repository)
+- [x] Add the Groq adapters in Infrastructure. (`GroqChatClient` typed HttpClient, strict `json_schema` output, `openai/gpt-oss-120b`, reasoning effort low, reasoning excluded; `GroqRequirementExtractor`, `GroqExplanationGenerator`)
+- [x] Choose the implementation from configuration. (key present -> Groq; key missing -> unconfigured, 503; tests clear the key)
+- [x] Require a signed-in user for both language model endpoints. (401 without a valid Supabase user token)
+- [x] Add rate limiting. (per user 5/min, total 25/min, shared by both endpoints; 429 problem details with Retry-After; recommendations are not limited)
+- [x] Never log the key, the user's text or model output. (Authorization header redacted; only HTTP status codes are logged)
+- [x] Add tests. (12 unit with a fake HTTP handler, 11 integration; build OK, 353 pass without SQL Server: 244 unit, 109 integration)
+- [x] Real-call smoke test by the owner (8 October 2026, Supabase test user token): criteria 200 from Groq; explanation 200 for `{budgetMax: 70000, minRamGb: 16}` (ranking 19, 8, 13; all numbers passed the fact check); 401 without token; per-user limit answered 429 after 5 calls shared by both endpoints; 353 non-SQL and 9 SqlServer tests pass (362 in total).
+- [x] Clarify the valueComment instructions. (the first real valueComment mentioned "a more expensive alternative", which valueAnalysis does not contain; a digit-free claim the fact check cannot catch, see ADR-027 limits)
+
+## Session 15.5 decisions (approved)
+- Groq free plan, no payment details on the account; moving to another provider later means one new Infrastructure adapter.
+- Package `Microsoft.Extensions.Http` 10.0.11 added to Infrastructure (already used by tools/Pikwise.DataImport).
+
+## Exit Criterion
+Both language model endpoints work against Groq for signed-in users, within free limits, without storing data.
 
 ---
 

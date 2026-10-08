@@ -559,3 +559,33 @@ explanation together, so they cannot drift apart if data changes between two cal
   approval, authentication and rate limiting (ADR-026), and the ADR-025 Icecat
   conditions (zero data retention, no training, request-time input only), because this
   is the first feature that sends Icecat-sourced facts to a model.
+
+---
+
+## ADR-028 — Session 15.5 Groq as the language model provider
+**Status:** Accepted (implements the provider conditions of ADR-025, ADR-026 and ADR-027)
+
+Groq is the first real provider behind IRequirementExtractor and IExplanationGenerator.
+Researched 2026-10-08 against the alternatives: Gemini's free tier uses data to improve
+products (human review), OpenRouter's free models log prompts for training, Mistral's free
+plan trains by default, GitHub Models is retired, and Ollama (local) needs hardware the
+deployment would also need. Groq's free plan never charges (429 at the limit), does not
+train on API data and offers Zero Data Retention to every customer.
+
+- The owner enabled organization-wide ZDR on 8 October 2026 and created the key; the
+  account has no payment details. The key is stored only in User Secrets / environment
+  (`Groq:ApiKey`); it is never committed, printed or logged.
+- Model `openai/gpt-oss-120b` (strict json_schema support), reasoning effort low,
+  reasoning excluded, max 2048 completion tokens; all configurable under `Groq`.
+- Infrastructure/Llm owns GroqChatClient (typed HttpClient, Authorization header redacted
+  in logs, only status codes logged) and two adapters. Any HTTP error, network error or
+  unreadable response becomes the feature's "unavailable" exception (503).
+- Without a key the unconfigured implementations stay registered; integration tests
+  clear the key so they never reach Groq.
+- ADR-026 conditions: both language model endpoints require a Supabase user token and
+  share a rate limit of 5 requests per user and 25 in total per minute (configurable
+  under `RateLimiting:LanguageModel`), answered with 429 problem details and Retry-After.
+  The recommendation endpoint stays public and unlimited.
+- Package `Microsoft.Extensions.Http` 10.0.11 added to Infrastructure.
+- Free-plan limits (per model, also tokens per minute) make this a development/MVP
+  setup; real traffic needs a paid plan or another provider, which is one new adapter.

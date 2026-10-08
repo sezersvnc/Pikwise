@@ -26,8 +26,14 @@ public static class ExplanationContract
         products: one entry per input product, with its productId, in ranking order. Each explanation is at
         most three plain sentences (no markdown, no lists) on why the product fits the user's criteria,
         based on its score components.
-        valueComment: when valueAnalysis is present, two or three sentences on whether paying more for the
-        best fit is worth it, using only valueAnalysis. Null when valueAnalysis is null.
+        valueComment: when valueAnalysis is present, two or three sentences using only valueAnalysis. Null when
+        valueAnalysis is null. Meaning of valueAnalysis:
+        - bestFitProductId is rank 1. cheaperAlternatives lists ranked products that are cheaper than the best
+          fit and at most nearEqualScoreGap points lower, with their scoreGap and priceDifference.
+        - If cheaperAlternatives is empty, say that the best fit is also the best value and that no cheaper
+          product is within nearEqualScoreGap points. Do not mention more expensive products.
+        - Otherwise, say that paying priceDifference more for the best fit gains only scoreGap points, and name
+          the product with bestValueProductId as the best value. Let the user decide; do not change the ranking.
         """;
 
     public const string JsonSchema = """

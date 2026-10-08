@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:5080
+@baseUrl = http://localhost:5157
 # Set these IDs to existing lookup rows in your local PikwiseDb.
 @brandId = 1
 @categoryId = 1
@@ -143,14 +143,16 @@ Content-Type: application/json
 
 { "importance": { "ram": 9 } }
 
-### Natural-language criteria (503 until a language model provider is configured)
+### Natural-language criteria (user token required; real Groq call when Groq:ApiKey is set, otherwise 503)
 POST {{baseUrl}}/api/recommendations/criteria
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
 Content-Type: application/json
 
 { "text": "50 bin TL bütçem var, okul ve yazılım için kullanacağım, arada oyun oynarım, çok ağır olmasın." }
 
-### Explanation of the Session 11 sample ranking (503 until a language model provider is configured)
+### Explanation of the Session 11 sample ranking (user token required; real Groq call when Groq:ApiKey is set)
 POST {{baseUrl}}/api/recommendations/explanation
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
 Content-Type: application/json
 
 {
@@ -161,6 +163,13 @@ Content-Type: application/json
 
 ### Natural-language criteria with empty text (400)
 POST {{baseUrl}}/api/recommendations/criteria
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
 Content-Type: application/json
 
 { "text": "   " }
+
+### Natural-language criteria without a token (401)
+POST {{baseUrl}}/api/recommendations/criteria
+Content-Type: application/json
+
+{ "text": "16 GB RAM" }

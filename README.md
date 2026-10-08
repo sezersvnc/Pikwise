@@ -58,7 +58,8 @@ Real laptop dataset (Icecat)     ✅ Session 11.5 complete (25 laptops, dev pric
 Recommendation Engine V1         ✅ Session 12 complete (POST /api/recommendations)
 Value-for-money analysis         ✅ Session 13 complete (valueAnalysis in recommendations)
 LLM structured input             ✅ Session 14 complete (criteria endpoint, no provider yet)
-AI explanation                   ✅ Session 15 complete (explanation endpoint, no provider yet)
+AI explanation                   ✅ Session 15 complete (explanation endpoint)
+LLM provider (Groq, free + ZDR)  ✅ Session 15.5 complete (auth + rate limit; smoke tested)
 ```
 
 ## Read order
@@ -102,6 +103,6 @@ filters, explicit sorting and SQL pagination with metadata. Session 10 adds stru
 comparison of two or three selected products in one SQL read.
 GET /api/products now returns an object with items instead of a bare array.
 Session 9 was reviewed and pushed. Session 10 was approved for commit/push;
-Session 11 (recommendation design) is complete; see docs/RECOMMENDATION_ENGINE.md. Session 12 implements the deterministic engine as `POST /api/recommendations` (Top 3 with score components; no LLM). Session 13 adds `valueAnalysis` (best fit vs best value, cheaper near-equal alternatives within 3 points, price per point); see docs/API.md. Session 14 adds `POST /api/recommendations/criteria` (natural language -> validated criteria behind a provider abstraction; no language model provider is configured yet, so it answers 503); see docs/AI.md. Session 15 adds `POST /api/recommendations/explanation` (ranks first, then explains the Top 3 with a deterministic fact check; also 503 until a provider is configured). Session 11.5 imported 25 real laptop specifications from Open Icecat with `tools/Pikwise.DataImport` (prices are development/test data); see docs/DATABASE.md. Details are in [docs/COMPARISON.md](docs/COMPARISON.md),
+Session 11 (recommendation design) is complete; see docs/RECOMMENDATION_ENGINE.md. Session 12 implements the deterministic engine as `POST /api/recommendations` (Top 3 with score components; no LLM). Session 13 adds `valueAnalysis` (best fit vs best value, cheaper near-equal alternatives within 3 points, price per point); see docs/API.md. Session 14 adds `POST /api/recommendations/criteria` (natural language -> validated criteria behind a provider abstraction); see docs/AI.md. Session 15 adds `POST /api/recommendations/explanation` (ranks first, then explains the Top 3 with a deterministic fact check). Session 15.5 connects both to Groq's free plan with Zero Data Retention; they require a signed-in user and are rate limited (ADR-028). To enable them locally, store your own Groq key with `dotnet user-secrets set "Groq:ApiKey" <key> --project src/Pikwise.Api`; without it both answer 503. Session 11.5 imported 25 real laptop specifications from Open Icecat with `tools/Pikwise.DataImport` (prices are development/test data); see docs/DATABASE.md. Details are in [docs/COMPARISON.md](docs/COMPARISON.md),
 [docs/PRODUCT_QUERIES.md](docs/PRODUCT_QUERIES.md)
 and [docs/Pikwise.http](docs/Pikwise.http).

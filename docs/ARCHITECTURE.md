@@ -376,3 +376,23 @@ or the engine), so validation and ranking are exactly those of POST /api/recomme
 It maps the ranking to ExplanationInput, calls the generator with a timeout, parses the
 output strictly and runs ExplanationFactChecker before building the response. No schema
 change, migration or package. See AI.md and ADR-027.
+
+## Session 15.5 implementation
+
+```text
+Pikwise.Infrastructure/Llm/
+  GroqOptions             key (User Secrets only), model, reasoning effort, token limit
+  GroqChatClient          typed HttpClient: chat completions with strict json_schema
+  GroqRequestException    infrastructure-only failure (status code at most)
+  GroqRequirementExtractor, GroqExplanationGenerator   adapters to the Application interfaces
+Pikwise.Api/RateLimiting/
+  LanguageModelRateLimiting   per-user + total fixed windows, 429 problem details
+```
+
+AddInfrastructure registers the Groq adapters when `Groq:ApiKey` is configured and the
+unconfigured implementations otherwise. The adapters translate GroqRequestException to
+the Application exceptions (503); Application code did not change. The two language model
+actions carry `[Authorize]` and `[EnableRateLimiting]`; UseRateLimiter runs after
+UseAuthorization so anonymous calls are rejected with 401 first. Package added:
+Microsoft.Extensions.Http 10.0.11 (Infrastructure). No schema change or migration.
+See AI.md and ADR-028.

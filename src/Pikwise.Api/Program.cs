@@ -11,6 +11,7 @@ using Pikwise.Application.RequirementParsing.Interfaces;
 using Pikwise.Application.RequirementParsing.Services;
 using Pikwise.Application.Explanations.Interfaces;
 using Pikwise.Application.Explanations.Services;
+using Pikwise.Api.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 // Compose dependencies at startup; controllers receive their services through DI.
@@ -26,12 +27,15 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+builder.Services.AddLanguageModelRateLimiting(builder.Configuration);
 var app = builder.Build();
 // Register before endpoints so exceptions from the request pipeline reach the central handler.
 app.UseExceptionHandler();
 // Establish identity before evaluating endpoint authorization policies.
 app.UseAuthentication();
 app.UseAuthorization();
+// After authorization: anonymous calls get 401 before they can use a rate-limit permit.
+app.UseRateLimiter();
 
 if (app.Environment.IsDevelopment())
 {

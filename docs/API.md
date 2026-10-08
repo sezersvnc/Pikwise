@@ -316,15 +316,17 @@ Content-Type: application/json
 excess decimals (for example `errors["Importance.Ram"]`).
 
 ### POST /api/recommendations/criteria
-Status: Session 14. Public (no token for now; see ADR-026), read-only. Converts a
+Status: Session 14; Groq provider, authentication and rate limiting since Session 15.5
+(ADR-028). Requires a Supabase user access token; read-only. Converts a
 natural-language need into criteria in the POST /api/recommendations request shape. It
 never ranks products: the client shows the criteria and sends them to
 POST /api/recommendations. Only the user's text goes to the language model.
 
-No language model provider is configured yet, so the endpoint currently answers 503.
+Without `Groq:ApiKey` in configuration the endpoint answers 503.
 
 ```http
 POST /api/recommendations/criteria
+Authorization: Bearer <user access token>
 Content-Type: application/json
 
 { "text": "50 bin TL bütçem var, okul ve yazılım için kullanacağım, arada oyun oynarım, çok ağır olmasın." }
@@ -349,14 +351,16 @@ Content-Type: application/json
   rules, or a budget although the text contains no digits. Values are never clamped.
 - 503 `application/problem+json` when no provider is configured, the provider fails or
   it does not answer within 15 seconds.
+- 401 without a valid user token; 429 (see below) when the rate limit is reached.
 
 ### POST /api/recommendations/explanation
-Status: Session 15. Public (no token for now; ADR-026/027), read-only. Same request body
-as POST /api/recommendations. The service ranks first, then asks the language model to
-explain that ranking, and returns both together so they always match.
+Status: Session 15; Groq provider, authentication and rate limiting since Session 15.5
+(ADR-028). Requires a Supabase user access token; read-only. Same request body as POST
+/api/recommendations. The service ranks first, then asks the language model to explain
+that ranking, and returns both together so they always match.
 
-No language model provider is configured yet, so the endpoint currently answers 503
-whenever there is something to explain.
+Without `Groq:ApiKey` in configuration the endpoint answers 503 whenever there is
+something to explain.
 
 200 response (shape; `recommendation` is the full POST /api/recommendations response):
 
@@ -382,6 +386,14 @@ whenever there is something to explain.
   POST /api/recommendations.
 - 503 `application/problem+json` when no provider is configured, the provider fails or it
   does not answer within 15 seconds.
+- 401 without a valid user token; 429 when the rate limit is reached.
+
+### Language model rate limits (Session 15.5)
+Both language model endpoints share two fixed one-minute windows, configured under
+`RateLimiting:LanguageModel`: `PerUserPerMinute` (default 5, keyed by the token's `sub`)
+and `TotalPerMinute` (default 25, all users together, below Groq's free-plan limit).
+A rejected request gets 429 `application/problem+json` with a `Retry-After` header.
+POST /api/recommendations and the product endpoints are not limited.
 
 ---
 

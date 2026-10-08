@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,10 +37,32 @@ public static class DependencyInjection
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
         services.AddScoped<IFavoriteRepository, FavoriteRepository>();
         services.AddScoped<IRecommendationRepository, RecommendationRepository>();
-        // No language model provider is configured yet; parsing requests answer 503 (ADR-026).
-        services.AddSingleton<IRequirementExtractor, UnconfiguredRequirementExtractor>();
-        services.AddSingleton<IExplanationGenerator, UnconfiguredExplanationGenerator>();
+        services.AddLanguageModel(configuration);
 
         return services;
+    }
+
+    // Groq when Groq:ApiKey is configured (ADR-028); otherwise both language model endpoints answer 503.
+    private static void AddLanguageModel(this IServiceCollection services, IConfiguration configuration)
+    {
+        var groq = GroqOptions.FromConfiguration(configuration);
+        if (groq is null)
+        {
+            services.AddSingleton<IRequirementExtractor, UnconfiguredRequirementExtractor>();
+            services.AddSingleton<IExplanationGenerator, UnconfiguredExplanationGenerator>();
+            return;
+        }
+
+        services.AddSingleton(groq);
+        services.AddHttpClient<GroqChatClient>(client =>
+            {
+                client.BaseAddress = groq.BaseUri;
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", groq.ApiKey);
+                // Safety net only; the Application services stop waiting after 15 seconds.
+                client.Timeout = TimeSpan.FromSeconds(30);
+            })
+            .RedactLoggedHeaders(["Authorization"]);
+        services.AddTransient<IRequirementExtractor, GroqRequirementExtractor>();
+        services.AddTransient<IExplanationGenerator, GroqExplanationGenerator>();
     }
 }

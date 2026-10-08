@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Pikwise.Application.Explanations.Interfaces;
 using Pikwise.Application.Products.DTOs;
@@ -22,8 +21,9 @@ public class ExplanationEndpointTests
     [InlineData("""{"budgetMax":"cheap"}""")]
     public async Task Invalid_criteria_return_400_without_database_access(string body)
     {
+        using var tokens = new AuthTestTokens();
         await using var factory = new PikwiseApiFactory();
-        using var client = factory.CreateClient();
+        using var client = SignedInClient(tokens, factory, generatorOutput: null, fakeRanking: false);
         using var content = new StringContent(body, Encoding.UTF8, "application/json");
 
         using var response = await client.PostAsync(Url, content);
@@ -34,8 +34,9 @@ public class ExplanationEndpointTests
     [Fact]
     public async Task Without_a_configured_provider_returns_503_problem_details()
     {
+        using var tokens = new AuthTestTokens();
         await using var factory = new PikwiseApiFactory();
-        using var client = ClientWith(factory, generatorOutput: null);
+        using var client = SignedInClient(tokens, factory, generatorOutput: null);
 
         using var response = await client.PostAsJsonAsync(Url, new { budgetMax = 70000 });
 
@@ -45,8 +46,9 @@ public class ExplanationEndpointTests
     [Fact]
     public async Task Valid_explanation_is_returned_with_the_ranking_it_explains()
     {
+        using var tokens = new AuthTestTokens();
         await using var factory = new PikwiseApiFactory();
-        using var client = ClientWith(factory, """
+        using var client = SignedInClient(tokens, factory, """
             { "products": [ { "productId": 13, "explanation": "DELL PW514265 68.000 TL ile bütçeye uyuyor ve 75,41 puan aldı." } ],
               "valueComment": "Daha ucuz ve 3 puandan az geride bir seçenek yok." }
             """);
@@ -68,23 +70,46 @@ public class ExplanationEndpointTests
     [InlineData("""{ "products": [ { "productId": 99, "explanation": "Uygun." } ], "valueComment": null }""")]
     public async Task Unusable_or_unsupported_explanation_returns_502_problem_details(string output)
     {
+        using var tokens = new AuthTestTokens();
         await using var factory = new PikwiseApiFactory();
-        using var client = ClientWith(factory, output);
+        using var client = SignedInClient(tokens, factory, output);
 
         using var response = await client.PostAsJsonAsync(Url, new { budgetMax = 70000 });
 
         await AssertProblem(response, HttpStatusCode.BadGateway);
     }
 
-    // generatorOutput null keeps the configured (unconfigured) generator. The derived factory is
-    // disposed together with the factory the test owns.
-    private static HttpClient ClientWith(PikwiseApiFactory factory, string? generatorOutput) =>
-        factory.WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
+    [Theory]
+    [InlineData("missing")]
+    [InlineData("expired")]
+    public async Task Requires_a_valid_user_token(string token)
+    {
+        using var tokens = new AuthTestTokens();
+        await using var baseFactory = new PikwiseApiFactory();
+        await using var factory = tokens.Configure(baseFactory);
+        using var client = factory.CreateClient();
+        using var request = new HttpRequestMessage(HttpMethod.Post, Url) { Content = JsonContent.Create(new { budgetMax = 70000 }) };
+        if (token != "missing") request.Headers.Authorization = new("Bearer", tokens.Create(token));
+
+        using var response = await client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    // generatorOutput null keeps the configured (unconfigured) generator; fakeRanking false keeps the
+    // real recommendation service. The derived factory is disposed with the factory the test owns.
+    private static HttpClient SignedInClient(
+        AuthTestTokens tokens, PikwiseApiFactory factory, string? generatorOutput, bool fakeRanking = true)
+    {
+        var client = tokens.Configure(factory, services =>
         {
-            services.AddScoped<IRecommendationService, FakeRecommendationService>();
+            if (fakeRanking) services.AddScoped<IRecommendationService, FakeRecommendationService>();
             if (generatorOutput is not null)
                 services.AddSingleton<IExplanationGenerator>(new FakeGenerator(generatorOutput));
-        })).CreateClient();
+        }).CreateClient();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", tokens.Create());
+        return client;
+    }
 
     private static async Task AssertProblem(HttpResponseMessage response, HttpStatusCode status)
     {
