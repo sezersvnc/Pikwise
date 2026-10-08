@@ -135,7 +135,7 @@ Before importing a dataset:
 - Price/Stock/IsActive from a development CSV (not market data; originally to be removed in Session 13, kept until a real price source exists per ADR-024).
 - Dry-run report must be reviewed before any CPU/GPU tier table or reference range is defined.
 - Migration is created but NOT applied until the user approves its SQL/schema impact. (approved and applied)
-- Icecat data must not feed LLM explanations (Session 15 needs permission or another source).
+- Icecat data must not feed LLM explanations (Session 15 needs permission or another source). (Permission received 7 October 2026 for request-time explanation input only; see ADR-025.)
 
 ## Session 11.5 verification (run locally by the user)
 - Build and unit tests pass; full test suite passed with the new migration on the test database. (Originally recorded as 123/123; recounted in Session 12 on the same code: 132 tests, 124 without SQL Server + 8 SqlServer.)
@@ -324,6 +324,8 @@ Only provide:
 - [ ] Prevent unsupported product facts.
 - [ ] Handle missing information honestly.
 - [ ] Ensure ranking exists before the LLM call.
+- [ ] Configure the LLM provider for zero data retention / no training before sending Icecat data (ADR-025).
+- [ ] Send Icecat data only as request-time input; no storage, embeddings or training (ADR-025).
 - [ ] Add tests where practical.
 
 ## Architectural Rule

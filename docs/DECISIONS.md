@@ -457,3 +457,40 @@ analysis needs prices and no real price source exists before the post-MVP store/
 tracking work. It is removed when a real, suitably licensed price source replaces it. Test
 prices must never be shown to users as market prices, so value results on the Session 11.5
 dataset are for development and testing only.
+
+---
+
+## ADR-025 — Icecat permission for LLM explanations; price-source plan
+**Status:** Accepted (updates the LLM restriction in ADR-020)
+
+Icecat permission (written, e-mail of 7 October 2026, from Icecat NV's Global Business
+Development Manager; the owner keeps the correspondence as a PDF outside the repository):
+- Open Icecat data may be used as described for Pikwise, a non-commercial student project,
+  as long as it is not used to train an AI model or for similar AI functions.
+- After clarification that product specifications are sent to an LLM only as request-time
+  context to write a "why this laptop fits you" explanation, never used for training or
+  fine-tuning and never stored, Icecat answered that this use is acceptable.
+- Open Icecat data may also be used if the project becomes commercial; Full Icecat
+  content requires a paid subscription.
+- Icecat stated that attribution is not mandatory. Pikwise keeps attributing Icecat
+  anyway, for transparency.
+- Icecat Stock and Pricing only updates prices from the customer's own suppliers, so it is
+  not a price source for Pikwise.
+
+Conditions Pikwise must keep (Session 15 and later):
+- Icecat data goes to an LLM only as request-time input for explanations or summaries.
+  No training, fine-tuning, embedding store or bulk transfer of Icecat data.
+- The LLM provider must be configured so submitted data is not retained or used for
+  training (zero data retention or the provider's equivalent). Verify this before the
+  first real call.
+- Any other use of Icecat data with AI needs a new question to Icecat.
+
+Price-source plan (no open-licensed laptop price source exists; researched 2026-10-07):
+- Until Session 22: development prices from dev-prices.csv, shown as demo prices.
+- Session 22 (Store / ProductOffer): manually entered real prices per offer with store,
+  source URL and observed date; displayed with that date.
+- Later: store feeds and affiliate feeds as providers behind the provider abstraction.
+- Amazon Creators API (amazon.com.tr) is not usable now: it needs an approved Associates
+  account with 10 sales in the trailing 30 days, allows at most 24-hour caching (no price
+  history) and forbids use with generative AI. eBay restricts AI use; Best Buy is US/USD.
+  Revisit when Pikwise is live.

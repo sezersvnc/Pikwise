@@ -46,3 +46,10 @@ When generating explanations, provide only:
 - EngineScore / score components
 
 If a fact is missing, the model should say it is unavailable rather than invent it.
+
+## Data licensing for LLM input
+Icecat-sourced product facts may be sent to the LLM only as request-time input for
+explanations (written permission, ADR-025). They must never be used for training,
+fine-tuning or embeddings, must not be stored by the LLM provider (zero data retention),
+and any other AI use needs a new question to Icecat. Development prices are demo data and
+must not be described as market prices.

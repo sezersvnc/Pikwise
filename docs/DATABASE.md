@@ -610,9 +610,11 @@ Specifications are imported from Open Icecat (https://icecat.biz) for developmen
 testing. Required obligations: attribute Icecat as the source; the data is under the Open
 Content License (v1.4), which has share-alike terms and requires modifications to be
 marked (Pikwise normalizes names and units, so imported values are modified data); fair-use
-rate limits apply. The license prohibits using the data for machine learning/AI purposes,
-so Icecat-derived data must NOT be used as generative-AI/LLM explanation input. Before
-Session 15, get written permission from Icecat or use a different, suitably licensed source.
+rate limits apply. The license restricts machine learning/AI use. Icecat gave written
+permission on 7 October 2026 (ADR-025): Icecat data may be sent to an LLM only as
+request-time input for explanations, never for training or fine-tuning and never stored,
+with an LLM provider configured for zero data retention. Icecat said attribution is not
+mandatory; Pikwise still attributes it.
 
 ### Development price data
 Open Icecat provides no price or stock. Price, Stock and IsActive come from a companion
