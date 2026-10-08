@@ -39,6 +39,24 @@ LLM explanation
 Client
 ```
 
+## Structured input (Session 14)
+`POST /api/recommendations/criteria` implements the first arrow of the flow, as a
+separate call: the client reviews the criteria and sends them to the engine itself.
+
+- The language model receives only the user's text, with
+  `RequirementExtractionContract.Instructions` and its JSON Schema. No product data is sent.
+- `IRequirementExtractor` is the provider abstraction (text in, raw JSON out). Providers
+  live in Infrastructure; Application never sees provider types.
+- The output is untrusted. RequirementParsingService rejects (502) anything that is not
+  exactly the schema, any value outside the manual request rules and any budget when the
+  text has no digits. Nothing is clamped or repaired.
+- Vague wishes become importance levels, not hard constraints; uncovered wishes are
+  reported in `unsupported` instead of being guessed.
+- Timeout 15 s; provider failures and timeouts answer 503. The user's text is never logged.
+- No provider is configured yet (`UnconfiguredRequirementExtractor`, 503). Before a real
+  provider is enabled: owner approval, authentication plus rate limiting on the endpoint,
+  and the provider's retention/training terms checked (ADR-026).
+
 ## Safety against hallucination
 When generating explanations, provide only:
 - UserNeeds

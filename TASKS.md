@@ -9,7 +9,8 @@ Current focus:
 - [x] Session 11 — Recommendation Engine Design
 - [x] Session 11.5 — Open Dataset Bootstrap
 - [x] Session 12 — Recommendation Engine V1
-- [x] Session 13 — Value-for-Money (not yet committed)
+- [x] Session 13 — Value-for-Money
+- [x] Session 14 — LLM Structured Input (no real provider yet)
 
 This file continues from Recommendation Engine onward.
 
@@ -292,13 +293,20 @@ arada oyun oynarım, çok ağır olmasın.
 ```
 
 ## Tasks
-- [ ] Define JSON Schema / structured output.
-- [ ] Create an LLM service abstraction.
-- [ ] Keep provider-specific details outside core business logic.
-- [ ] Convert natural language to `UserRequirements`.
-- [ ] Validate LLM output before sending it to the Recommendation Engine.
-- [ ] Add timeout/error handling.
-- [ ] Never let the LLM bypass hard constraints.
+- [x] Define JSON Schema / structured output. (`RequirementExtractionContract`: instructions + strict schema; a test keeps it in sync with the parser)
+- [x] Create an LLM service abstraction. (`IRequirementExtractor`: user text in, raw JSON out)
+- [x] Keep provider-specific details outside core business logic. (Application has no provider types; Infrastructure registers `UnconfiguredRequirementExtractor` until a provider is approved)
+- [x] Convert natural language to `UserRequirements`. (returns the `RecommendationRequestDto` shape; the client sends it to POST /api/recommendations)
+- [x] Validate LLM output before sending it to the Recommendation Engine. (strict JSON: unknown/duplicate fields and string numbers rejected; same range rules as a manual request; nothing clamped)
+- [x] Add timeout/error handling. (15 s timeout, also for providers that ignore cancellation; 503 unavailable, 502 unusable output, 400 invalid text)
+- [x] Never let the LLM bypass hard constraints. (no field can remove a constraint; a budget is rejected when the text has no digits; the LLM never ranks)
+- [x] Add tests. (33 unit, 9 integration with a fake extractor; no real LLM call; build OK, 283 pass without SQL Server: 193 unit, 90 integration; the 9 SqlServer tests pass on PikwiseSession3Tests (run by the user); 292 in total)
+
+## Session 14 decisions (approved)
+- Option (a): abstraction + fake extractor only. No real provider, package or API key in this session; adding one needs the owner's approval (cost: the owner is a student).
+- Endpoint: `POST /api/recommendations/criteria`, criteria only; ranking stays a separate, deterministic call.
+- Anonymous for now (no cost without a provider). Authentication and rate limiting are required before a real provider is enabled (ADR-026).
+- A budget is accepted only when the user's text contains digits.
 
 ## Exit Criterion
 Natural-language input becomes validated structured criteria.

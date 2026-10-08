@@ -333,3 +333,24 @@ Infrastructure's RecommendationRepository loads all products with Brand and
 LaptopSpecification in one untracked query; it applies no business filter. Domain and
 schema are unchanged; no migration or package was added. The LLM is not involved.
 See RECOMMENDATION_ENGINE.md and ADR-022.
+
+## Session 14 implementation
+
+```text
+Pikwise.Application/RequirementParsing/
+  Interfaces/   IRequirementExtractor (provider abstraction), IRequirementParsingService
+  DTOs/         NaturalLanguageRequestDto, ParsedRequirementsResponseDto
+  Models/       ExtractedRequirements, RequirementExtractionContract (instructions + JSON Schema)
+  Services/     RequirementParsingService
+  Validators/   NaturalLanguageRequestValidator
+  Exceptions/   RequirementExtractionInvalidException (502), RequirementExtractionUnavailableException (503)
+Pikwise.Infrastructure/Llm/
+  UnconfiguredRequirementExtractor (default until a provider is approved)
+```
+
+RecommendationsController exposes `POST /api/recommendations/criteria` and only binds
+and returns. RequirementParsingService validates the text, calls the extractor with a
+timeout, parses the output strictly, reuses RecommendationRequestValidator and applies the
+digits-for-budget rule. It does not call the engine or the repository. ApiExceptionHandler
+maps the two new exceptions and logs only their reason. No schema change, migration or
+package. See AI.md and ADR-026.

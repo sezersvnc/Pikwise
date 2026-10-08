@@ -315,6 +315,41 @@ Content-Type: application/json
 400 `application/problem+json` with `errors` for invalid JSON, out-of-range values or
 excess decimals (for example `errors["Importance.Ram"]`).
 
+### POST /api/recommendations/criteria
+Status: Session 14. Public (no token for now; see ADR-026), read-only. Converts a
+natural-language need into criteria in the POST /api/recommendations request shape. It
+never ranks products: the client shows the criteria and sends them to
+POST /api/recommendations. Only the user's text goes to the language model.
+
+No language model provider is configured yet, so the endpoint currently answers 503.
+
+```http
+POST /api/recommendations/criteria
+Content-Type: application/json
+
+{ "text": "50 bin TL bütçem var, okul ve yazılım için kullanacağım, arada oyun oynarım, çok ağır olmasın." }
+```
+
+200 response (example):
+
+```json
+{
+  "criteria": { "budgetMax": 50000, "minRamGb": null, "minStorageGb": null, "maxWeightKg": null,
+                "importance": { "ram": 4, "storage": null, "cpu": 4, "gpu": 3, "weight": 4, "refreshRate": 3 } },
+  "unsupported": []
+}
+```
+
+- `criteria`: null fields are not applied; null importance levels default to 3 in the engine.
+- `unsupported`: wishes no criterion covers (for example "battery life"); at most 10.
+- 400 `application/problem+json` with `errors["Text"]` for missing, whitespace-only or
+  longer than 1000 characters text.
+- 502 `application/problem+json` when the model output is unusable: not JSON, unknown or
+  duplicate fields, numbers as strings, values outside the POST /api/recommendations
+  rules, or a budget although the text contains no digits. Values are never clamped.
+- 503 `application/problem+json` when no provider is configured, the provider fails or
+  it does not answer within 15 seconds.
+
 LLM explanations are Session 15.
 
 ---

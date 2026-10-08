@@ -494,3 +494,35 @@ Price-source plan (no open-licensed laptop price source exists; researched 2026-
   account with 10 sales in the trailing 30 days, allows at most 24-hour caching (no price
   history) and forbids use with generative AI. eBay restricts AI use; Best Buy is US/USD.
   Revisit when Pikwise is live.
+
+---
+
+## ADR-026 — Session 14 natural-language criteria (LLM structured input)
+**Status:** Accepted
+
+`POST /api/recommendations/criteria` turns the user's text into criteria in the
+POST /api/recommendations request shape. It returns criteria only; ranking stays a
+separate deterministic call, so the language model can never choose or reorder products.
+
+- Provider abstraction: `IRequirementExtractor` in Application (text in, raw JSON out).
+  Provider adapters belong in Infrastructure/Llm. The schema and instructions
+  (`RequirementExtractionContract`) are provider-neutral Application code.
+- Only the user's text is sent. No product (Icecat) data is part of this request, so the
+  ADR-025 conditions apply to Session 15, not here.
+- Output is untrusted: strict JSON (unknown or duplicate fields and string numbers
+  rejected), then the same validator as a manual request. Invalid output is rejected
+  with 502; values are never clamped. A budget is accepted only when the text contains
+  digits, so the model cannot invent a price limit. Uncovered wishes are listed in
+  `unsupported`.
+- Timeout 15 s (also enforced when a provider ignores cancellation); provider failure
+  or timeout answers 503. Text is limited to 1000 characters and is never logged.
+- No real provider in Session 14 (option (a)): the owner is a student and wants no paid
+  calls. `UnconfiguredRequirementExtractor` answers 503; tests use a fake extractor.
+  No package, API key or configuration was added.
+- The endpoint is anonymous while it costs nothing. Before a real provider is enabled
+  (separate owner approval): require authentication, add per-user rate limiting, check
+  the provider's data-retention and training terms, and keep the key in User Secrets or
+  environment variables.
+
+Known limitation: a budget written only in words ("elli bin") is not accepted; the
+instructions ask the model to report it in `unsupported` instead.

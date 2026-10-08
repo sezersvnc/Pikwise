@@ -142,3 +142,15 @@ POST {{baseUrl}}/api/recommendations
 Content-Type: application/json
 
 { "importance": { "ram": 9 } }
+
+### Natural-language criteria (503 until a language model provider is configured)
+POST {{baseUrl}}/api/recommendations/criteria
+Content-Type: application/json
+
+{ "text": "50 bin TL bütçem var, okul ve yazılım için kullanacağım, arada oyun oynarım, çok ağır olmasın." }
+
+### Natural-language criteria with empty text (400)
+POST {{baseUrl}}/api/recommendations/criteria
+Content-Type: application/json
+
+{ "text": "   " }

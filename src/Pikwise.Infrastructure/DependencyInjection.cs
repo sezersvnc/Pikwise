@@ -10,6 +10,8 @@ using Pikwise.Application.Favorites.Interfaces;
 using Pikwise.Infrastructure.Favorites;
 using Pikwise.Application.Recommendations.Interfaces;
 using Pikwise.Infrastructure.Recommendations;
+using Pikwise.Application.RequirementParsing.Interfaces;
+using Pikwise.Infrastructure.Llm;
 
 namespace Pikwise.Infrastructure;
 
@@ -33,6 +35,8 @@ public static class DependencyInjection
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
         services.AddScoped<IFavoriteRepository, FavoriteRepository>();
         services.AddScoped<IRecommendationRepository, RecommendationRepository>();
+        // No language model provider is configured yet; parsing requests answer 503 (ADR-026).
+        services.AddSingleton<IRequirementExtractor, UnconfiguredRequirementExtractor>();
 
         return services;
     }
