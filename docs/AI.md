@@ -57,6 +57,27 @@ separate call: the client reviews the criteria and sends them to the engine itse
   provider is enabled: owner approval, authentication plus rate limiting on the endpoint,
   and the provider's retention/training terms checked (ADR-026).
 
+## Explanation (Session 15)
+`POST /api/recommendations/explanation` implements the last arrows of the flow.
+
+- ExplanationService ranks through IRecommendationService first; the model never sees
+  products outside the Top 3 and never decides. An empty ranking makes no model call.
+- Input (`ExplanationInput`, serialized by `ExplanationContract.SerializeInput`): criteria,
+  candidate/ranked counts, Top 3 stored facts, scores, score components (value and
+  contribution) and valueAnalysis. Null facts are unknown.
+- `IExplanationGenerator` is the provider abstraction (input JSON in, raw JSON out).
+- Output: one explanation per product plus an optional valueComment. Strict JSON, then
+  `ExplanationFactChecker`: each Top 3 product exactly once, no value comment without a
+  value analysis, text 1..1200 characters, and every number in the text must appear in
+  the input (Turkish "68.000" / "1,5", English "68,000", "68 bin", rounding to 0-2 decimals
+  allowed). Any failure rejects the whole explanation (502).
+- Known limits: numbers written as words and invented facts without digits are not
+  detected; a number is checked against the whole input, not per product. The
+  instructions forbid both, and the ranking never depends on the model.
+- No provider yet (`UnconfiguredExplanationGenerator`, 503). This is the first feature that
+  sends Icecat data, so the ADR-025 conditions (zero retention, no training, request-time
+  input only) must be verified when the provider is chosen.
+
 ## Safety against hallucination
 When generating explanations, provide only:
 - UserNeeds

@@ -9,6 +9,8 @@ using Pikwise.Application.Recommendations.Interfaces;
 using Pikwise.Application.Recommendations.Services;
 using Pikwise.Application.RequirementParsing.Interfaces;
 using Pikwise.Application.RequirementParsing.Services;
+using Pikwise.Application.Explanations.Interfaces;
+using Pikwise.Application.Explanations.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Compose dependencies at startup; controllers receive their services through DI.
@@ -18,6 +20,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<IRequirementParsingService, RequirementParsingService>();
+builder.Services.AddScoped<IExplanationService, ExplanationService>();
 builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();

@@ -5,6 +5,7 @@ using Pikwise.Application.Favorites.Exceptions;
 using Pikwise.Application.Users.Exceptions;
 using Pikwise.Application.Recommendations.Exceptions;
 using Pikwise.Application.RequirementParsing.Exceptions;
+using Pikwise.Application.Explanations.Exceptions;
 
 namespace Pikwise.Api.Errors;
 
@@ -44,6 +45,14 @@ public sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : I
             {
                 Status = StatusCodes.Status503ServiceUnavailable, Title = "Natural-language criteria parsing is currently unavailable. Enter the criteria manually."
             },
+            ExplanationInvalidException => new ProblemDetails
+            {
+                Status = StatusCodes.Status502BadGateway, Title = "The language model returned an explanation that failed the fact check. The recommendation itself is still available."
+            },
+            ExplanationUnavailableException => new ProblemDetails
+            {
+                Status = StatusCodes.Status503ServiceUnavailable, Title = "Explanations are currently unavailable. The recommendation itself is still available."
+            },
             PersistenceConflictException => new ProblemDetails
             {
                 Status = StatusCodes.Status409Conflict, Title = "The data changed or conflicts with a related record. Reload and retry."
@@ -54,8 +63,9 @@ public sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : I
         if (problem.Status == StatusCodes.Status500InternalServerError)
             logger.LogError(exception, "Unhandled request error. Trace: {TraceId}", context.TraceIdentifier);
         // Language model failures are logged by reason only; the user's text is never logged.
-        else if (exception is RequirementExtractionInvalidException or RequirementExtractionUnavailableException)
-            logger.LogWarning("Requirement parsing failed: {Reason} Trace: {TraceId}", exception.Message, context.TraceIdentifier);
+        else if (exception is RequirementExtractionInvalidException or RequirementExtractionUnavailableException
+                 or ExplanationInvalidException or ExplanationUnavailableException)
+            logger.LogWarning("Language model request failed: {Reason} Trace: {TraceId}", exception.Message, context.TraceIdentifier);
         problem.Extensions["traceId"] = context.TraceIdentifier;
         context.Response.StatusCode = problem.Status!.Value;
         await context.Response.WriteAsJsonAsync((object)problem, options: null,

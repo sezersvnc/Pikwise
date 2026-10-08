@@ -11,6 +11,7 @@ Current focus:
 - [x] Session 12 — Recommendation Engine V1
 - [x] Session 13 — Value-for-Money
 - [x] Session 14 — LLM Structured Input (no real provider yet)
+- [x] Session 15 — AI Explanation (no real provider yet; ADR-025 provider tasks open)
 
 This file continues from Recommendation Engine onward.
 
@@ -327,14 +328,20 @@ Only provide:
 - value-for-money analysis
 
 ## Tasks
-- [ ] Build explanation input DTO.
-- [ ] Add explanation service.
-- [ ] Prevent unsupported product facts.
-- [ ] Handle missing information honestly.
-- [ ] Ensure ranking exists before the LLM call.
-- [ ] Configure the LLM provider for zero data retention / no training before sending Icecat data (ADR-025).
-- [ ] Send Icecat data only as request-time input; no storage, embeddings or training (ADR-025).
-- [ ] Add tests where practical.
+- [x] Build explanation input DTO. (`ExplanationInput`: criteria, Top 3 stored facts, scores, components, valueAnalysis; normalized values and weights left out)
+- [x] Add explanation service. (`ExplanationService` + `IExplanationGenerator` abstraction; `POST /api/recommendations/explanation`)
+- [x] Prevent unsupported product facts. (`ExplanationFactChecker`: every product exactly once, no other product id, every number must appear in the input (Turkish/English formats, "bin", rounding allowed); any failure rejects the whole explanation with 502)
+- [x] Handle missing information honestly. (null fields and unknownCriteria are sent as unknown; the instructions require "bilgi yok"; invented numbers are rejected)
+- [x] Ensure ranking exists before the LLM call. (the service ranks through IRecommendationService first and returns that ranking with the explanation; empty ranking = no LLM call)
+- [ ] Configure the LLM provider for zero data retention / no training before sending Icecat data (ADR-025). (open: no real provider yet; the owner chooses it)
+- [ ] Send Icecat data only as request-time input; no storage, embeddings or training (ADR-025). (open until a provider exists; the contract sends input per request only)
+- [x] Add tests where practical. (39 unit, 8 integration with fake generator and fake ranking; build OK, 330 pass without SQL Server: 232 unit, 98 integration; the 9 SqlServer tests pass on PikwiseSession3Tests (run by the user); 339 in total)
+
+## Session 15 decisions (approved)
+- Option (a) again: abstraction + fake generator; no real provider, package or API key. The owner will name the provider; then auth + rate limiting + retention check (ADR-026, ADR-025).
+- Separate endpoint `POST /api/recommendations/explanation`; the recommendation endpoint stays fast, free and deterministic.
+- Any fact-check failure rejects the whole explanation (502); nothing is partially shown.
+- Top 3 stays (ADR-019/022). A configurable `limit` (1..5, default 3) may be a separate later step with its own ADR.
 
 ## Architectural Rule
 

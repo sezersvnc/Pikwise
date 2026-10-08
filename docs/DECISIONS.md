@@ -526,3 +526,36 @@ separate deterministic call, so the language model can never choose or reorder p
 
 Known limitation: a budget written only in words ("elli bin") is not accepted; the
 instructions ask the model to report it in `unsupported` instead.
+
+---
+
+## ADR-027 — Session 15 AI explanation
+**Status:** Accepted
+
+`POST /api/recommendations/explanation` takes the same criteria as POST
+/api/recommendations, ranks through IRecommendationService first and then asks a
+language model to explain that ranking. The response carries the ranking and the
+explanation together, so they cannot drift apart if data changes between two calls.
+
+- Separate endpoint: the recommendation endpoint stays fast, free and deterministic;
+  a model failure (503/502) never breaks recommendations; explanations cost only when
+  requested; authentication and rate limiting can later apply to this endpoint alone.
+- Model input: the user's criteria, candidate/ranked counts, Top 3 stored facts, scores,
+  score components (value, contribution) and valueAnalysis. No other products, no
+  normalized values or weights. Null facts are unknown and must be called unavailable.
+- Provider abstraction `IExplanationGenerator` (input JSON in, raw JSON out); the
+  instructions, schema and input serialization are provider-neutral Application code.
+- Output is untrusted: strict JSON, then a deterministic fact check. Every Top 3 product
+  exactly once and no other id; a value comment only with a value analysis; texts of
+  1..1200 characters; every number in a text must appear in the input (Turkish and
+  English separators, "bin"/"milyon", rounding to 0-2 decimals accepted). Any failure
+  rejects the whole explanation with 502 (no partial explanations).
+- Known limits: numbers written as words and invented facts without digits are not
+  detected, and numbers are checked against the whole input, not per product.
+- Top 3 stays (ADR-019/022). A request `limit` (1..5, default 3) was discussed and left for
+  a separate decision.
+- No real provider in Session 15 (option (a)). `UnconfiguredExplanationGenerator` answers
+  503; tests use fakes. The owner will choose the provider. Before it is enabled: owner
+  approval, authentication and rate limiting (ADR-026), and the ADR-025 Icecat
+  conditions (zero data retention, no training, request-time input only), because this
+  is the first feature that sends Icecat-sourced facts to a model.

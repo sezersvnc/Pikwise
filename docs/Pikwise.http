@@ -149,6 +149,16 @@ Content-Type: application/json
 
 { "text": "50 bin TL bütçem var, okul ve yazılım için kullanacağım, arada oyun oynarım, çok ağır olmasın." }
 
+### Explanation of the Session 11 sample ranking (503 until a language model provider is configured)
+POST {{baseUrl}}/api/recommendations/explanation
+Content-Type: application/json
+
+{
+  "budgetMax": 70000,
+  "minRamGb": 16,
+  "importance": { "ram": 3, "storage": 3, "cpu": 4, "gpu": 2, "weight": 5, "refreshRate": 1 }
+}
+
 ### Natural-language criteria with empty text (400)
 POST {{baseUrl}}/api/recommendations/criteria
 Content-Type: application/json

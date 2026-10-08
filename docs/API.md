@@ -350,7 +350,38 @@ Content-Type: application/json
 - 503 `application/problem+json` when no provider is configured, the provider fails or
   it does not answer within 15 seconds.
 
-LLM explanations are Session 15.
+### POST /api/recommendations/explanation
+Status: Session 15. Public (no token for now; ADR-026/027), read-only. Same request body
+as POST /api/recommendations. The service ranks first, then asks the language model to
+explain that ranking, and returns both together so they always match.
+
+No language model provider is configured yet, so the endpoint currently answers 503
+whenever there is something to explain.
+
+200 response (shape; `recommendation` is the full POST /api/recommendations response):
+
+```json
+{
+  "recommendation": { "items": [ { "rank": 1, "productId": 13, "...": "..." } ], "summary": { "...": "..." },
+                      "valueAnalysis": { "...": "..." } },
+  "explanations": [ { "productId": 13, "explanation": "DELL PW514265 68.000 TL ile bütçeye uyuyor ..." } ],
+  "valueComment": "Daha ucuz ve 3 puandan az geride bir seçenek yok."
+}
+```
+
+- `explanations`: one per ranked product, in ranking order. Empty (and no model call)
+  when no product qualifies.
+- `valueComment`: null when there is no value analysis.
+- The model receives only the criteria, the Top 3 stored facts, scores, score components
+  and the value analysis. Prices are development demo prices.
+- 400 `application/problem+json`: the same validation as POST /api/recommendations.
+- 502 `application/problem+json` when the output breaks the schema or the fact check:
+  a product missing, repeated or not in the Top 3, a value comment without a value
+  analysis, an empty or over 1200-character text, or a number that does not appear in the
+  input. The whole explanation is rejected; the ranking is still available from
+  POST /api/recommendations.
+- 503 `application/problem+json` when no provider is configured, the provider fails or it
+  does not answer within 15 seconds.
 
 ---
 

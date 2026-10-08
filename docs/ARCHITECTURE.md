@@ -354,3 +354,25 @@ timeout, parses the output strictly, reuses RecommendationRequestValidator and a
 digits-for-budget rule. It does not call the engine or the repository. ApiExceptionHandler
 maps the two new exceptions and logs only their reason. No schema change, migration or
 package. See AI.md and ADR-026.
+
+## Session 15 implementation
+
+```text
+Pikwise.Application/Explanations/
+  Interfaces/   IExplanationGenerator (provider abstraction), IExplanationService
+  DTOs/         ExplanationResponseDto, ProductExplanationDto
+  Models/       ExplanationInput, GeneratedExplanation, ExplanationContract (instructions, schema, input serialization)
+  Mappers/      ExplanationMapper (recommendation response -> ExplanationInput)
+  Services/     ExplanationService
+  Validation/   ExplanationFactChecker
+  Exceptions/   ExplanationInvalidException (502), ExplanationUnavailableException (503)
+Pikwise.Infrastructure/Llm/
+  UnconfiguredExplanationGenerator (default until a provider is approved)
+```
+
+RecommendationsController exposes `POST /api/recommendations/explanation` and only binds
+and returns. ExplanationService depends on IRecommendationService (not on the repository
+or the engine), so validation and ranking are exactly those of POST /api/recommendations.
+It maps the ranking to ExplanationInput, calls the generator with a timeout, parses the
+output strictly and runs ExplanationFactChecker before building the response. No schema
+change, migration or package. See AI.md and ADR-027.
