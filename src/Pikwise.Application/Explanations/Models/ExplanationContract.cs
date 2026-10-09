@@ -22,6 +22,9 @@ public static class ExplanationContract
           never guess it.
         - Prices are development demo prices, not market prices. Do not call them current or market prices.
         - Do not add facts such as battery life, benchmarks, stock, reviews or release dates.
+        - Judge each property by its contribution: call it a strength only when its contribution is among the
+          higher ones of that product, and a weakness when it is low. Do not praise a property with a low
+          contribution (for example do not call a laptop light when its weight contribution is low).
 
         products: one entry per input product, with its productId, in ranking order. Each explanation is at
         most three plain sentences (no markdown, no lists) on why the product fits the user's criteria,

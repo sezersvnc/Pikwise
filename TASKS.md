@@ -373,6 +373,8 @@ Connect the Session 14/15 abstractions to a real, free language model without co
 - [x] Add tests. (12 unit with a fake HTTP handler, 11 integration; build OK, 353 pass without SQL Server: 244 unit, 109 integration)
 - [x] Real-call smoke test by the owner (8 October 2026, Supabase test user token): criteria 200 from Groq; explanation 200 for `{budgetMax: 70000, minRamGb: 16}` (ranking 19, 8, 13; all numbers passed the fact check); 401 without token; per-user limit answered 429 after 5 calls shared by both endpoints; 353 non-SQL and 9 SqlServer tests pass (362 in total).
 - [x] Clarify the valueComment instructions. (the first real valueComment mentioned "a more expensive alternative", which valueAnalysis does not contain; a digit-free claim the fact check cannot catch, see ADR-027 limits)
+- [x] Tune the criteria instructions after a second smoke test (9 October 2026). Before: "50 bin TL" gave budgetMax null with "budget must be written with digits" and every importance 3. Fix: digits-with-words budget rule, importance cues, a worked example with a different sentence, no "3 for everything"; explanations must not praise low-contribution properties. After: budgetMax 50000, ram 4, cpu 4, gpu 4, weight 5, refreshRate 3, storage null, unsupported empty; reasoning effort stays low.
+- [x] Rerun the explanation smoke test: valueComment now matches valueAnalysis (best fit is also best value, no cheaper near-equal product).
 
 ## Session 15.5 decisions (approved)
 - Groq free plan, no payment details on the account; moving to another provider later means one new Infrastructure adapter.
