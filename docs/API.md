@@ -95,8 +95,9 @@ Input:
 Response:
 - `ProductResponseDto`
 
-Authorization:
-- likely Admin later.
+Authorization (Session 15.6, ADR-029): POST, PUT and DELETE require a user token
+whose local profile has Role=Admin (LocalAdmin policy). No token returns 401, a
+non-Admin profile 403. GET routes stay public.
 
 Status: implemented in Session 5. Returns 201 and the ProductResponseDto with a
 Location header pointing to GET by Id. Input includes all editable catalog fields
@@ -396,6 +397,16 @@ A rejected request gets 429 `application/problem+json` with a `Retry-After` head
 POST /api/recommendations and the product endpoints are not limited.
 
 ---
+
+## CORS (Session 15.6)
+
+Browser apps on other origins may call the API only from origins listed in
+`Cors:AllowedOrigins` (Development: `http://localhost:5173`, `http://localhost:3000`;
+none elsewhere until the frontend's domain is known). Allowed: methods GET, POST, PUT,
+DELETE and headers `Authorization`, `Content-Type`; exposed: `Retry-After`, `Location`.
+Credentials (cookies) are not allowed; tokens go in the Authorization header. Error
+responses (400, 401, 403, 429, 5xx) carry the same CORS headers. An invalid origin
+setting (wildcard, path, trailing slash) stops startup.
 
 ## Authentication
 

@@ -589,3 +589,31 @@ train on API data and offers Zero Data Retention to every customer.
 - Package `Microsoft.Extensions.Http` 10.0.11 added to Infrastructure.
 - Free-plan limits (per model, also tokens per minute) make this a development/MVP
   setup; real traffic needs a paid plan or another provider, which is one new adapter.
+
+---
+
+## ADR-029 — Session 15.6 CORS for the frontend and Admin-only product writes
+**Status:** Accepted
+
+The frontend is a separate browser app built by a teammate (docs/FRONTEND.md), so the
+API needs CORS, and the product write endpoints, public since Session 5 as a development
+contract, must not stay open once a public frontend exists.
+
+CORS:
+- One named policy; origins only from `Cors:AllowedOrigins` per environment
+  (Development: `http://localhost:5173` for Vite, `http://localhost:3000` for Next.js;
+  none elsewhere until the frontend domain is known). Wildcards, paths and trailing
+  slashes stop startup.
+- Methods GET, POST, PUT, DELETE; headers Authorization and Content-Type; exposed
+  headers Retry-After (needed for the 429 message) and Location. No credentials:
+  tokens travel in the Authorization header, not in cookies.
+- UseCors runs before authentication, so error responses (400, 401, 403, 429, 5xx)
+  are readable by the browser too.
+
+Product writes:
+- POST, PUT and DELETE /api/products use the existing LocalAdmin policy (Role=Admin in
+  the SQL profile, read on every request). No token returns 401, a regular user 403.
+  GET routes stay public. tools/Pikwise.DataImport writes through the database and is
+  unaffected.
+- Roles are still changed only by the database owner in SQL; no role-changing API is
+  added (it would be a privilege-escalation surface).

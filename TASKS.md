@@ -383,6 +383,24 @@ Both language model endpoints work against Groq for signed-in users, within free
 
 ---
 
+# Session 15.6 — Frontend readiness (CORS, Admin-only product writes)
+
+## Goal
+Let the teammate's browser frontend call the API, and close the public product write endpoints before that.
+
+## Tasks
+- [x] CORS allow-list from `Cors:AllowedOrigins` (Development: localhost:5173 and localhost:3000); methods GET/POST/PUT/DELETE, headers Authorization/Content-Type, `Retry-After` and `Location` exposed, no credentials; invalid origins stop startup.
+- [x] UseCors before authentication, so 400/401/403/429 responses carry CORS headers.
+- [x] POST/PUT/DELETE /api/products require the LocalAdmin policy (401 without token, 403 for Role=User); reads stay public.
+- [x] Owner granted Admin to their own account (9 October 2026; admin-check 204); steps in AUTHENTICATION.md.
+- [x] Tests: 8 product authorization, 8 CORS; ProductCrudTests now writes as a real Admin profile and checks 401 (build OK, 369 pass without SQL Server: 244 unit, 125 integration).
+- [x] Owner runs the SqlServer tests and a manual Admin product write. (9 October 2026: 9/9 SqlServer tests pass, 378 in total; DELETE of a missing product with the Admin token returned 404, i.e. authorized)
+
+## Exit Criterion
+A browser app on an allowed origin can call the API, and only Admin profiles can change products.
+
+---
+
 # Session 16 — Frontend Foundation
 
 ## Goal

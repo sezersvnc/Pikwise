@@ -30,11 +30,24 @@ Frontend              = shows these; never re-ranks, never invents facts
   (publishable) key may be in frontend configuration; never the service_role key and
   never the Groq key.
 
-## 2. Recommended tech (unchanged from Session 16)
+## 2. Recommended tech
 
-- React or Next.js, TypeScript preferred
-- The existing ASP.NET Core API
-- Supabase Auth (`supabase-js`) for registration, login and sessions
+Recommendation of the backend owner (9 October 2026); the final choice is the frontend
+teammate's:
+
+| Need | Recommended | Why |
+|---|---|---|
+| Language | TypeScript | types mirror the docs/API.md contracts; contract changes fail at build time |
+| Framework | React + Vite (single-page app) | all business logic is already in the ASP.NET Core API; no second server layer where rules could drift; free static hosting (Vercel, Netlify, Cloudflare Pages) |
+| Routing | React Router | `/`, `/login`, `/register`, `/advisor`, ... |
+| API state | TanStack Query | loading/error states and retries for the `/criteria` -> `/explanation` chain |
+| Auth | `@supabase/supabase-js` | Supabase's official client for registration, login and sessions |
+| Styling | Tailwind CSS | brand colours (section 9) defined once as theme tokens |
+
+Next.js is the alternative if search-engine visibility of the landing page becomes
+important; it must then still call the ASP.NET Core API for every business rule and not
+reimplement them in Next.js route handlers. The development CORS settings allow both
+Vite (`http://localhost:5173`) and Next.js (`http://localhost:3000`).
 
 Suggested structure:
 
@@ -203,11 +216,14 @@ User -> Supabase login/register (supabase-js) -> access token
 
 ## 7. Backend work this frontend needs (backend team)
 
-These are not done yet and need the owner's approval before implementation:
+Open items need the owner's approval before implementation:
 
-- [ ] **CORS**: the API has no CORS policy, so a browser app on another origin (for
-  example `http://localhost:3000`) cannot call it. Add an allow-list policy for the
-  frontend origin(s), configured per environment.
+- [x] **CORS** (Session 15.6, ADR-029): Development allows `http://localhost:5173` (Vite)
+  and `http://localhost:3000` (Next.js); `Retry-After` and `Location` are readable by
+  the browser. For another dev port or the production domain, the backend adds it to
+  `Cors:AllowedOrigins`. See API.md "CORS".
+- [x] **Product writes are Admin-only** (Session 15.6, ADR-029): the user-facing
+  frontend has no product create/update/delete screens.
 - [ ] **AI advisor endpoint (R4)**: a follow-up question endpoint on the shown results.
   Needs its own session and ADR: the same verified input as the explanation, a fact
   check on the answer, the shared language model rate limit, and a decision on whether

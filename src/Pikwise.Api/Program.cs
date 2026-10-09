@@ -12,6 +12,7 @@ using Pikwise.Application.RequirementParsing.Services;
 using Pikwise.Application.Explanations.Interfaces;
 using Pikwise.Application.Explanations.Services;
 using Pikwise.Api.RateLimiting;
+using Pikwise.Api.Cors;
 
 var builder = WebApplication.CreateBuilder(args);
 // Compose dependencies at startup; controllers receive their services through DI.
@@ -28,9 +29,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 builder.Services.AddLanguageModelRateLimiting(builder.Configuration);
+builder.Services.AddFrontendCors(builder.Configuration);
 var app = builder.Build();
 // Register before endpoints so exceptions from the request pipeline reach the central handler.
 app.UseExceptionHandler();
+// CORS before authentication, so 401, 403 and 429 responses also carry CORS headers.
+app.UseCors(FrontendCors.PolicyName);
 // Establish identity before evaluating endpoint authorization policies.
 app.UseAuthentication();
 app.UseAuthorization();

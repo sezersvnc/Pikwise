@@ -111,6 +111,32 @@ do not save tokens in tracked files. GET /api/auth/me should return 200, and
 admin-check should return 403 for a default User profile. Delete the authorization
 header to verify 401. The OpenAPI JSON is at `/openapi/v1.json` in Development.
 
+## Getting a user token and granting Admin (local)
+
+There is deliberately no API that changes roles; the database owner grants Admin by
+hand. Verified by the owner on 9 October 2026 (admin-check returned 204).
+
+1. Start the API (`dotnet run --project src/Pikwise.Api`).
+2. Get a user token in PowerShell with Supabase's password grant against
+   `<project URL>/auth/v1/token?grant_type=password`, sending the project's anon or
+   publishable key as the `apikey` header and the user's e-mail/password as JSON. Read
+   the key and password with `Read-Host -AsSecureString`, store `access_token` only in
+   `$env:PIKWISE_ACCESS_TOKEN` and never print or save it. Never use the service_role
+   or secret key.
+3. Call `GET /api/auth/me` once; it creates the local profile with Role=User.
+4. In SQL Server (`PikwiseDb`):
+
+   ```sql
+   DECLARE @Email nvarchar(256) = N'your-email@example.com';
+   UPDATE UserProfiles SET Role = 'Admin' WHERE Email = @Email;
+   SELECT Id, Email, Role FROM UserProfiles WHERE Email = @Email;
+   ```
+
+5. `GET /api/auth/admin-check` returns 204. The role is read on every request, so no
+   new login is needed. Set `Role = 'User'` the same way to revoke it.
+
+Keep Admin to the owner's own account; use a separate regular test user to check 403.
+
 ## Limits and next session
 
 JWT verification accepts an otherwise valid token until it expires (plus clock
@@ -120,8 +146,8 @@ refresh for unknown signing keys with a one-minute refresh throttle. Supabase al
 caches its public JWKS, so key changes are not instantaneous. Use HTTPS when
 deploying the API.
 
-Product CRUD keeps its existing public development contract; protecting product
-writes with a local Admin policy is a separate decision. Session 8 implements
+Since Session 15.6 (ADR-029) product writes (POST/PUT/DELETE /api/products) use the
+LocalAdmin policy; product reads stay public. Session 8 implements
 the protected Favorites API using this current-profile flow; see FAVORITES.md.
 Filtering, comparison and recommendation remain future sessions.
 

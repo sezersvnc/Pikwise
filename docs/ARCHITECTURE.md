@@ -396,3 +396,10 @@ actions carry `[Authorize]` and `[EnableRateLimiting]`; UseRateLimiter runs afte
 UseAuthorization so anonymous calls are rejected with 401 first. Package added:
 Microsoft.Extensions.Http 10.0.11 (Infrastructure). No schema change or migration.
 See AI.md and ADR-028.
+
+## Session 15.6 implementation
+
+`Pikwise.Api/Cors/FrontendCors` registers one CORS policy from `Cors:AllowedOrigins`;
+Program applies it with `UseCors` before authentication. ProductsController's write
+actions carry `[Authorize(Policy = "LocalAdmin")]`; Application and Infrastructure did not
+change. No package, schema change or migration. See API.md and ADR-029.

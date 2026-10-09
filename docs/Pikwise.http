@@ -47,9 +47,10 @@ GET {{baseUrl}}/api/products/compare?ids={{comparisonProductId1}}&ids={{comparis
 ### Missing products (404, missingProductIds)
 GET {{baseUrl}}/api/products/compare?ids=2147483647&ids=2147483646
 
-### Create a product (201, Location)
+### Create a product (201, Location; Admin token required, otherwise 401/403)
 # @name createProduct
 POST {{baseUrl}}/api/products
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
 Content-Type: application/json
 
 {
@@ -91,8 +92,9 @@ Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
 DELETE {{baseUrl}}/api/favorites/{{createProduct.response.body.$.id}}
 Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
 
-### Update the same product (200)
+### Update the same product (200; Admin token required)
 PUT {{baseUrl}}/api/products/{{createProduct.response.body.$.id}}
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
 Content-Type: application/json
 
 {
@@ -115,8 +117,9 @@ Content-Type: application/json
   }
 }
 
-### Delete only the product created above (204)
+### Delete only the product created above (204; Admin token required)
 DELETE {{baseUrl}}/api/products/{{createProduct.response.body.$.id}}
+Authorization: Bearer {{$processEnv PIKWISE_ACCESS_TOKEN}}
 
 ### Missing product (404)
 GET {{baseUrl}}/api/products/2147483647

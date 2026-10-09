@@ -24,12 +24,24 @@ public class ProductCrudTests
         var otherBrand = new Brand { Name = "CRUD other brand " + suffix };
         var category = new Category { Name = "CRUD category " + suffix };
         var otherCategory = new Category { Name = "CRUD other category " + suffix };
-        database.AddRange(brand, otherBrand, category, otherCategory);
+        // Product writes need a local Admin profile (ADR-029); the token subject matches this row.
+        using var tokens = new AuthTestTokens();
+        var admin = new UserProfile
+        {
+            AuthProviderUserId = tokens.Subject, Email = "crud-admin-" + suffix + "@example.test",
+            Role = "Admin", CreatedAt = DateTimeOffset.UtcNow
+        };
+        database.AddRange(brand, otherBrand, category, otherCategory, admin);
         await database.SaveChangesAsync();
         try
         {
-            await using var factory = new PikwiseApiFactory(connection);
+            await using var baseFactory = new PikwiseApiFactory(connection);
+            await using var factory = tokens.Configure(baseFactory);
+            using var anonymous = factory.CreateClient();
+            using var anonymousCreate = await anonymous.PostAsJsonAsync("/api/products", new { });
+            Assert.Equal(HttpStatusCode.Unauthorized, anonymousCreate.StatusCode);
             using var client = factory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new("Bearer", tokens.Create());
             var body = new
             {
                 name = "  CRUD laptop  ", price = 35000.25m, stock = 4, isActive = true,
@@ -100,7 +112,7 @@ public class ProductCrudTests
             var products = await database.Products.Where(p => p.BrandId == brand.Id || p.BrandId == otherBrand.Id).ToListAsync();
             database.Products.RemoveRange(products);
             await database.SaveChangesAsync();
-            database.RemoveRange(brand, otherBrand, category, otherCategory);
+            database.RemoveRange(brand, otherBrand, category, otherCategory, admin);
             await database.SaveChangesAsync();
         }
     }

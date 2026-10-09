@@ -60,6 +60,7 @@ Value-for-money analysis         ✅ Session 13 complete (valueAnalysis in recom
 LLM structured input             ✅ Session 14 complete (criteria endpoint, no provider yet)
 AI explanation                   ✅ Session 15 complete (explanation endpoint)
 LLM provider (Groq, free + ZDR)  ✅ Session 15.5 complete (auth + rate limit; smoke tested)
+Frontend readiness               ✅ Session 15.6 complete (CORS, Admin-only product writes)
 ```
 
 ## Read order

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pikwise.Application.Products.DTOs;
 using Pikwise.Application.Products.Interfaces;
@@ -7,6 +8,7 @@ namespace Pikwise.Api.Controllers;
 [ApiController]
 [Route("api/products")]
 // Keep HTTP routing and status codes here; ProductService handles each use case.
+// Reads are public; writes need a local Admin profile (LocalAdmin policy, ADR-029).
 public sealed class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpGet("compare")]
@@ -25,6 +27,9 @@ public sealed class ProductsController(IProductService productService) : Control
         Ok(await productService.GetAllAsync(query, cancellationToken));
 
     [HttpPost]
+    [Authorize(Policy = "LocalAdmin")]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProductResponseDto>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
@@ -36,6 +41,9 @@ public sealed class ProductsController(IProductService productService) : Control
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "LocalAdmin")]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProductResponseDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -47,6 +55,9 @@ public sealed class ProductsController(IProductService productService) : Control
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "LocalAdmin")]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
