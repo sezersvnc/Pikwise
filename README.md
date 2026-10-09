@@ -70,6 +70,7 @@ LLM provider (Groq, free + ZDR)  ✅ Session 15.5 complete (auth + rate limit; s
 5. `docs/ROADMAP.md`
 6. `TASKS.md`
 7. `docs/DECISIONS.md`
+8. `docs/FRONTEND.md` (frontend requirements and API usage for the frontend teammate)
 
 ## Run the backend
 

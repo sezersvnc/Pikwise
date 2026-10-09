@@ -388,6 +388,8 @@ Both language model endpoints work against Groq for signed-in users, within free
 ## Goal
 Connect the existing ASP.NET Core backend to a real web interface.
 
+Owned by a teammate; the backend team does not change frontend code. Product requirements, screens and API usage: [docs/FRONTEND.md](docs/FRONTEND.md).
+
 ## Recommended Tech
 - React or Next.js
 - TypeScript preferred
@@ -454,6 +456,8 @@ Users can browse products from the browser using the real Pikwise API.
 
 ## Goal
 Connect Supabase Auth to the frontend.
+
+See [docs/FRONTEND.md](docs/FRONTEND.md) sections 3 (R2) and 6.
 
 ## Flow
 
