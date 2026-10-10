@@ -14,6 +14,7 @@ Current focus:
 - [x] Session 15 — AI Explanation
 - [x] Session 15.5 — LLM provider (Groq)
 - [x] Session 15.7 — Explicit text collation
+- [ ] Session 15.8 — Deployment to MonsterASP.NET (package and SQL scripts ready; owner steps pending, see DEPLOYMENT.md)
 
 This file continues from Recommendation Engine onward.
 
@@ -419,6 +420,28 @@ Make text matching independent of the SQL Server default, so local (Turkish_CI_A
 
 ## Exit Criterion
 The same query gives the same text matches on a Turkish-default and a Latin1-default server.
+
+---
+
+# Session 15.8 — Deployment to MonsterASP.NET (ADR-031)
+
+## Goal
+Run the API at pikwise-api.runasp.net with the catalog, so the frontend teammate can use it.
+
+## Tasks
+- [x] Hosting chosen (Azure failed); site and MSSQL database created by the owner; collation matches ADR-030.
+- [x] `appsettings.Production.json` with non-secret values only (Supabase issuer, temporary localhost CORS).
+- [x] `dotnet publish -r win-x86` package (`publish/pikwise-api.zip`, ignored by git).
+- [x] `publish/sql/01-schema.sql` (idempotent) and `02-catalog-data.sql` (25 laptops), tested on a temporary local database, which was then dropped.
+- [ ] Owner: change the exposed database password; keep remote access disabled.
+- [ ] Owner: Import SQL 01 then 02; check 8 tables.
+- [ ] Owner: upload and extract the package; set environment variables; restart.
+- [ ] Check /health, /api/products and POST /api/recommendations over HTTP.
+- [ ] Support ticket for HTTPS; then signed-in checks, Admin role on the live profile, Groq endpoints.
+- [ ] Give the API address to the frontend teammate.
+
+## Exit Criterion
+The live API answers over HTTPS with the 25-laptop catalog, and signed-in endpoints work.
 
 ---
 

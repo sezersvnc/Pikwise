@@ -641,3 +641,23 @@ and recreates the unique indexes on Brands.Name, Categories.Name and
 are unchanged. A pre-check on local PikwiseDb found no names that become duplicates under
 the new collation. A model test fails if a text column has no collation; a SQL Server test
 checks sys.columns and that cpu=intel finds "Intel" products.
+
+---
+
+## ADR-031 — Session 15.8 hosting on MonsterASP.NET (free plan)
+**Status:** Accepted (deployment in progress)
+
+Azure for Students could not be set up, so the API is hosted on the MonsterASP.NET free plan:
+Windows/IIS with .NET 10 in a 32-bit application pool, 256 MB RAM, and an MSSQL database
+(SQL Server 2025, default collation SQL_Latin1_General_CP1_CI_AS, matching ADR-030). Address:
+`pikwise-api.runasp.net`. Steps are in DEPLOYMENT.md.
+
+- Package: framework-dependent `dotnet publish -r win-x86` (matches the 32-bit pool, keeps
+  one native SQL client library). `publish/` is ignored by git.
+- Database: schema from an idempotent migration script and the catalog from a generated
+  INSERT script, both applied with the panel's Import SQL and tested on a temporary local
+  database first. Remote access (port 1433) is disabled except for a specific task.
+- Secrets (connection string, Groq key) only in the panel's environment variables. The
+  public Supabase issuer and the CORS origins are in `appsettings.Production.json`; CORS
+  temporarily allows the teammate's localhost origins until the frontend has an address.
+- No signed-in endpoint is used before HTTPS is enabled (free plan: support ticket).
