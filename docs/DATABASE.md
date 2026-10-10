@@ -411,8 +411,9 @@ Navigation properties support object traversal and require explicit loading.
 
 Price uses decimal(18,2); ScreenSize uses inches, decimal(5,2); Weight uses kg,
 decimal(6,3). CreatedAt/UpdatedAt are datetimeoffset, with UpdatedAt nullable.
-String lengths and reasons are recorded in ADR-011. Name uniqueness uses the
-server/database collation. Application owns future value validation and timestamp
+String lengths and reasons are recorded in ADR-011. Name uniqueness used the
+server/database collation until ADR-030; text columns now state
+SQL_Latin1_General_CP1_CI_AS explicitly. Application owns future value validation and timestamp
 assignment; the database mapping does not invent those business rules.
 
 ### Relationship queries verified on SQL Server
@@ -437,8 +438,8 @@ or repository is introduced before Session 4.
 
 ### Test commands
 
-Current counts (Session 13): 241 tests run without SQL Server; 9 more are marked
-`Category=SqlServer`; 250 in total.
+Current counts (ADR-030): 370 tests run without SQL Server; 10 more are marked
+`Category=SqlServer`; 380 in total.
 
 Run the tests that need no SQL Server (CMD or PowerShell):
 
@@ -571,7 +572,8 @@ No schema/migration change. ProductRepository adds composable price/brand/spec
 predicates, filtered CountAsync and explicit ordering with ID ties. Skip/Take
 translates to SQL Server OFFSET/FETCH before materialization; includes load only
 the page's response relationships. Count and page are separate statements without
-snapshot consistency. Text predicates/order follow the database collation.
+snapshot consistency. Text predicates/order follow the column collation
+(SQL_Latin1_General_CP1_CI_AS since ADR-030, independent of the server default).
 
 ProductQuerySqlTests verifies combined HTTP queries and records server SQL to
 prove pagination executes in the database. The current suite has 74 passing tests

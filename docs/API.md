@@ -20,7 +20,8 @@ Session 5 bare array: clients must read products from `items`.
 | pageSize | 1..100, default 20 |
 
 Filters combine with AND. Specification filters exclude products without a
-specification. Text matching/name ordering follow SQL Server collation. Sort
+specification. Text matching/name ordering use the columns' Latin1 case-insensitive
+collation (ADR-030), so `cpu=intel` finds "Intel". Sort
 keywords are case-insensitive independently of server culture. Every sort uses
 ascending product ID to break ties; sorting by ID itself respects sortDirection.
 RAM sorting retains products without a specification (SQL NULL ordering).

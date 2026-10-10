@@ -617,3 +617,27 @@ Product writes:
   unaffected.
 - Roles are still changed only by the database owner in SQL; no role-changing API is
   added (it would be a privilege-escalation surface).
+
+---
+
+## ADR-030 — Explicit text collation (SQL_Latin1_General_CP1_CI_AS)
+**Status:** Accepted
+
+Text columns used to inherit the database default collation. Local databases created on a
+Turkish SQL Server default to Turkish_CI_AS, while the hosted database (MonsterASP.NET, SQL
+Server 2025) defaults to SQL_Latin1_General_CP1_CI_AS. Under Turkish_CI_AS "intel" does not
+equal "Intel" (Turkish i/İ and ı/I casing), so a lowercase CPU or GPU search missed Intel
+products locally, and tests did not represent production.
+
+Decision: ApplicationDbContext gives every string column without an explicit collation
+SQL_Latin1_General_CP1_CI_AS (case- and accent-insensitive Latin1). Product data is mostly
+English brand and model names, and nothing needs Turkish casing rules. Identifier columns
+keep their explicit Latin1_General_100_BIN2 collation (ExternalId, AuthProviderUserId).
+The database default no longer affects Pikwise columns.
+
+Migration ExplicitLatin1Collation alters the ten text columns in one transaction; EF drops
+and recreates the unique indexes on Brands.Name, Categories.Name and
+(ProductExternalReferences.Provider, ExternalId) around the change. Lengths and nullability
+are unchanged. A pre-check on local PikwiseDb found no names that become duplicates under
+the new collation. A model test fails if a text column has no collation; a SQL Server test
+checks sys.columns and that cpu=intel finds "Intel" products.

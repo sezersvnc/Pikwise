@@ -26,8 +26,9 @@ now leaves missing values to Required where applicable.
 
 All filters intersect. Price bounds are inclusive and use the stored price's
 precision. Brand matching uses ID. RAM/storage use minimum GB. CPU/GPU are literal
-substring searches after trimming; spaces alone disable those filters. SQL Server
-collation determines text matching and name ordering. Missing specifications are
+substring searches after trimming; spaces alone disable those filters. Text columns
+use SQL_Latin1_General_CP1_CI_AS (ADR-030), so matching is case-insensitive with Latin
+rules ("intel" finds "Intel") on every server, including Turkish-default ones. Missing specifications are
 excluded only when a specification filter is supplied. RAM sorting uses SQL NULL
 ordering: missing specifications precede values ascending and follow descending.
 

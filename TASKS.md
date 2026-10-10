@@ -13,6 +13,7 @@ Current focus:
 - [x] Session 14 — LLM Structured Input (no real provider yet)
 - [x] Session 15 — AI Explanation
 - [x] Session 15.5 — LLM provider (Groq)
+- [x] Session 15.7 — Explicit text collation
 
 This file continues from Recommendation Engine onward.
 
@@ -400,6 +401,24 @@ Let the teammate's browser frontend call the API, and close the public product w
 
 ## Exit Criterion
 A browser app on an allowed origin can call the API, and only Admin profiles can change products.
+
+---
+
+# Session 15.7 — Explicit text collation (ADR-030)
+
+## Goal
+Make text matching independent of the SQL Server default, so local (Turkish_CI_AS) and hosted (SQL_Latin1) databases behave the same before deployment.
+
+## Tasks
+- [x] Default collation SQL_Latin1_General_CP1_CI_AS for every string column without an explicit one; BIN2 identifiers unchanged.
+- [x] Migration ExplicitLatin1Collation: ten columns altered in one transaction, unique indexes dropped and recreated; SQL reviewed with the owner.
+- [x] Pre-check: no Brands/Categories/external-reference duplicates under the new collation in PikwiseDb.
+- [x] Tests: model test (every text column has a collation); SqlServer test (sys.columns collations, cpu=intel finds Intel). Build OK; 370 pass without SQL Server (244 unit, 126 integration).
+- [x] Owner approved; migration applied to PikwiseDb (10 October 2026). Verified: 12 text columns on the intended collations, 3 unique indexes recreated, 25 products and 2 profiles kept, `LIKE '%intel%'` finds all 12 Intel processors.
+- [x] Owner ran the SqlServer tests (10 October 2026: 10/10 pass, including TextCollationSqlTests; 380 in total).
+
+## Exit Criterion
+The same query gives the same text matches on a Turkish-default and a Latin1-default server.
 
 ---
 
